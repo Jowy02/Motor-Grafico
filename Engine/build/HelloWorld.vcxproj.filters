@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\joelv\Desktop\Engine\helloworld.cpp">
+    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\helloworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\joelv\Desktop\Engine\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{75F66AC8-2E96-3A2E-9B5F-D7D517A7EAA0}</UniqueIdentifier>
+      <UniqueIdentifier>{D23BEC78-CF8F-37BB-8417-DE7B9D44FDDB}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
