@@ -1,0 +1,10 @@
+^C:\USERS\JOELV\DESKTOP\ENGINE\CMAKELISTS.TXT
+setlocal
+C:\Users\joelv\Downloads\cmake-4.1.1-windows-x86_64\cmake-4.1.1-windows-x86_64\bin\cmake.exe -SC:/Users/joelv/Desktop/Engine -BC:/Users/joelv/Desktop/Engine/build --check-stamp-file C:/Users/joelv/Desktop/Engine/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
