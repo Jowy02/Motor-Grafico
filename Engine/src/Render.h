@@ -1,0 +1,64 @@
+#pragma once
+#define _USE_MATH_DEFINES
+
+#include "Module.h"
+#include "Camera.h"
+
+#include "SDL2/SDL.h"
+#include<glm/glm.hpp>
+#include<glm/gtc/matrix_transform.hpp> 
+#include<glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
+
+#include <vector>
+#include <cmath>
+
+
+
+class Render : public Module
+{
+public:
+	Render();
+
+	// Destructor
+	virtual ~Render();
+
+	// Called before render is available
+	bool Awake();
+
+	// Called before the first frame
+	bool Start();
+
+	// Called each loop iteration
+	bool PreUpdate();
+	bool Update(float dt);
+	bool PostUpdate();
+
+	// Called before quitting
+	bool CleanUp();
+
+	bool DrawTriangle();
+	bool DrawElements();
+	bool Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation);
+
+	void SetViewPort(const SDL_Rect& rect);
+	void ResetViewPort();
+
+	SDL_Renderer* renderer;
+	SDL_Rect camera;
+	SDL_Rect viewport;
+	SDL_Color background;
+	unsigned int shaderProgram;
+
+
+private:
+	unsigned int VBO, VAO, EBO;
+
+	unsigned int vertexShader;
+	unsigned int fragmentShader;
+
+	double prevTime;
+
+	SDL_Window* temp;
+
+};

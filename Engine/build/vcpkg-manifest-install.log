@@ -1,42 +1,38 @@
-Fetching registry information from https://github.com/microsoft/vcpkg (HEAD)...
-Detecting compiler hash for triplet x64-windows...
-Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
-The following packages will be built and installed:
+Detectando hash del compilador para el triplete x64-windows...
+Se encontr├│ el compilador: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
+Los siguientes paquetes ya est├ín instalados:
   * egl-registry:x64-windows@2024-01-25 -- git+https://github.com/microsoft/vcpkg@d883db43133dd223c4ffdbef4193943f6784d43a
     fmt:x64-windows@12.0.0 -- git+https://github.com/microsoft/vcpkg@c5dcb90bc1da6e7ba3d6e62e62a0b7df3192f51c
     glad[core,loader]:x64-windows@0.1.36 -- git+https://github.com/microsoft/vcpkg@fa93b14c1581057e1d14650f5f15c9b0757dd548
-    glfw3:x64-windows@3.4#1 -- git+https://github.com/microsoft/vcpkg@d4bbd4f27c2ca619f57778985120cddcedadb1cc
   * opengl-registry:x64-windows@2024-02-10#1 -- git+https://github.com/microsoft/vcpkg@22f7aa58ee78c9f0db904b6251e9265f2be26f9d
+    sdl2:x64-windows@2.32.10 -- git+https://github.com/microsoft/vcpkg@af36a2c0ace7069e28bded20480ebbaf4e9c6e98
   * vcpkg-cmake:x64-windows@2024-04-23 -- git+https://github.com/microsoft/vcpkg@e74aa1e8f93278a8e71372f1fa08c3df420eb840
   * vcpkg-cmake-config:x64-windows@2024-05-23 -- git+https://github.com/microsoft/vcpkg@97a63e4bc1a17422ffe4eff71da53b4b561a7841
-Additional packages (*) will be modified to complete this operation.
-Restored 7 package(s) from C:\Users\joelv\AppData\Local\vcpkg\archives in 147 ms. Use --debug to see more details.
-Installing 1/7 vcpkg-cmake-config:x64-windows@2024-05-23...
-Elapsed time to handle vcpkg-cmake-config:x64-windows: 4.85 ms
-vcpkg-cmake-config:x64-windows package ABI: 3eaf419b6254809a75d35b41965cf065fd505a5df832c1cb6c9e73515866efd3
-Installing 2/7 vcpkg-cmake:x64-windows@2024-04-23...
-Elapsed time to handle vcpkg-cmake:x64-windows: 10.8 ms
-vcpkg-cmake:x64-windows package ABI: bcecf87a0f54eaf6dbe68dbeb1b5c1924ee1aa3778a2ab9be9874264241730c1
-Installing 3/7 fmt:x64-windows@12.0.0...
-Elapsed time to handle fmt:x64-windows: 17.4 ms
-fmt:x64-windows package ABI: f1f84b19b93f908862739e611511c1d7fac7db957e54e25f725f69c94f32cf10
-Installing 4/7 egl-registry:x64-windows@2024-01-25...
-Elapsed time to handle egl-registry:x64-windows: 12.2 ms
-egl-registry:x64-windows package ABI: 667249f23931acfa474aba941581884d0dd3e2358744465d1caed86a9d0f1d8d
-Installing 5/7 opengl-registry:x64-windows@2024-02-10#1...
-Elapsed time to handle opengl-registry:x64-windows: 18.3 ms
-opengl-registry:x64-windows package ABI: 0e12d7eae1ca05cde61f15261d051d3c12006d6b797ce3e770b06878fec35f66
-Installing 6/7 glad[core,loader]:x64-windows@0.1.36...
-Elapsed time to handle glad:x64-windows: 14.6 ms
-glad:x64-windows package ABI: 4c3b65325fb7f297f5c16052e095160bcba1135d7182897af3f2e54450a6b03e
-Installing 7/7 glfw3:x64-windows@3.4#1...
-Elapsed time to handle glfw3:x64-windows: 14.1 ms
-glfw3:x64-windows package ABI: a05a7def174c9926f401bbf219491b2540d3030bf0e97de339ac5f8b9e17886d
-Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
-Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
-Packages installed in this vcpkg installation declare the following licenses:
+Se compilar├ín e instalar├ín los siguientes paquetes:
+    glm:x64-windows@1.0.1#3 -- git+https://github.com/microsoft/vcpkg@f8b09027afe97c717e95bd81d1d4f37c057d1c78
+Se restauraron 0┬ápaquetes de C:\Users\joelv\AppData\Local\vcpkg\archives en 374 us. Use --debug para ver m├ís detalles.
+Instalando 1/1 glm:x64-windows@1.0.1#3...
+Compilando glm:x64-windows@1.0.1#3...
+C:\Users\joelv\AppData\Local\vcpkg\registries\git-trees\f8b09027afe97c717e95bd81d1d4f37c057d1c78: info: instalaci├│n desde el registro de Git git+https://github.com/microsoft/vcpkg@f8b09027afe97c717e95bd81d1d4f37c057d1c78
+-- Note: glm only supports static library linkage. Building static library.
+Downloading https://github.com/g-truc/glm/archive/1.0.1.tar.gz -> g-truc-glm-1.0.1.tar.gz
+Successfully downloaded g-truc-glm-1.0.1.tar.gz
+-- Extracting source C:/Users/joelv/vcpkg/downloads/g-truc-glm-1.0.1.tar.gz
+-- Applying patch fix-clang.patch
+-- Using source at C:/Users/joelv/vcpkg/buildtrees/glm/src/1.0.1-cf6930f99d.clean
+-- Found external ninja('1.12.1').
+-- Configuring x64-windows
+-- Building x64-windows-dbg
+-- Building x64-windows-rel
+-- Installing: C:/Users/joelv/vcpkg/packages/glm_x64-windows/share/glm/copyright
+-- Installing: C:/Users/joelv/vcpkg/packages/glm_x64-windows/share/glm/usage
+-- Realizando la validaci├│n posterior a la compilaci├│n
+Iniciando el env├¡o de glm:x64-windows@1.0.1#3 a 1 cach├®s binarias en segundo plano
+Tiempo transcurrido para controlar glm:x64-windows: 9.7 s
+ABI del paquete glm:x64-windows: 2352547063a0a5322ed16b2db1a1e5fd8d85c216aab9f10e51d26795603de2f5
+Los propietarios le conceden una licencia para el contenido instalado. Microsoft no se hace responsable de los paquetes de terceros ni concede licencias para los mismos.
+Los paquetes instalados en esta instalaci├│n de vcpkg declaran las siguientes licencias:
 MIT
-Zlib
 The package fmt provides CMake targets:
 
     find_package(fmt CONFIG REQUIRED)
@@ -46,21 +42,30 @@ The package fmt provides CMake targets:
     find_package(fmt CONFIG REQUIRED)
     target_link_libraries(main PRIVATE fmt::fmt-header-only)
 
-glad provides CMake targets:
+glad proporciona destinos de CMake:
 
-  # this is heuristically generated, and may not be correct
+  # esto se genera de forma heur├¡stica y puede que no sea correcto
   find_package(glad CONFIG REQUIRED)
   target_link_libraries(main PRIVATE glad::glad)
 
-glfw3 provides CMake targets:
+The package glm provides CMake targets:
 
-  # this is heuristically generated, and may not be correct
-  find_package(glfw3 CONFIG REQUIRED)
-  target_link_libraries(main PRIVATE glfw)
+    find_package(glm CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE glm::glm)
 
-glfw3 provides pkg-config modules:
+    # Or use the header-only version
+    find_package(glm CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE glm::glm-header-only)
 
-  # A multi-platform library for OpenGL, window and input
-  glfw3
+sdl2 provides CMake targets:
 
-All requested installations completed successfully in: 101 ms
+    find_package(SDL2 CONFIG REQUIRED)
+    target_link_libraries(main
+        PRIVATE
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    )
+
+Esperando 1 env├¡os de cach├® binaria restantes...
+Env├¡o de glm:x64-windows@1.0.1#3 completado a 1 cach├®s binarias en 382 ms (1/1)
+Todas las instalaciones solicitadas se completaron correctamente en: 9.7 s
