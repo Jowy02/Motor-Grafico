@@ -4,6 +4,12 @@
     <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -16,12 +22,15 @@
     <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\helloworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Module.h">
@@ -34,9 +43,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

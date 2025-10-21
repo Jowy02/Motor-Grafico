@@ -1,5 +1,6 @@
 #pragma once
 #include "Module.h"
+#include "Model.h"
 
 struct SDL_Texture;
 
@@ -37,5 +38,5 @@ private:
 
 	SDL_Texture* mouseTileTex = nullptr;
 	std::string tilePosDebug = "[0,0]";
-
+	Model* myModel = nullptr;
 };

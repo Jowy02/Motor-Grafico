@@ -1,38 +1,109 @@
-Detectando hash del compilador para el triplete x64-windows...
-Se encontr├│ el compilador: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
-Los siguientes paquetes ya est├ín instalados:
+Fetching registry information from https://github.com/microsoft/vcpkg (HEAD)...
+Detecting compiler hash for triplet x64-windows...
+Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
+The following packages will be built and installed:
+    assimp:x64-windows@6.0.2#1 -- git+https://github.com/microsoft/vcpkg@c5281ba1740ef8aeff54f666fbe1c60c0deac076
+  * draco:x64-windows@1.5.7 -- git+https://github.com/microsoft/vcpkg@06799add74da6e9e4634e4c7f27b82b1149a8bb6
   * egl-registry:x64-windows@2024-01-25 -- git+https://github.com/microsoft/vcpkg@d883db43133dd223c4ffdbef4193943f6784d43a
     fmt:x64-windows@12.0.0 -- git+https://github.com/microsoft/vcpkg@c5dcb90bc1da6e7ba3d6e62e62a0b7df3192f51c
     glad[core,loader]:x64-windows@0.1.36 -- git+https://github.com/microsoft/vcpkg@fa93b14c1581057e1d14650f5f15c9b0757dd548
+    glm:x64-windows@1.0.1#3 -- git+https://github.com/microsoft/vcpkg@f8b09027afe97c717e95bd81d1d4f37c057d1c78
+  * jhasse-poly2tri:x64-windows@2023-12-27#2 -- git+https://github.com/microsoft/vcpkg@d94a24dde4173f85d1aaeb16b3eecc71b100b5be
+  * kubazip:x64-windows@0.3.5 -- git+https://github.com/microsoft/vcpkg@f6a191f1346675cf2a6683141e8a24f3052a1d27
+  * minizip:x64-windows@1.3.1#1 -- git+https://github.com/microsoft/vcpkg@bb8016593efa5220d1b877c27cd8612862c13d81
   * opengl-registry:x64-windows@2024-02-10#1 -- git+https://github.com/microsoft/vcpkg@22f7aa58ee78c9f0db904b6251e9265f2be26f9d
+  * polyclipping:x64-windows@6.4.2#13 -- git+https://github.com/microsoft/vcpkg@2388298c7ad673550c7492454666dd3a34ada895
+  * pugixml:x64-windows@1.15 -- git+https://github.com/microsoft/vcpkg@a3181de4dee35567b45611a938eb0f44f5ee016d
+  * rapidjson:x64-windows@2025-02-26 -- git+https://github.com/microsoft/vcpkg@4297a243aa0e3ed6c3a4c307579914593da5751d
     sdl2:x64-windows@2.32.10 -- git+https://github.com/microsoft/vcpkg@af36a2c0ace7069e28bded20480ebbaf4e9c6e98
+  * stb:x64-windows@2024-07-29#1 -- git+https://github.com/microsoft/vcpkg@c362152d1d02973e7b1ce777960f8a6876656560
+  * utfcpp:x64-windows@4.0.6 -- git+https://github.com/microsoft/vcpkg@f73420a80f760312a45c40fce2b350009991c674
   * vcpkg-cmake:x64-windows@2024-04-23 -- git+https://github.com/microsoft/vcpkg@e74aa1e8f93278a8e71372f1fa08c3df420eb840
   * vcpkg-cmake-config:x64-windows@2024-05-23 -- git+https://github.com/microsoft/vcpkg@97a63e4bc1a17422ffe4eff71da53b4b561a7841
-Se compilar├ín e instalar├ín los siguientes paquetes:
-    glm:x64-windows@1.0.1#3 -- git+https://github.com/microsoft/vcpkg@f8b09027afe97c717e95bd81d1d4f37c057d1c78
-Se restauraron 0┬ápaquetes de C:\Users\joelv\AppData\Local\vcpkg\archives en 374 us. Use --debug para ver m├ís detalles.
-Instalando 1/1 glm:x64-windows@1.0.1#3...
-Compilando glm:x64-windows@1.0.1#3...
-C:\Users\joelv\AppData\Local\vcpkg\registries\git-trees\f8b09027afe97c717e95bd81d1d4f37c057d1c78: info: instalaci├│n desde el registro de Git git+https://github.com/microsoft/vcpkg@f8b09027afe97c717e95bd81d1d4f37c057d1c78
--- Note: glm only supports static library linkage. Building static library.
-Downloading https://github.com/g-truc/glm/archive/1.0.1.tar.gz -> g-truc-glm-1.0.1.tar.gz
-Successfully downloaded g-truc-glm-1.0.1.tar.gz
--- Extracting source C:/Users/joelv/vcpkg/downloads/g-truc-glm-1.0.1.tar.gz
--- Applying patch fix-clang.patch
--- Using source at C:/Users/joelv/vcpkg/buildtrees/glm/src/1.0.1-cf6930f99d.clean
--- Found external ninja('1.12.1').
--- Configuring x64-windows
--- Building x64-windows-dbg
--- Building x64-windows-rel
--- Installing: C:/Users/joelv/vcpkg/packages/glm_x64-windows/share/glm/copyright
--- Installing: C:/Users/joelv/vcpkg/packages/glm_x64-windows/share/glm/usage
--- Realizando la validaci├│n posterior a la compilaci├│n
-Iniciando el env├¡o de glm:x64-windows@1.0.1#3 a 1 cach├®s binarias en segundo plano
-Tiempo transcurrido para controlar glm:x64-windows: 9.7 s
-ABI del paquete glm:x64-windows: 2352547063a0a5322ed16b2db1a1e5fd8d85c216aab9f10e51d26795603de2f5
-Los propietarios le conceden una licencia para el contenido instalado. Microsoft no se hace responsable de los paquetes de terceros ni concede licencias para los mismos.
-Los paquetes instalados en esta instalaci├│n de vcpkg declaran las siguientes licencias:
+  * vcpkg-cmake-get-vars:x64-windows@2025-05-29 -- git+https://github.com/microsoft/vcpkg@d6510f888dd526c7828f6b973349e7f30be51254
+  * zlib:x64-windows@1.3.1 -- git+https://github.com/microsoft/vcpkg@3f05e04b9aededb96786a911a16193cdb711f0c9
+Additional packages (*) will be modified to complete this operation.
+Restored 20 package(s) from C:\Users\joelv\AppData\Local\vcpkg\archives in 1.6 s. Use --debug to see more details.
+Installing 1/20 vcpkg-cmake:x64-windows@2024-04-23...
+Elapsed time to handle vcpkg-cmake:x64-windows: 6.08 ms
+vcpkg-cmake:x64-windows package ABI: bcecf87a0f54eaf6dbe68dbeb1b5c1924ee1aa3778a2ab9be9874264241730c1
+Installing 2/20 zlib:x64-windows@1.3.1...
+Elapsed time to handle zlib:x64-windows: 9.16 ms
+zlib:x64-windows package ABI: 9d6c55f9675933c893599bd8321c7bc71a3439ceb6afb7f724d470d51465dc78
+Installing 3/20 vcpkg-cmake-config:x64-windows@2024-05-23...
+Elapsed time to handle vcpkg-cmake-config:x64-windows: 4.49 ms
+vcpkg-cmake-config:x64-windows package ABI: 3eaf419b6254809a75d35b41965cf065fd505a5df832c1cb6c9e73515866efd3
+Installing 4/20 utfcpp:x64-windows@4.0.6...
+Elapsed time to handle utfcpp:x64-windows: 7.04 ms
+utfcpp:x64-windows package ABI: 524f132e19bdde2e17d7bc10ebac958742df5cf5b93f695b4e4f0c916675cc48
+Installing 5/20 stb:x64-windows@2024-07-29#1...
+Elapsed time to handle stb:x64-windows: 9.2 ms
+stb:x64-windows package ABI: 50103c398510c634db4ca2cffeffda1a9147ecb4c7b7aa2737d3eb24a461bd99
+Installing 6/20 rapidjson:x64-windows@2025-02-26...
+Elapsed time to handle rapidjson:x64-windows: 14.3 ms
+rapidjson:x64-windows package ABI: 8a4f959b90cfe5eee784dc64a2f0846f76c36203d242145e9f4783d686aedf36
+Installing 7/20 pugixml:x64-windows@1.15...
+Elapsed time to handle pugixml:x64-windows: 8.8 ms
+pugixml:x64-windows package ABI: f26fec337340ad71e44d066fe660941f452a3bc8566d5b016a6dc0467627b889
+Installing 8/20 polyclipping:x64-windows@6.4.2#13...
+Elapsed time to handle polyclipping:x64-windows: 13.9 ms
+polyclipping:x64-windows package ABI: 297382abd555006a3660b4e7eef9d9b122cff227cc9e6f015de3c17522caeac5
+Installing 9/20 vcpkg-cmake-get-vars:x64-windows@2025-05-29...
+Elapsed time to handle vcpkg-cmake-get-vars:x64-windows: 5.33 ms
+vcpkg-cmake-get-vars:x64-windows package ABI: 3ab604691ad71943c30bf3bd8af39b60a23f3a19a31191f1ce037e6167c1357f
+Installing 10/20 minizip:x64-windows@1.3.1#1...
+Elapsed time to handle minizip:x64-windows: 10.6 ms
+minizip:x64-windows package ABI: 22974beafabf7966f836ffef69027b0fcc0a95370b8a5e4df72e8fb68fe4065a
+Installing 11/20 kubazip:x64-windows@0.3.5...
+Elapsed time to handle kubazip:x64-windows: 8.92 ms
+kubazip:x64-windows package ABI: 3fd025c1507a546f79bbe874d65e938d0a245bb6a1453a95d393bf9ceadc0ecc
+Installing 12/20 jhasse-poly2tri:x64-windows@2023-12-27#2...
+Elapsed time to handle jhasse-poly2tri:x64-windows: 15.9 ms
+jhasse-poly2tri:x64-windows package ABI: 9d2bc4b18d5ef95fcecd1655f7e930ff17bb73354b7cca9fea0a539aa783c32f
+Installing 13/20 draco:x64-windows@1.5.7...
+Elapsed time to handle draco:x64-windows: 55.8 ms
+draco:x64-windows package ABI: 94cec0e90507e18c47504230ff6ba17f88cb297e6863e378e26873c23d9dbfe8
+Installing 14/20 assimp:x64-windows@6.0.2#1...
+Elapsed time to handle assimp:x64-windows: 34.7 ms
+assimp:x64-windows package ABI: 0e8c0ec2d9618d41b806fa6d28ba4c6b7f676c0efe916a91b53a17d0eb7de610
+Installing 15/20 fmt:x64-windows@12.0.0...
+Elapsed time to handle fmt:x64-windows: 12.1 ms
+fmt:x64-windows package ABI: f1f84b19b93f908862739e611511c1d7fac7db957e54e25f725f69c94f32cf10
+Installing 16/20 egl-registry:x64-windows@2024-01-25...
+Elapsed time to handle egl-registry:x64-windows: 6.92 ms
+egl-registry:x64-windows package ABI: 667249f23931acfa474aba941581884d0dd3e2358744465d1caed86a9d0f1d8d
+Installing 17/20 opengl-registry:x64-windows@2024-02-10#1...
+Elapsed time to handle opengl-registry:x64-windows: 45 ms
+opengl-registry:x64-windows package ABI: 0e12d7eae1ca05cde61f15261d051d3c12006d6b797ce3e770b06878fec35f66
+Installing 18/20 glad[core,loader]:x64-windows@0.1.36...
+Elapsed time to handle glad:x64-windows: 8.92 ms
+glad:x64-windows package ABI: 4c3b65325fb7f297f5c16052e095160bcba1135d7182897af3f2e54450a6b03e
+Installing 19/20 glm:x64-windows@1.0.1#3...
+Elapsed time to handle glm:x64-windows: 96.5 ms
+glm:x64-windows package ABI: 2352547063a0a5322ed16b2db1a1e5fd8d85c216aab9f10e51d26795603de2f5
+Installing 20/20 sdl2:x64-windows@2.32.10...
+Elapsed time to handle sdl2:x64-windows: 34.7 ms
+sdl2:x64-windows package ABI: 9cb38e1942fd53586fbf135c447447d7eda826bf7c9c38d2d3e0d90527c57127
+Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
+Packages installed in this vcpkg installation declare the following licenses:
+(MIT OR CC-PDDC)
+Apache-2.0
+BSD-3-Clause
+BSL-1.0
 MIT
+Zlib
+assimp provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(assimp CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE assimp::assimp)
+
+assimp provides pkg-config modules:
+
+  # Import various well-known 3D model formats in an uniform manner.
+  assimp
+
 The package fmt provides CMake targets:
 
     find_package(fmt CONFIG REQUIRED)
@@ -42,9 +113,9 @@ The package fmt provides CMake targets:
     find_package(fmt CONFIG REQUIRED)
     target_link_libraries(main PRIVATE fmt::fmt-header-only)
 
-glad proporciona destinos de CMake:
+glad provides CMake targets:
 
-  # esto se genera de forma heur├¡stica y puede que no sea correcto
+  # this is heuristically generated, and may not be correct
   find_package(glad CONFIG REQUIRED)
   target_link_libraries(main PRIVATE glad::glad)
 
@@ -66,6 +137,4 @@ sdl2 provides CMake targets:
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     )
 
-Esperando 1 env├¡os de cach├® binaria restantes...
-Env├¡o de glm:x64-windows@1.0.1#3 completado a 1 cach├®s binarias en 382 ms (1/1)
-Todas las instalaciones solicitadas se completaron correctamente en: 9.7 s
+All requested installations completed successfully in: 417 ms

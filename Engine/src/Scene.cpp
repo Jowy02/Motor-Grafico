@@ -2,6 +2,8 @@
 #include "Render.h"
 #include "Window.h"
 #include "Scene.h"
+#include "Model.h"
+
 
 Scene::Scene() : Module()
 {
@@ -20,6 +22,7 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
+    myModel = new Model("C:/Users/joelv/Downloads/warrior.fbx");
 
 	return true;
 }
@@ -32,6 +35,14 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
+    if (myModel)
+    {
+        GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+        myModel->Draw(shaderProgram);
+
+    }
+
+
     ////Triangle
     //GLfloat vertices2[] =
     //{ //     COORDINATES     /        COLORS      /   TexCoord  //
@@ -91,36 +102,35 @@ bool Scene::Update(float dt)
  //   // Cada frame:
  //   Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
-    //Rombo
-    GLfloat vertices2[] =
-    { //     COORDINATES     /        COLORS      /   TexCoord  //
-         0.0f,  0.5f,  0.0f,     1.0f, 0.8f, 0.2f, 0.5f, 1.0f, // top
-         0.5f,  0.0f,  0.0f,     1.0f, 0.0f, 0.0f, 1.0f, 0.5f,
-         0.0f,  0.0f,  0.5f,     0.0f, 1.0f, 0.0f, 0.5f, 0.0f,
-        -0.5f,  0.0f,  0.0f,     0.0f, 0.0f, 1.0f, 0.0f, 0.5f,
-         0.0f,  0.0f, -0.5f,     1.0f, 0.5f, 0.5f, 0.5f, 0.5f,
-         0.0f, -0.5f,  0.0f,     0.3f, 0.3f, 0.3f, 0.5f, 0.5f  // bottom
-    };
+    ////Rombo
+    //GLfloat vertices2[] =
+    //{ //     COORDINATES     /        COLORS      /   TexCoord  //
+    //     0.0f,  0.5f,  0.0f,     1.0f, 0.8f, 0.2f, 0.5f, 1.0f, // top
+    //     0.5f,  0.0f,  0.0f,     1.0f, 0.0f, 0.0f, 1.0f, 0.5f,
+    //     0.0f,  0.0f,  0.5f,     0.0f, 1.0f, 0.0f, 0.5f, 0.0f,
+    //    -0.5f,  0.0f,  0.0f,     0.0f, 0.0f, 1.0f, 0.0f, 0.5f,
+    //     0.0f,  0.0f, -0.5f,     1.0f, 0.5f, 0.5f, 0.5f, 0.5f,
+    //     0.0f, -0.5f,  0.0f,     0.3f, 0.3f, 0.3f, 0.5f, 0.5f  // bottom
+    //};
 
-    // Indices for vertices order
-    GLuint indices2[] =
-    {
-        // Mitad superior
-        0, 1, 2,
-        0, 2, 3,
-        0, 3, 4,
-        0, 4, 1,
-        // Mitad inferior
-        5, 2, 1,
-        5, 3, 2,
-        5, 4, 3,
-        5, 1, 4
-    };
-    int vertexCount = sizeof(vertices2) / sizeof(float);
-    int indexCount = sizeof(indices2) / sizeof(unsigned int);
-    // Cada frame:
-    Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
-    return true;
+    //// Indices for vertices order
+    //GLuint indices2[] =
+    //{
+    //    // Mitad superior
+    //    0, 1, 2,
+    //    0, 2, 3,
+    //    0, 3, 4,
+    //    0, 4, 1,
+    //    // Mitad inferior
+    //    5, 2, 1,
+    //    5, 3, 2,
+    //    5, 4, 3,
+    //    5, 1, 4
+    //};
+    //int vertexCount = sizeof(vertices2) / sizeof(float);
+    //int indexCount = sizeof(indices2) / sizeof(unsigned int);
+    //// Cada frame:
+    //Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
 
 
@@ -134,6 +144,11 @@ bool Scene::PostUpdate()
 }
 
 bool Scene::CleanUp() {
+    if (myModel)
+    {
+        delete myModel;
+        myModel = nullptr;
+    }
 
 	return true;
 }
