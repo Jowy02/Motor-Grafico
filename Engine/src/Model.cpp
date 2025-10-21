@@ -2,11 +2,6 @@
 #include "Application.h"
 #include "Camera.h"
 #include <iostream>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
 #include <cstring> 
 
 Model::Model(const std::string& path)
@@ -15,8 +10,9 @@ Model::Model(const std::string& path)
 }
 
 // Dibuja todas las mallas del modelo
-void Model::Draw(GLuint shaderProgram)
+void Model::Draw()
 {
+    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
     //Modelo se vea desde la posicón de la cámara correcta
     Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
@@ -35,11 +31,10 @@ void Model::Draw(GLuint shaderProgram)
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     // Dibujar todos los meshes
-    for (auto& mesh : meshes)
-    {
-        glBindVertexArray(mesh.VAO);
-        glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
-    }
+
+    glBindVertexArray(Mmesh.VAO);
+    glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
+    
     glBindVertexArray(0);
 }
 
@@ -123,17 +118,17 @@ void Model::processMesh(aiMesh* mesh)
     }
 
     // Crear buffers OpenGL
-    ModelMesh modelMesh;
-    glGenVertexArrays(1, &modelMesh.VAO);
-    glGenBuffers(1, &modelMesh.VBO);
-    glGenBuffers(1, &modelMesh.EBO);
 
-    glBindVertexArray(modelMesh.VAO);
+    glGenVertexArrays(1, &Mmesh.VAO);
+    glGenBuffers(1, &Mmesh.VBO);
+    glGenBuffers(1, &Mmesh.EBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, modelMesh.VBO);
+    glBindVertexArray(Mmesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, Mmesh.VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelMesh.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mmesh.EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     // Posición
@@ -150,6 +145,5 @@ void Model::processMesh(aiMesh* mesh)
 
     glBindVertexArray(0);
 
-    modelMesh.indexCount = indices.size();
-    meshes.push_back(modelMesh);
+    Mmesh.indexCount = indices.size();
 }

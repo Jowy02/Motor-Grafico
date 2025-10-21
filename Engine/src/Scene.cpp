@@ -22,7 +22,7 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    myModel = new Model("C:/Users/joelv/Downloads/warrior.fbx");
+    models.push_back(Model("C:/Users/joelv/Downloads/warrior.fbx"));
 
 	return true;
 }
@@ -35,13 +35,9 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
-    if (myModel)
-    {
-        GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-        myModel->Draw(shaderProgram);
 
-    }
-
+    for(auto& Model : models) Model.Draw();
+   
 
     ////Triangle
     //GLfloat vertices2[] =

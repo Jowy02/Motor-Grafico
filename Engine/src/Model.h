@@ -24,11 +24,10 @@ public:
     Model(const std::string& path);
 
     // Dibuja el modelo con un shader y una cámara
-    void Draw(GLuint shaderProgram);
+    void Draw();
 
 private:
-    std::vector<ModelMesh> meshes;
-
+    ModelMesh Mmesh;
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh);
