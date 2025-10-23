@@ -3,7 +3,7 @@
 #include "Window.h"
 #include "Scene.h"
 #include "Model.h"
-
+#include <iostream> 
 
 Scene::Scene() : Module()
 {
@@ -20,30 +20,52 @@ bool Scene::Awake()
 	return true;
 }
 
+
 bool Scene::Start()
 {
-    listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
+    //listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
    
-    std::string texPath = "../Images/Baker_house.png";
-    Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    //std::string texPath = "../Images/Baker_house.png";
+    //Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-    listFBX[0].Mmesh.texture = tex;
+    //listFBX[0].Mmesh.texture = tex;
 
 
 
-    std::string parentDir = std::string("../Images/");
-    imagesFiles.push_back(std::string("textura.png"));
+    //std::string parentDir = std::string("../Images/");
+    //imagesFiles.push_back(std::string("textura.png"));
 
-    for (size_t i = 0; i < imagesFiles.size(); ++i)
-    {
-        std::string fullPath = parentDir + imagesFiles[i];
-        // Crear la textura con tu clase Texture (usa DevIL internamente)
-        Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
-        images.push_back(tex);
-    }
+    //for (size_t i = 0; i < imagesFiles.size(); ++i)
+    //{
+    //    std::string fullPath = parentDir + imagesFiles[i];
+    //    // Crear la textura con tu clase Texture (usa DevIL internamente)
+    //    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
+    //    images.push_back(tex);
+    //}
 
 	return true;
 }
+
+void Scene::LoadFBX(const std::string& path) {
+    Model model(path.c_str());
+    models.push_back(model);
+}
+
+void Scene::ApplyTextureToSelected(const std::string& path) {
+   
+    if (!models.empty()) 
+    {
+        Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+        models.back().Mmesh.texture = tex;
+    }
+    else {
+        Texture tex(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+        images.push_back(tex);
+    }
+  
+}
+
 
 bool Scene::PreUpdate()
 {
@@ -58,37 +80,37 @@ bool Scene::Update(float dt)
    
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-     for (auto& modelFBX : listFBX) {
+    /* for (auto& modelFBX : listFBX) {
          modelFBX.Draw();
-     }
+     }*/
 
     //Image 2D
-    //for (int i = 0; i < images.size(); i++)
-    //{
-    //    images[i].texUnit(shaderProgram, "tex0", 0);
-    //    images[i].Bind();
+    for (int i = 0; i < images.size(); i++)
+    {
+        images[i].texUnit(shaderProgram, "tex0", 0);
+        images[i].Bind();
 
-    //    GLfloat vertices2[] =
-    //    { 
-    //        -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, // inferior izquierda
-    //         0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, // inferior derecha
-    //         0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f, // superior derecha
-    //        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
-    //    };
+        GLfloat vertices2[] =
+        { 
+            -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, // inferior izquierda
+             0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, // inferior derecha
+             0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f, // superior derecha
+            -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
+        };
 
-    //    //// Indices para formar dos triángulos
-    //    GLuint indices2[] =
-    //    {
-    //        0, 1, 2,  // primer triángulo
-    //        2, 3, 0   // segundo triángulo
-    //    };
+        //// Indices para formar dos triángulos
+        GLuint indices2[] =
+        {
+            0, 1, 2,  // primer triángulo
+            2, 3, 0   // segundo triángulo
+        };
 
-    //    int vertexCount = sizeof(vertices2) / sizeof(float);
-    //    int indexCount = sizeof(indices2) / sizeof(unsigned int);
-    //    Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f, &images[i]);
+        int vertexCount = sizeof(vertices2) / sizeof(float);
+        int indexCount = sizeof(indices2) / sizeof(unsigned int);
+        Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 0.0f, &images[i]);
 
-    //    images[i].Unbind();
-    //}
+        images[i].Unbind();
+    }
 
     //Imatge 3d
     //for (int i = 0; i < images.size(); i++)

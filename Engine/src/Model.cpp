@@ -174,12 +174,21 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
         {
             std::string filename = std::string(path.C_Str());
-            filename = directory + "/" + filename;
+
+            // Normalizar barras invertidas
+            std::replace(filename.begin(), filename.end(), '\\', '/');
+
+            // Si la textura NO es una ruta absoluta, agrégale el directorio del modelo
+            if (filename[0] != '/' && !(filename.length() > 1 && filename[1] == ':'))
+            {
+                filename = directory + "/" + filename;
+            }
 
             std::cout << "Cargando textura desde material: " << filename << std::endl;
 
             Mmesh.texture = new Texture(filename.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
         }
+        
         else
         {
             std::cout << "No se encontró textura difusa en el material." << std::endl;

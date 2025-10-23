@@ -85,6 +85,22 @@ bool Application::Update() {
     bool ret = true;
     PrepareUpdate();
 
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_DROPFILE) {
+            char* dropped_filedir = event.drop.file;
+            std::string path = dropped_filedir;
+            SDL_free(dropped_filedir);
+
+            std::string extension = path.substr(path.find_last_of('.') + 1);
+            if (extension == "fbx" || extension == "FBX") {
+                Application::GetInstance().scene->LoadFBX(path);
+            }
+            else if (extension == "png" || extension == "dds") {
+                Application::GetInstance().scene->ApplyTextureToSelected(path);
+            }
+        }
+    }
  /*   if (input->GetWindowEvent(WE_QUIT) == true)
         ret = false;*/
 

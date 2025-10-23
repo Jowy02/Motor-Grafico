@@ -58,6 +58,8 @@ bool Window::Awake()
         SDL_Quit();
         return -1;
     }
+
+
 }
 
 // Called before quitting

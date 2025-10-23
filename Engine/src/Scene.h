@@ -32,8 +32,12 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	void LoadFBX(const std::string& path);
+
+	void ApplyTextureToSelected(const std::string& path);
 
 public:
+	Model* selectedModel = nullptr;
 
 
 private:
