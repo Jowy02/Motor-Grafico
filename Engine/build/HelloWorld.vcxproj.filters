@@ -1,60 +1,66 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Application.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Camera.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Model.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Render.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Scene.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Window.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\helloworld.cpp">
+    <ClCompile Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\helloworld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Application.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Camera.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Model.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Module.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Render.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Scene.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\src\Window.h">
+    <ClInclude Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\src\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\joelv\Documents\GitHub\Motor-Grafico\Engine\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\janap\Documents\GitHub\Motor-Grafico\Engine\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{8EBC59E5-C813-363A-9A85-F9A55A2F87EE}</UniqueIdentifier>
+      <UniqueIdentifier>{AB0366F9-D165-3B6B-AB4C-0CD6C740B27E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{D23BEC78-CF8F-37BB-8417-DE7B9D44FDDB}</UniqueIdentifier>
+      <UniqueIdentifier>{C86BD98B-9DF2-392F-8AF5-6BB9CBB69CB1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

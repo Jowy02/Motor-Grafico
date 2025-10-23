@@ -1,6 +1,6 @@
-^C:\USERS\JOELV\DOCUMENTS\GITHUB\MOTOR-GRAFICO\ENGINE\CMAKELISTS.TXT
+^C:\USERS\JANAP\DOCUMENTS\GITHUB\MOTOR-GRAFICO\ENGINE\CMAKELISTS.TXT
 setlocal
-C:\Users\joelv\Downloads\cmake-4.1.1-windows-x86_64\cmake-4.1.1-windows-x86_64\bin\cmake.exe -SC:/Users/joelv/Documents/GitHub/Motor-Grafico/Engine -BC:/Users/joelv/Documents/GitHub/Motor-Grafico/Engine/build --check-stamp-file C:/Users/joelv/Documents/GitHub/Motor-Grafico/Engine/build/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/janap/Documents/GitHub/Motor-Grafico/Engine -BC:/Users/janap/Documents/GitHub/Motor-Grafico/Engine/build --check-stamp-file C:/Users/janap/Documents/GitHub/Motor-Grafico/Engine/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

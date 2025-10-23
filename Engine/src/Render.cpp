@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "Window.h"
 #include "Render.h"
+#include "Texture.h"
+
 #define VSYNC true
 
 const char* vertexShaderSource = "#version 330 core\n"
@@ -25,10 +27,16 @@ const char* vertexShaderSource = "#version 330 core\n"
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "in vec3 ourColor;\n"
+"in vec2 TexCoord;\n"
 "out vec4 FragColor;\n"
+"uniform sampler2D tex0;\n"
+"uniform bool useTexture;\n" 
 "void main()\n"
 "{\n"
-"   FragColor = vec4(ourColor, 1.0f);\n"
+"   if(useTexture)\n"
+"       FragColor = texture(tex0, TexCoord);\n"
+"   else\n"
+"       FragColor = vec4(ourColor, 1.0);\n"
 "}\n\0";
 
 SDL_Event event;
@@ -159,7 +167,7 @@ bool Render::Update(float dt)
 //    return true;
 //}
 
-bool Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation)
+bool Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
 {
     Application::GetInstance().camera.get()->Inputs(temp);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
@@ -209,6 +217,19 @@ bool Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* i
         // Enviar solo el modelo (la cámara ya envió view y projection)
         int modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        // Decidir si usar textura
+        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+        if (texture)
+        {
+            texture->texUnit(shaderProgram, "tex0", 0);
+            texture->Bind();
+            glUniform1i(useTexLoc, 1);
+        }
+        else
+        {
+            glUniform1i(useTexLoc, 0);
+        }
 
         // Outputs the matrices into the Vertex Shader
     

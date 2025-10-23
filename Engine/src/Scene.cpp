@@ -22,8 +22,25 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    models.push_back(Model("C:/Users/joelv/Downloads/warrior.fbx"));
+    listFBX.push_back(Model("../FBX/warrior.fbx"));
 
+    //std::string devILPath = std::string("C:../Devil/");
+    //std::string devILPath = std::string("C:/Users/Usuari/Documents/GitHub/Motor-Grafico/Engine/Devil/");
+
+
+
+    std::string parentDir = std::string("../Images/");
+    imagesFiles.push_back(std::string("Bird.png"));
+
+
+    for (size_t i = 0; i < imagesFiles.size(); ++i)
+    {
+        std::string fullPath = parentDir + imagesFiles[i];
+        // Crear la textura con tu clase Texture (usa DevIL internamente)
+        Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
+        images.push_back(tex);
+
+    }
 	return true;
 }
 
@@ -38,6 +55,38 @@ bool Scene::Update(float dt)
 
     for(auto& Model : models) Model.Draw();
    
+    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+
+    /* for (auto& modelFBX : listFBX) {
+         modelFBX.Draw(shaderProgram);
+     }*/
+
+    for (int i = 0; i < images.size(); i++)
+    {
+        images[i].texUnit(shaderProgram, "tex0", 0);
+        images[i].Bind();
+
+        GLfloat vertices2[] =
+        { 
+            -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, // inferior izquierda
+             0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, // inferior derecha
+             0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f, // superior derecha
+            -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
+        };
+
+        //// Indices para formar dos triángulos
+        GLuint indices2[] =
+        {
+            0, 1, 2,  // primer triángulo
+            2, 3, 0   // segundo triángulo
+        };
+
+        int vertexCount = sizeof(vertices2) / sizeof(float);
+        int indexCount = sizeof(indices2) / sizeof(unsigned int);
+        Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 0.0f, &images[i]);
+
+        images[i].Unbind();
+    }
 
     ////Triangle
     //GLfloat vertices2[] =
@@ -140,11 +189,13 @@ bool Scene::PostUpdate()
 }
 
 bool Scene::CleanUp() {
-    if (myModel)
-    {
-        delete myModel;
-        myModel = nullptr;
+    listFBX.clear();
+    imagesFiles.clear();
+    for (auto& tex : images) {
+        tex.Delete();
     }
+    images.clear();
+
 
 	return true;
 }
