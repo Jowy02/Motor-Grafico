@@ -22,11 +22,12 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    listFBX.push_back(Model("../FBX/warrior.fbx"));
+    listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
+   
+    std::string texPath = "../Images/Baker_house.png";
+    Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-    //std::string devILPath = std::string("C:../Devil/");
-    //std::string devILPath = std::string("C:/Users/Usuari/Documents/GitHub/Motor-Grafico/Engine/Devil/");
-
+    listFBX[0].Mmesh.texture = tex;
 
 
     std::string parentDir = std::string("../Images/");
@@ -55,11 +56,11 @@ bool Scene::Update(float dt)
 
     for(auto& Model : models) Model.Draw();
    
-    //GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-    /* for (auto& modelFBX : listFBX) {
-         modelFBX.Draw(shaderProgram);
-     }*/
+     for (auto& modelFBX : listFBX) {
+         modelFBX.Draw();
+     }
 
     //Image 2D
     //for (int i = 0; i < images.size(); i++)
@@ -90,63 +91,63 @@ bool Scene::Update(float dt)
     //}
 
     //Imatge 3d
-    for (int i = 0; i < images.size(); i++)
-    {
-        GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+    //for (int i = 0; i < images.size(); i++)
+    //{
+    //    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-        // Configuramos la textura (asumiendo que brickTex es tu Texture ya cargada)
+    //    // Configuramos la textura (asumiendo que brickTex es tu Texture ya cargada)
 
-        images[i].texUnit(shaderProgram, "tex0", 0);
-        images[i].Bind();
+    //    images[i].texUnit(shaderProgram, "tex0", 0);
+    //    images[i].Bind();
 
-        // Vertices de la pirámide: posición (x,y,z), color (r,g,b), textura (u,v)
-        GLfloat vertices[] =
-        { //     COORDINATES     /        COLORS      /   TexCoord  //
-            -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-            -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 1.0f,
-             0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 1.0f,
-             0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-             0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
-        };
+    //    // Vertices de la pirámide: posición (x,y,z), color (r,g,b), textura (u,v)
+    //    GLfloat vertices[] =
+    //    { //     COORDINATES     /        COLORS      /   TexCoord  //
+    //        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+    //        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 1.0f,
+    //         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 1.0f,
+    //         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+    //         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
+    //    };
 
-        // Indices for vertices order
-        GLuint indices[] =
-        {
-            0, 1, 2,
-            0, 2, 3,
-            0, 1, 4,
-            1, 2, 4,
-            2, 3, 4,
-            3, 0, 4
-        };
+    //    // Indices for vertices order
+    //    GLuint indices[] =
+    //    {
+    //        0, 1, 2,
+    //        0, 2, 3,
+    //        0, 1, 4,
+    //        1, 2, 4,
+    //        2, 3, 4,
+    //        3, 0, 4
+    //    };
 
-        int vertexCount = sizeof(vertices) / sizeof(float);
-        int indexCount = sizeof(indices) / sizeof(unsigned int);
+    //    int vertexCount = sizeof(vertices) / sizeof(float);
+    //    int indexCount = sizeof(indices) / sizeof(unsigned int);
 
-        const Uint8* state = SDL_GetKeyboardState(NULL);
-        glm::vec3 dir = Application::GetInstance().camera->Orientation;
-        float rotation = glm::degrees(atan2(dir.x, dir.z));
+    //    const Uint8* state = SDL_GetKeyboardState(NULL);
+    //    glm::vec3 dir = Application::GetInstance().camera->Orientation;
+    //    float rotation = glm::degrees(atan2(dir.x, dir.z));
 
-        // Transformaciones
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)Application::GetInstance().window.get()->width / Application::GetInstance().window.get()->height, 0.1f, 100.0f);
+    //    // Transformaciones
+    //    glm::mat4 model = glm::mat4(1.0f);
+    //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    //    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)Application::GetInstance().window.get()->width / Application::GetInstance().window.get()->height, 0.1f, 100.0f);
 
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+    //    model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        // Enviar matrices al shader
-        int modelLoc = glGetUniformLocation(shaderProgram, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        int viewLoc = glGetUniformLocation(shaderProgram, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        int projLoc = glGetUniformLocation(shaderProgram, "proj");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+    //    // Enviar matrices al shader
+    //    int modelLoc = glGetUniformLocation(shaderProgram, "model");
+    //    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    //    int viewLoc = glGetUniformLocation(shaderProgram, "view");
+    //    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    //    int projLoc = glGetUniformLocation(shaderProgram, "proj");
+    //    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
-        // Dibujar la pirámide
-        Application::GetInstance().render.get()->Draw3D(vertices, vertexCount, indices, indexCount, 60.0f, &images[i]);
+    //    // Dibujar la pirámide
+    //    Application::GetInstance().render.get()->Draw3D(vertices, vertexCount, indices, indexCount, 60.0f, &images[i]);
 
 
-    }
+    //}
 
     ////Triangle
     //GLfloat vertices2[] =

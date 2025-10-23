@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Application.h"
 #include "Camera.h"
+#include "Texture.h"
 #include <iostream>
 #include <cstring> 
 
@@ -20,15 +21,28 @@ void Model::Draw()
     // Matriz de modelo
     glm::mat4 model = glm::mat4(1.0f);
 
-    //model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));    //Centrar
+    model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));    //Centrar
 
-    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));   //Rotar
+    //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));   //Rotar
 
-    model = glm::scale(model, glm::vec3(0.01f)); //Escalar
+    model = glm::scale(model, glm::vec3(0.5f)); //Escalar
 
     // Enviar la matriz al shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    if (Mmesh.texture)
+    {
+        Mmesh.texture->texUnit(shaderProgram, "tex0", 0);
+        Mmesh.texture->Bind();
+        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+        glUniform1i(useTexLoc, 1);
+    }
+    else
+    {
+        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+        glUniform1i(useTexLoc, 0);
+    }
 
     // Dibujar todos los meshes
 
@@ -36,6 +50,10 @@ void Model::Draw()
     glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
     
     glBindVertexArray(0);
+
+
+    if (Mmesh.texture)
+        Mmesh.texture->Unbind();
 }
 
 // Carga el modelo con Assimp
@@ -57,7 +75,9 @@ void Model::loadModel(const std::string& path)
         return;
     }
 
+    directory = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
+
 }
 
 // Procesa recursivamente todos los nodos
@@ -67,7 +87,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        processMesh(mesh);
+        processMesh(mesh, scene);
     }
 
     // Recurre en los hijos
@@ -78,7 +98,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 }
 
 // Convierte un aiMesh de Assimp en ModelMesh con VAO/VBO/EBO
-void Model::processMesh(aiMesh* mesh)
+void Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
@@ -146,4 +166,38 @@ void Model::processMesh(aiMesh* mesh)
     glBindVertexArray(0);
 
     Mmesh.indexCount = indices.size();
+
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        aiString path;
+        if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
+        {
+            std::string filename = std::string(path.C_Str());
+            filename = directory + "/" + filename;
+
+            std::cout << "Cargando textura desde material: " << filename << std::endl;
+
+            Mmesh.texture = new Texture(filename.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+        }
+        else
+        {
+            std::cout << "No se encontró textura difusa en el material." << std::endl;
+            Mmesh.texture = nullptr;
+        }
+    }
+}
+
+void Model::CleanUp()
+{
+    if (Mmesh.texture)
+    {
+        Mmesh.texture->Delete();
+        delete Mmesh.texture;
+        Mmesh.texture = nullptr;
+    }
+
+    glDeleteVertexArrays(1, &Mmesh.VAO);
+    glDeleteBuffers(1, &Mmesh.VBO);
+    glDeleteBuffers(1, &Mmesh.EBO);
 }
