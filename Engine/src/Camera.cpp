@@ -33,68 +33,73 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
 void Camera::Inputs(SDL_Window* window)
 {
     const Uint8* state = SDL_GetKeyboardState(NULL);
-
-    // Movimiento del teclado
-    if (state[SDL_SCANCODE_W]) {
-        Position += speed * Orientation;
-    }
-    if (state[SDL_SCANCODE_A]) {
-        Position += speed * -glm::normalize(glm::cross(Orientation, Up));
-    }
-    if (state[SDL_SCANCODE_S]) {
-        Position += speed * -Orientation;
-    }
-    if (state[SDL_SCANCODE_D]) {
-        Position += speed * glm::normalize(glm::cross(Orientation, Up));
-    }
-    if (state[SDL_SCANCODE_SPACE]) {
-        Position += speed * Up;
-    }
-    if (state[SDL_SCANCODE_LCTRL]) {
-        Position += speed * -Up;
-    }
-
-    // --- Manejo del ratón ---
-    int mouseX, mouseY;
-    Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
-
-    if (mouseState && SDL_BUTTON(SDL_BUTTON_LEFT)) {
-        SDL_ShowCursor(SDL_DISABLE);
-
-        if (firstClick) {
-            SDL_WarpMouseInWindow(window, width / 2, height / 2);
-            firstClick = false;
+    bool shiftHeld = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
+   
+    if (!shiftHeld) {
+        // Movimiento del teclado
+        if (state[SDL_SCANCODE_W]) {
+            Position += speed * Orientation;
+        }
+        if (state[SDL_SCANCODE_A]) {
+            Position += speed * -glm::normalize(glm::cross(Orientation, Up));
+        }
+        if (state[SDL_SCANCODE_S]) {
+            Position += speed * -Orientation;
+        }
+        if (state[SDL_SCANCODE_D]) {
+            Position += speed * glm::normalize(glm::cross(Orientation, Up));
+        }
+        if (state[SDL_SCANCODE_SPACE]) {
+            Position += speed * Up;
+        }
+        if (state[SDL_SCANCODE_LCTRL]) {
+            Position += speed * -Up;
         }
 
-        // Obtener posición del ratón y calcular rotaciones
-        SDL_GetMouseState(&mouseX, &mouseY);
-        float rotX = sensitivity * (float)(mouseY - height / 2) / height;
-        float rotY = sensitivity * (float)(mouseX - width / 2) / width;
+        // --- Manejo del ratón ---
+        int mouseX, mouseY;
+        Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
-        // Rotación vertical
-        glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
+        if (mouseState && SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            SDL_ShowCursor(SDL_DISABLE);
 
-        // Rota verticalmente (pitch)
-        glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX), right);
-        glm::vec3 newOrientation = glm::vec3(pitch * glm::vec4(Orientation, 0.0f));
+            if (firstClick) {
+                SDL_WarpMouseInWindow(window, width / 2, height / 2);
+                firstClick = false;
+            }
 
-        // Limitar la inclinación vertical
-        float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
-            (glm::length(newOrientation) * glm::length(Up))));
+            // Obtener posición del ratón y calcular rotaciones
+            SDL_GetMouseState(&mouseX, &mouseY);
+            float rotX = sensitivity * (float)(mouseY - height / 2) / height;
+            float rotY = sensitivity * (float)(mouseX - width / 2) / width;
 
-        if (fabs(angleBetween - 90.0f) <= 85.0f) {
-            Orientation = newOrientation;
+            // Rotación vertical
+            glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
+
+            // Rota verticalmente (pitch)
+            glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX), right);
+            glm::vec3 newOrientation = glm::vec3(pitch * glm::vec4(Orientation, 0.0f));
+
+            // Limitar la inclinación vertical
+            float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
+                (glm::length(newOrientation) * glm::length(Up))));
+
+            if (fabs(angleBetween - 90.0f) <= 85.0f) {
+                Orientation = newOrientation;
+            }
+
+            // Rota horizontalmente (yaw)
+            glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY), Up);
+            Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
+
         }
-
-        // Rota horizontalmente (yaw)
-        glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY), Up);
-        Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
-
+        else {
+            SDL_ShowCursor(SDL_ENABLE);
+            firstClick = true;
+        }
     }
-    else {
-        SDL_ShowCursor(SDL_ENABLE);
-        firstClick = true;
-    }
+    
+    
 }
 
 bool Camera::CleanUp()
