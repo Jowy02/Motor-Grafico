@@ -27,11 +27,8 @@ bool Scene::Start()
     //std::string devILPath = std::string("C:../Devil/");
     //std::string devILPath = std::string("C:/Users/Usuari/Documents/GitHub/Motor-Grafico/Engine/Devil/");
 
-
-
     std::string parentDir = std::string("../Images/");
     imagesFiles.push_back(std::string("textura.png"));
-
 
     for (size_t i = 0; i < imagesFiles.size(); ++i)
     {
@@ -39,8 +36,8 @@ bool Scene::Start()
         // Crear la textura con tu clase Texture (usa DevIL internamente)
         Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
         images.push_back(tex);
-
     }
+
 	return true;
 }
 
