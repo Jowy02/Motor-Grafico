@@ -32,29 +32,27 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
 
 void Camera::Inputs(SDL_Window* window)
 {
-    const Uint8* state = SDL_GetKeyboardState(NULL);
+    const bool* state = SDL_GetKeyboardState(NULL);
     bool shiftHeld = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
 
     SDL_Event event;
-    if (SDL_PollEvent(&event)) {
-        if (event.type == SDL_MOUSEWHEEL) {
-            if (event.wheel.y > 0) {
-                Position += 1.0f * Orientation;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_EVENT_MOUSE_WHEEL) {
+            if (event.wheel.y > 0.0f) {
+                Position += speed * Orientation;
             }
-            else if (event.wheel.y < 0) {
-                Position += 1.0f * -Orientation;
+            else if (event.wheel.y < 0.0f) {
+                Position += speed * -Orientation;
             }
         }
     }
- 
-
 
     // --- Manejo del ratón ---
-    int mouseX, mouseY;
+    float mouseX, mouseY;
     Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
-    if (mouseState && SDL_BUTTON(SDL_BUTTON_LEFT)) {
-        SDL_ShowCursor(SDL_DISABLE);
+    if (mouseState == SDL_BUTTON_LEFT) {
+        SDL_HideCursor();
 
         if (firstClick) {
             SDL_WarpMouseInWindow(window, width / 2, height / 2);
@@ -63,6 +61,7 @@ void Camera::Inputs(SDL_Window* window)
 
         // Obtener posición del ratón y calcular rotaciones
         SDL_GetMouseState(&mouseX, &mouseY);
+
         float rotX = sensitivity * (float)(mouseY - height / 2) / height;
         float rotY = sensitivity * (float)(mouseX - width / 2) / width;
 
@@ -103,7 +102,7 @@ void Camera::Inputs(SDL_Window* window)
             Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
         }
     }
-    else if(mouseState && SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+    else if(mouseState == SDL_BUTTON_RIGHT) {
         // Movimiento del teclado
         if (state[SDL_SCANCODE_W]) {
             Position += speed * Orientation;
@@ -125,7 +124,7 @@ void Camera::Inputs(SDL_Window* window)
         }
     }
     else {
-        SDL_ShowCursor(SDL_ENABLE);
+        SDL_ShowCursor();
         firstClick = true;
     }
 }

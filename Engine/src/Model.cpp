@@ -67,8 +67,6 @@ void Model::loadModel(const std::string& path)
         aiProcess_GenNormals
     );
 
- 
-
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -77,7 +75,6 @@ void Model::loadModel(const std::string& path)
 
     directory = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
-
 }
 
 // Procesa recursivamente todos los nodos

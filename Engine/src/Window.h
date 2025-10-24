@@ -3,9 +3,13 @@
 #define SDL_MAIN_HANDLED   // evita conflicto con SDL_main
 
 #include "Module.h"
-#include "SDL2/SDL_Video.h"
-#include "SDL2/SDL.h"
+#include "SDL3/SDL_Video.h"
+#include "SDL3/SDL.h"
 #include <glad/glad.h>
+
+#include "imgui.h"
+//#include "imgui_impl_sdl2.h"
+//#include "imgui_impl_sdlrenderer2.h"
 
 class Window : public Module
 {

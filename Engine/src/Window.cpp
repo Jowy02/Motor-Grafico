@@ -31,10 +31,10 @@ bool Window::Awake()
 
     // Crear ventana
     window = SDL_CreateWindow("MyEngine",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         width, height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+        SDL_WINDOW_OPENGL);
 
+    SDL_ShowWindow(window);
     if (!window) {
         //std::cerr << "Error creando ventana: " << SDL_GetError() << "\n";
         SDL_Quit();
@@ -53,7 +53,7 @@ bool Window::Awake()
     // Inicializar GLAD
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         //std::cerr << "Error inicializando GLAD\n";
-        SDL_GL_DeleteContext(context);
+        SDL_GL_DestroyContext(context);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
@@ -69,7 +69,7 @@ bool Window::CleanUp()
 	// Destroy window
 	if (window != NULL)
 	{
-        SDL_GL_DeleteContext(context);
+        SDL_GL_DestroyContext(context);
         SDL_DestroyWindow(window);
         SDL_Quit();
 	}

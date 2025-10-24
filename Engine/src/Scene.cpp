@@ -53,16 +53,16 @@ void Scene::LoadFBX(const std::string& path) {
 
 void Scene::ApplyTextureToSelected(const std::string& path) {
    
-    if (!models.empty()) 
-    {
+    //if (!models.empty()) 
+    //{
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
         models.back().Mmesh.texture = tex;
-    }
-    else {
-        Texture tex(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-        images.push_back(tex);
-    }
+    /*}*/
+    //else {
+    //    Texture tex(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    //    images.push_back(tex);
+    //}
   
 }
 
@@ -75,14 +75,31 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
+    //DRAG AND DROP
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_EVENT_DROP_FILE) {
+            std::string path = event.drop.data;
+
+            std::string extension = path.substr(path.find_last_of('.') + 1);
+            if (extension == "fbx" || extension == "FBX") {
+                Application::GetInstance().scene->LoadFBX(path);
+            }
+            else if (extension == "png" || extension == "dds") {
+                Application::GetInstance().scene->ApplyTextureToSelected(path);
+            }
+            //TODO: do we need to free the drag&drop event??
+            //SDL_free(&event);
+        }
+    }
 
     for(auto& Model : models) Model.Draw();
    
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-    /* for (auto& modelFBX : listFBX) {
+     for (auto& modelFBX : listFBX) {
          modelFBX.Draw();
-     }*/
+     }
 
     //Image 2D
     for (int i = 0; i < images.size(); i++)

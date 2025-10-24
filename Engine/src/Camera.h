@@ -7,7 +7,8 @@
 #include "Application.h"
 
 #include<glad/glad.h>
-#include "SDL2/SDL.h"
+#include "SDL3/SDL.h"
+#include "SDL3/SDL_events.h"
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp> 
 #include<glm/gtc/type_ptr.hpp>
@@ -43,7 +44,7 @@ public:
 	int height;
 
 	// Adjust the speed of the camera and it's sensitivity when looking around
-	float speed = 0.1f;
+	float speed = 0.5f;
 	float sensitivity = 0.1f;
 	
 	// Camera constructor to set up initial values
