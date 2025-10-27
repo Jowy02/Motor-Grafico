@@ -50,17 +50,64 @@ bool Input::Start()
 // Called each loop iteration
 bool Input::PreUpdate()
 {
+
 	static SDL_Event event;
 	float speed = Application::GetInstance().camera.get()->speed;
 	glm::vec3 Orientation = Application::GetInstance().camera.get()->Orientation;
 
+	for (int i = 0; i < NUM_MOUSE_BUTTONS; ++i)
+	{
+		if (mouseButtons[i] == KEY_DOWN)
+			mouseButtons[i] = KEY_REPEAT;
+
+		if (mouseButtons[i] == KEY_UP)
+			mouseButtons[i] = KEY_IDLE;
+	}
+	
+	const bool* keys = SDL_GetKeyboardState(NULL);
+
+	for (int i = 0; i < MAX_KEYS; ++i)
+	{
+		if (keys[i] == 1)
+		{
+			if (keyboard[i] == KEY_IDLE)
+				keyboard[i] = KEY_DOWN;
+			else
+				keyboard[i] = KEY_REPEAT;
+		}
+		else
+		{
+			if (keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN)
+				keyboard[i] = KEY_UP;
+			else
+				keyboard[i] = KEY_IDLE;
+		}
+	}
+
 	while(SDL_PollEvent(&event) != 0)
 	{
+		int btn = event.button.button; 
 		switch(event.type)
 		{
 			case SDL_EVENT_QUIT:
 				windowEvents[WE_QUIT] = true;
 			break;
+
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				if (btn >= 1 && btn <= NUM_MOUSE_BUTTONS)
+					mouseButtons[btn - 1] = KEY_DOWN;
+			break;
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+			
+				if (btn >= 1 && btn <= NUM_MOUSE_BUTTONS)
+					mouseButtons[btn - 1] = KEY_UP;
+			break;
+
+			case SDL_EVENT_MOUSE_MOTION:
+				
+				SDL_GetMouseState(&mouseX, &mouseY);
+				break;
+
             case SDL_EVENT_MOUSE_WHEEL:
 
                 if (event.wheel.y > 0.0f) {

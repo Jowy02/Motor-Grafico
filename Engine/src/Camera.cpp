@@ -1,3 +1,4 @@
+#include"Input.h"
 #include"Camera.h"
 
 Camera::Camera() : Module()
@@ -32,14 +33,8 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
 
 void Camera::Inputs(SDL_Window* window)
 {
-    const bool* state = SDL_GetKeyboardState(NULL);
-    bool shiftHeld = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
 
-    // --- Manejo del ratón ---
-    float mouseX, mouseY;
-    Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
-
-    if (mouseState == SDL_BUTTON_LEFT) {
+    if (Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) {
         SDL_HideCursor();
 
         if (firstClick) {
@@ -47,13 +42,11 @@ void Camera::Inputs(SDL_Window* window)
             firstClick = false;
         }
 
-        // Obtener posición del ratón y calcular rotaciones
-        SDL_GetMouseState(&mouseX, &mouseY);
+        //calcular rotaciones
+        float rotX = sensitivity * (float)(Application::GetInstance().input.get()->GetMousePosition().y - height / 2) / height;
+        float rotY = sensitivity * (float)(Application::GetInstance().input.get()->GetMousePosition().x - width / 2) / width;
 
-        float rotX = sensitivity * (float)(mouseY - height / 2) / height;
-        float rotY = sensitivity * (float)(mouseX - width / 2) / width;
-
-        if (state[SDL_SCANCODE_LALT]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) {
 
             //glm::vec3 target = Position + Orientation * distanceToTarget;
             glm::vec3 target = glm::vec3(0.0f);// cambiar por la posicion (0,0,0) del objeto que queremos centrar
@@ -90,24 +83,24 @@ void Camera::Inputs(SDL_Window* window)
             Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
         }
     }
-    else if(mouseState == SDL_BUTTON_RIGHT) {
+    else if(Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) {
         // Movimiento del teclado
-        if (state[SDL_SCANCODE_W]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
             Position += speed * Orientation;
         }
-        if (state[SDL_SCANCODE_A]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
             Position += speed * -glm::normalize(glm::cross(Orientation, Up));
         }
-        if (state[SDL_SCANCODE_S]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
             Position += speed * -Orientation;
         }
-        if (state[SDL_SCANCODE_D]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
             Position += speed * glm::normalize(glm::cross(Orientation, Up));
         }
-        if (state[SDL_SCANCODE_SPACE]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) {
             Position += speed * Up;
         }
-        if (state[SDL_SCANCODE_LCTRL]) {
+        if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) {
             Position += speed * -Up;
         }
     }

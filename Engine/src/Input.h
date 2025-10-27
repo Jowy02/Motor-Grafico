@@ -73,6 +73,6 @@ private:
 
 	int	mouseMotionX;
 	int mouseMotionY;
-	int mouseX;
-	int mouseY;
+	float mouseX;
+	float mouseY;
 };
