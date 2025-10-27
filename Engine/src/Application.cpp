@@ -66,6 +66,7 @@ bool Application::Awake() {
 // Called before the first frame
 bool Application::Start() {
 
+
     //Measure the amount of ms that takes to execute the App Start() and LOG the result
 
     //Iterates the module list and calls Start on each module
@@ -84,7 +85,6 @@ bool Application::Update() {
 
     bool ret = true;
     PrepareUpdate();
-
  /*   if (input->GetWindowEvent(WE_QUIT) == true)
         ret = false;*/
 
@@ -113,6 +113,10 @@ bool Application::CleanUp() {
             break;
         }
     }
+    
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 
     return result;
 }
@@ -120,12 +124,26 @@ bool Application::CleanUp() {
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
-   /* frameTime.Start();*/
+    uint64_t now = SDL_GetPerformanceCounter();
+    if (perfLastTime == 0)
+        perfLastTime = now; // primera vez
+
+    dt = (float)(now - perfLastTime) / (float)SDL_GetPerformanceFrequency();
+    perfLastTime = now;
+
+    //frameTime.Start();
+    frameStart = SDL_GetTicks();
 }
 
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
+ 
+    //if (frameDelay > frameTime)
+    //    SDL_Delay(frameDelay - frameTime);
+    //frameTime = SDL_GetTicks() - frameStart;
+    //dt = frameTime / 1000.0f; // en segundos
+
    window.get()->SetTitle("Motor Grafico");
 }
 

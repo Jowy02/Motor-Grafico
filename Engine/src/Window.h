@@ -34,6 +34,8 @@ public:
 	// Retrieve window scale
 	int GetScale() const;
 
+	SDL_Window* GetSDLWindow() const { return window; }
+	SDL_GLContext GetGLContext() const { return context; }
 	// The window we'll be rendering to
 	SDL_Window* window;
 	void SetScreen(bool fullscreen);

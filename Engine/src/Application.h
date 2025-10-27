@@ -2,6 +2,13 @@
 #include <memory>
 #include <list>
 #include "Module.h"
+#include "SDL3/SDL.h"
+#include "SDL3/SDL_events.h"
+
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_opengl3.h"
+
 
 // Modules
 class Window;
@@ -103,5 +110,14 @@ private:
 
 	//Maximun frame duration in miliseconds.
 	int maxFrameDuration = 16;
+
+
+	Uint32 frameStart = 0;
+	Uint32 frameTime = 0;
+	//Limitar fps
+	const int targetFPS = 60;
+	const int frameDelay = 1000 / targetFPS;
+	
+	uint64_t perfLastTime = 0;
 
 };

@@ -5,6 +5,10 @@
 #include "Model.h"
 #include <iostream> 
 
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_opengl3.h"
+
 Scene::Scene() : Module()
 {
 
@@ -43,6 +47,18 @@ bool Scene::Start()
     //    images.push_back(tex);
     //}
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
+    SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
+    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
+
+    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+
 	return true;
 }
 
@@ -69,6 +85,9 @@ void Scene::ApplyTextureToSelected(const std::string& path) {
 
 bool Scene::PreUpdate()
 {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
 
 	return true;
 }
@@ -260,14 +279,46 @@ bool Scene::Update(float dt)
     //// Cada frame:
     //Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
+framesCounter++;
+timeAccumulator += dt;
+
+if (timeAccumulator >= 1.0f) // cada segundo
+{
+    currentFPS = (float)framesCounter / timeAccumulator;
+    fpsHistory.push_back(currentFPS);
+
+    if (fpsHistory.size() > 100) // límite para el gráfico
+        fpsHistory.erase(fpsHistory.begin());
+
+    framesCounter = 0;
+    timeAccumulator = 0.0f;
+
+    std::cout << "FPS: " << currentFPS << std::endl;
+
+}
+
+FPS_graph();
 
 
 	return true;
 
 }
 
+void Scene::FPS_graph()
+{
+    ImGui::Begin("FPS Monitor");
+    ImGui::Text("FPS actual: %.1f", currentFPS);
+    if (!fpsHistory.empty()) {
+        ImGui::PlotLines("FPS", fpsHistory.data(), fpsHistory.size(), 0, nullptr, 0.0f, 120.0f, ImVec2(500, 300));
+    }
+    ImGui::End();
+}
+
 bool Scene::PostUpdate()
 {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	return true;
 }
 
@@ -279,6 +330,9 @@ bool Scene::CleanUp() {
     }
     images.clear();
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 
 	return true;
 }

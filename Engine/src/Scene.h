@@ -36,6 +36,8 @@ public:
 
 	void ApplyTextureToSelected(const std::string& path);
 
+	void FPS_graph();
+
 public:
 	Model* selectedModel = nullptr;
 
@@ -48,4 +50,11 @@ private:
 	std::vector<Model>listFBX;
 	std::vector<std::string>imagesFiles;
 	std::vector<Texture >images;
+
+	std::vector<float> fpsHistory;
+	Uint32 lastFrameTime = 0;
+	float currentFPS = 0.0f;
+	int framesCounter = 0;
+
+	float timeAccumulator = 0.0f;
 };
