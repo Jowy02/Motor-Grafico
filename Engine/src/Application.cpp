@@ -1,6 +1,6 @@
 #include "Application.h"
 #include "Window.h"
-//#include "Input.h"
+#include "Input.h"
 #include "Render.h"
 #include "Scene.h"
 #include "Camera.h"
@@ -19,7 +19,7 @@ Application::Application() {
 
     // Modules
     window = std::make_shared<Window>();
-    //input = std::make_shared<Input>();
+    input = std::make_shared<Input>();
     render = std::make_shared<Render>();
     scene = std::make_shared<Scene>();
     camera = std::make_shared<Camera>();
@@ -29,7 +29,7 @@ Application::Application() {
     // Ordered for awake / Start / Update
     // Reverse order of CleanUp
     AddModule(std::static_pointer_cast<Module>(window));
-//    AddModule(std::static_pointer_cast<Module>(input));
+    AddModule(std::static_pointer_cast<Module>(input));
     AddModule(std::static_pointer_cast<Module>(scene));
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));

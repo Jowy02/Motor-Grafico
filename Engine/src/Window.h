@@ -8,8 +8,8 @@
 #include <glad/glad.h>
 
 #include "imgui.h"
-//#include "imgui_impl_sdl2.h"
-//#include "imgui_impl_sdlrenderer2.h"
+#include "imgui_impl_sdl3.h"
+//#include "imgui_impl_sdlrenderer3.h"
 
 class Window : public Module
 {

@@ -146,8 +146,6 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
-    SDL_PollEvent(&event);
-    
 
 	return true;
 }
@@ -169,12 +167,11 @@ bool Render::Update(float dt)
 
 bool Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
 {
-    Application::GetInstance().camera.get()->Inputs(temp);
+    //Application::GetInstance().camera.get()->Inputs(temp);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
     static MeshData mesh;
 
-    
     if (!mesh.initialized)
     {
         mesh.initialized = true;

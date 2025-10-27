@@ -35,18 +35,6 @@ void Camera::Inputs(SDL_Window* window)
     const bool* state = SDL_GetKeyboardState(NULL);
     bool shiftHeld = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
 
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_EVENT_MOUSE_WHEEL) {
-            if (event.wheel.y > 0.0f) {
-                Position += speed * Orientation;
-            }
-            else if (event.wheel.y < 0.0f) {
-                Position += speed * -Orientation;
-            }
-        }
-    }
-
     // --- Manejo del ratón ---
     float mouseX, mouseY;
     Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);

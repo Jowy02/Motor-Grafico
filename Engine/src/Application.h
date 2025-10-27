@@ -5,7 +5,7 @@
 
 // Modules
 class Window;
-//class Input;
+class Input;
 class Camera;
 class Render;
 class Scene;
@@ -75,7 +75,7 @@ public:
 
 	// Modules
 	std::shared_ptr<Window> window;
-	//std::shared_ptr<Input> input;
+	std::shared_ptr<Input> input;
 	std::shared_ptr<Render> render;
 	std::shared_ptr<Scene> scene;
 	std::shared_ptr<Camera> camera;
