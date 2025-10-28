@@ -47,8 +47,6 @@ bool Scene::Start()
     //    images.push_back(tex);
     //}
 
-   
-
     LogToConsole("Initializing ImGui...");
 
     Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");

@@ -56,8 +56,12 @@ void Camera::Inputs(SDL_Window* window)
             Position = target + direction * idealDistance;
             Orientation = glm::normalize(target - Position);
         }
-
     }
+    if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+    {
+        speed = MOVESPEED * 2;
+    }
+    else speed = MOVESPEED;
 
     if (!io.WantCaptureMouse && Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) {
         SDL_HideCursor();
