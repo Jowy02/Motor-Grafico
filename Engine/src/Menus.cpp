@@ -57,6 +57,52 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Exit"))
+            {
+                Application::GetInstance().requestExit = true;
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("View"))
+        {
+            ImGui::MenuItem("Console", nullptr, &showConsole);
+            ImGui::MenuItem("FPS Monitor", nullptr, &showFPS);
+            ImGui::MenuItem("Hierarchy", nullptr, &showHierarchy);
+            ImGui::MenuItem("System Info", nullptr, &showSystemInfo);
+            ImGui::EndMenu();
+        }
+
+        // Help menu
+        if (ImGui::BeginMenu("Help"))
+        {
+            // Open GitHub documentation
+            if (ImGui::MenuItem("GitHub Documentation"))
+                ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico", 0, 0, SW_SHOWNORMAL);
+
+            // Open GitHub issues page
+            if (ImGui::MenuItem("Report a Bug"))
+                ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/issues", 0, 0, SW_SHOWNORMAL);
+
+            // Open GitHub releases page
+            if (ImGui::MenuItem("Download Latest"))
+                ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/releases", 0, 0, SW_SHOWNORMAL);
+
+            ImGui::Separator();
+
+            // About window toggle
+            ImGui::MenuItem("About", nullptr, &showAbout);
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+
 
     framesCounter++;
     timeAccumulator += dt;
@@ -76,16 +122,19 @@ bool Menus::Update(float dt)
 
     }
 
-    DrawConsole();
-    FPS_graph();
-    Hierarchy_Menu();
-    DrawSystemInfo();
+    if (showConsole) DrawConsole();
+    if (showFPS) FPS_graph();
+    if (showHierarchy) Hierarchy_Menu();
+    if (showSystemInfo) DrawSystemInfo();
+    if (showAbout) DrawAboutWindow();
+
+
     return true;
 }
 
 void Menus::FPS_graph()
 {
-    ImGui::Begin("FPS Monitor");
+    ImGui::Begin("FPS Monitor", &showFPS);
     ImGui::Text("FPS actual: %.1f", currentFPS);
     if (!fpsHistory.empty()) {
         ImGui::PlotLines("FPS", fpsHistory.data(), fpsHistory.size(), 0, nullptr, 0.0f, 120.0f, ImVec2(100, 50));
@@ -95,7 +144,7 @@ void Menus::FPS_graph()
 
 void Menus::DrawConsole()
 {
-    ImGui::Begin("Console");
+    ImGui::Begin("Console", &showConsole);
 
     for (const auto& line : consoleLog) {
         ImGui::TextUnformatted(line.c_str());
@@ -105,7 +154,7 @@ void Menus::DrawConsole()
 }
 void Menus::Hierarchy_Menu()
 {
-    ImGui::Begin("Hierarchy");
+    ImGui::Begin("Hierarchy", &showHierarchy);
 
     for (auto& Model : models) DrawGameObjectNode(&Model);
 
@@ -139,7 +188,7 @@ float Menus::GetRAMUsageMB()
 
 void Menus::DrawSystemInfo()
 {
-    ImGui::Begin("System Info");
+    ImGui::Begin("System Info", &showSystemInfo);
 
     // Memory usage
     ImGui::Text("Memory Usage:");
@@ -164,6 +213,46 @@ void Menus::DrawSystemInfo()
     ImGui::End();
 }
 
+void Menus::DrawAboutWindow()
+{
+    ImGui::Begin("About", &showAbout);
+
+    // Engine name
+    ImGui::Text("Motor Gráfico");
+    ImGui::Separator();
+
+    // Version
+    ImGui::Text("Version: 1.0.0");
+
+    // Team members
+    ImGui::Text("Team:");
+    ImGui::BulletText("Joel Vicente");
+    ImGui::BulletText("Arthur Córdoba");
+    ImGui::BulletText("Jana Puig");
+
+    ImGui::Separator();
+
+    // Libraries used
+    ImGui::Text("Libraries used:");
+    ImGui::BulletText("SDL3");
+    ImGui::BulletText("OpenGL");
+    ImGui::BulletText("Assimp");
+    ImGui::BulletText("ImGui");
+    ImGui::BulletText("DevIL");
+    ImGui::BulletText("GLM");
+    ImGui::BulletText("GLAD");
+
+    ImGui::Separator();
+
+    // License
+    ImGui::Text("License...");
+    ImGui::TextWrapped(
+        "...."
+    );
+
+    ImGui::End();
+}
+
 bool Menus::PostUpdate()
 {
     ImGui::Render();
@@ -174,12 +263,13 @@ bool Menus::PostUpdate()
 
 bool Menus::CleanUp() {
     LogToConsole("Shutting down ImGui...");
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
+
     LogToConsole("Scene::CleanUp completed");
 
-    Application::GetInstance().menus->LogToConsole("Menus::CleanUp started");
     
     return true;
 }

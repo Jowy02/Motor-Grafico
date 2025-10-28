@@ -49,7 +49,7 @@ public:
 	float GetRAMUsageMB();
 
 	void DrawSystemInfo();
-
+	void DrawAboutWindow();
 private:
 	std::vector<Model>models;
 
@@ -59,4 +59,11 @@ private:
 	int framesCounter = 0;
 
 	float timeAccumulator = 0.0f;
+
+
+	bool showConsole = true;
+	bool showFPS = true;
+	bool showHierarchy = true;
+	bool showSystemInfo = true;
+	bool showAbout = false;
 };

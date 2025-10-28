@@ -48,7 +48,7 @@ bool Scene::Start()
     //}
 
 
-    //Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
 	return true;
 }

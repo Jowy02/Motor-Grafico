@@ -85,6 +85,9 @@ bool Application::Start() {
 bool Application::Update() {
 
     bool ret = true;
+    if (requestExit)
+        return false;
+
     PrepareUpdate();
  /*   if (input->GetWindowEvent(WE_QUIT) == true)
         ret = false;*/
@@ -114,9 +117,6 @@ bool Application::CleanUp() {
             break;
         }
     }
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
 
     return result;
 }

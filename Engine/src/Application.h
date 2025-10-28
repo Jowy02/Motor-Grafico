@@ -41,6 +41,7 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	
 private:
 
 	// Private constructor to prevent instantiation
@@ -68,6 +69,7 @@ private:
 
 	std::list<std::shared_ptr<Module>> moduleList;
 
+
 public:
 
 	enum EngineState
@@ -89,6 +91,7 @@ public:
 	std::shared_ptr<Camera> camera;
 	std::shared_ptr<Menus> menus;
 
+	bool requestExit = false;
 
 
 private:
