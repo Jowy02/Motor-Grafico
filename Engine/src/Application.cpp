@@ -89,8 +89,8 @@ bool Application::Update() {
         return false;
 
     PrepareUpdate();
- /*   if (input->GetWindowEvent(WE_QUIT) == true)
-        ret = false;*/
+    if (input->GetWindowEvent(WE_QUIT) == true)
+        ret = false;
 
     if (ret == true)
         ret = PreUpdate();
