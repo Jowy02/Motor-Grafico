@@ -32,6 +32,7 @@ public:
 	bool CleanUp();
 
 
+	void CalculateFPS(float dt);
 	void FPS_graph();
 
 	void DrawConsole();
@@ -51,6 +52,9 @@ public:
 
 	void DrawSystemInfo();
 	void DrawAboutWindow();
+
+	void MainMenu();
+	void BuildDockSpace();
 private:
 	std::vector<Model>models;
 

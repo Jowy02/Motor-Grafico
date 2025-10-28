@@ -10,7 +10,7 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
 #include <windows.h>
-
+#include "imgui_internal.h"
 Menus::Menus() : Module()
 {
 }
@@ -35,6 +35,10 @@ bool Menus::Start()
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
 
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //Docking
+    ImGui::StyleColorsDark();
+
+
     SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
     SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
 
@@ -57,6 +61,26 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
+    //Dock space
+    BuildDockSpace();
+    MainMenu();
+
+   
+
+    CalculateFPS(dt);
+
+    if (showConsole) DrawConsole();
+    if (showFPS) FPS_graph();
+    if (showHierarchy) Hierarchy_Menu();
+    if (showSystemInfo) DrawSystemInfo();
+    if (showAbout) DrawAboutWindow();
+    DrawInspector();
+
+
+    return true;
+}
+
+void Menus::MainMenu() {
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
@@ -102,6 +126,76 @@ bool Menus::Update(float dt)
 
         ImGui::EndMainMenuBar();
     }
+}
+
+void Menus::BuildDockSpace() {
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+        ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowPadding = ImVec2(0.0f, 0.0f);      // Sin margen interno en ventanas
+    //style.FramePadding = ImVec2(0.0f, 0.0f);       // Sin margen en botones y elementos
+    //style.ItemSpacing = ImVec2(0.0f, 0.0f);        // Sin espacio entre elementos
+    style.WindowBorderSize = 0.0f;                 // Sin borde de ventana
+    style.IndentSpacing = 0.0f;
+
+    ImGui::Begin("MainDockSpace", nullptr, window_flags);
+    ImGui::PopStyleVar(2);
+
+    ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    static bool layoutInitialized = false;
+    if (!layoutInitialized && ImGui::DockBuilderGetNode(dockspace_id) == nullptr)
+    {
+        ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+        ImGui::DockBuilderRemoveNode(dockspace_id);
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
+
+        // Paso 1: dividir verticalmente el nodo raíz
+        ImGuiID dock_top, dock_bottom, dock_center;
+        dock_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
+        dock_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
+        dock_center = dockspace_id; // lo que queda en el medio
+
+        // Paso 2: dividir horizontalmente el centro
+        ImGuiID dock_left, dock_right;
+        dock_left = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Left, 0.2f, nullptr, &dock_center);
+        dock_right = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Right, 0.2f, nullptr, &dock_center);
+        // dock_center ahora es el centro real
+
+        // Asignar ventanas
+        ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
+        ImGui::DockBuilderDockWindow("Inspector", dock_right);
+        ImGui::DockBuilderDockWindow("Console", dock_bottom);
+        ImGui::DockBuilderDockWindow("FPS Monitor", dock_top);
+        ImGui::DockBuilderDockWindow("Scene", dock_center);
+
+        ImGui::DockBuilderFinish(dockspace_id);
+
+
+        layoutInitialized = true;
+    }
+
+    ImGui::End();
+}
+
+
+void Menus::CalculateFPS(float dt)
+{
 
     framesCounter++;
     timeAccumulator += dt;
@@ -120,16 +214,7 @@ bool Menus::Update(float dt)
         std::cout << "FPS: " << currentFPS << std::endl;
 
     }
-
-    if (showConsole) DrawConsole();
-    if (showFPS) FPS_graph();
-    if (showHierarchy) Hierarchy_Menu();
-    if (showSystemInfo) DrawSystemInfo();
-    if (showAbout) DrawAboutWindow();
-
-    return true;
 }
-
 void Menus::FPS_graph()
 {
     ImGui::Begin("FPS Monitor", &showFPS);
