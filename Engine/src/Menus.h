@@ -43,6 +43,7 @@ public:
 	std::vector<std::string> consoleLog;
 	void Hierarchy_Menu();
 	void DrawGameObjectNode(Model* model);
+	void DrawInspector();
 
 	Model* selectedObj = nullptr;
 

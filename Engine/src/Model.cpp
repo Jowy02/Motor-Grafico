@@ -30,7 +30,7 @@ void Model::Draw()
 
     // Enviar la matriz al shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transformMatrix));
 
     if (Mmesh.texture)
     {
@@ -56,7 +56,45 @@ void Model::Draw()
     if (Mmesh.texture)
         Mmesh.texture->Unbind();
 }
+void Model::UpdateTransform()
+{
+    // Recalcular matriz de transformación
+    transformMatrix = glm::mat4(1.0f);
+    transformMatrix = glm::translate(transformMatrix, position);
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+    transformMatrix = glm::scale(transformMatrix, scale);
 
+    // Los 8 vértices del AABB original
+    glm::vec3 corners[8] = {
+        {minAABB.x, minAABB.y, minAABB.z},
+        {minAABB.x, minAABB.y, maxAABB.z},
+        {minAABB.x, maxAABB.y, minAABB.z},
+        {minAABB.x, maxAABB.y, maxAABB.z},
+        {maxAABB.x, minAABB.y, minAABB.z},
+        {maxAABB.x, minAABB.y, maxAABB.z},
+        {maxAABB.x, maxAABB.y, minAABB.z},
+        {maxAABB.x, maxAABB.y, maxAABB.z},
+    };
+
+    glm::vec3 newMin(FLT_MAX);
+    glm::vec3 newMax(-FLT_MAX);
+
+    // Aplicar la matriz de transformación a cada vértice
+    for (int i = 0; i < 8; ++i)
+    {
+        glm::vec4 transformed = transformMatrix * glm::vec4(corners[i], 1.0f);
+        glm::vec3 p = glm::vec3(transformed);
+
+        newMin = glm::min(newMin, p);
+        newMax = glm::max(newMax, p);
+    }
+
+    // Guardar nuevo centro y tamaño
+    center = (newMin + newMax) * 0.5f;
+    size = newMax - newMin;
+}
 // Carga el modelo con Assimp
 void Model::loadModel(const std::string& path)
 {
@@ -91,6 +129,12 @@ void Model::loadModel(const std::string& path)
     processNode(scene->mRootNode, scene);
     center = (minAABB + maxAABB) * 0.5f;
     size = maxAABB - minAABB;
+
+    position = { 0,0,0 };
+    rotation = { 0,0,0 };
+    scale = { 1,1,1 };
+
+    UpdateTransform();
 }
 
 // Procesa recursivamente todos los nodos

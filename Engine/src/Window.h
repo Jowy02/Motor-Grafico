@@ -40,8 +40,8 @@ public:
 	SDL_Window* window;
 	void SetScreen(bool fullscreen);
 
-	int width = 800;
-	int height = 600;
+	int width = 1600;
+	int height = 900;
 private:
 	SDL_GLContext context;
 
