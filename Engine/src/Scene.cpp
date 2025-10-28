@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
+#include <windows.h>
 
 Scene::Scene() : Module()
 {
@@ -306,7 +307,7 @@ bool Scene::Update(float dt)
     DrawConsole();
     FPS_graph();
     Hierarchy_Menu();
-
+    DrawSystemInfo();
 
 	return true;
 
@@ -354,6 +355,43 @@ void Scene::DrawGameObjectNode(Model* obj)
     if (nodeOpen) {
         ImGui::TreePop();
     }
+}
+
+
+float Scene::GetRAMUsageMB()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+    return physMemUsed / (1024.0f * 1024.0f);
+}
+
+void Scene::DrawSystemInfo()
+{
+    ImGui::Begin("System Info");
+
+    // Memory usage
+    ImGui::Text("Memory Usage:");
+    ImGui::Text("RAM: %.2f MB", GetRAMUsageMB());
+
+    // Hardware info
+    ImGui::Separator();
+    ImGui::Text("Hardware:");
+    ImGui::Text("CPU: %s", SDL_GetPlatform());
+    ImGui::Text("GPU: %s", (const char*)glGetString(GL_RENDERER));
+    ImGui::Text("OpenGL Vendor: %s", (const char*)glGetString(GL_VENDOR));
+
+    // Library versions
+    ImGui::Separator();
+    ImGui::Text("Library Versions:");
+
+    ImGui::Text("SDL Version: %s", SDL_GetRevision());
+
+    ImGui::Text("OpenGL Version: %s", (const char*)glGetString(GL_VERSION));
+    ImGui::Text("DevIL Version: %d", IL_VERSION);
+
+    ImGui::End();
 }
 
 bool Scene::PostUpdate()

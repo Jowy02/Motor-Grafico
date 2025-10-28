@@ -52,6 +52,9 @@ public:
 
 	Model* selectedObj = nullptr;
 
+	float GetRAMUsageMB();
+
+	void DrawSystemInfo();
 
 private:
 	std::vector<Model>models;
