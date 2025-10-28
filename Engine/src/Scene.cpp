@@ -278,26 +278,29 @@ bool Scene::Update(float dt)
     //// Cada frame:
     //Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
-framesCounter++;
-timeAccumulator += dt;
+    framesCounter++;
+    timeAccumulator += dt;
 
-if (timeAccumulator >= 1.0f) // cada segundo
-{
-    currentFPS = (float)framesCounter / timeAccumulator;
-    fpsHistory.push_back(currentFPS);
+    if (timeAccumulator >= 1.0f) // cada segundo
+    {
+        currentFPS = (float)framesCounter / timeAccumulator;
+        fpsHistory.push_back(currentFPS);
 
-    if (fpsHistory.size() > 100) // límite para el gráfico
-        fpsHistory.erase(fpsHistory.begin());
+        if (fpsHistory.size() > 100) // límite para el gráfico
+            fpsHistory.erase(fpsHistory.begin());
 
-    framesCounter = 0;
-    timeAccumulator = 0.0f;
+        framesCounter = 0;
+        timeAccumulator = 0.0f;
 
-    std::cout << "FPS: " << currentFPS << std::endl;
+        std::cout << "FPS: " << currentFPS << std::endl;
 
-}
+    }
 
-FPS_graph();
-DrawConsole();
+
+    DrawConsole();
+    FPS_graph();
+    Hierarchy_Menu();
+
 
 	return true;
 
@@ -312,6 +315,7 @@ void Scene::FPS_graph()
     }
     ImGui::End();
 }
+
 void Scene::DrawConsole()
 {
     ImGui::Begin("Console");
@@ -322,6 +326,30 @@ void Scene::DrawConsole()
 
     ImGui::End();
 }
+void Scene::Hierarchy_Menu()
+{
+    ImGui::Begin("Hierarchy");
+
+    for (auto& Model : models) DrawGameObjectNode(&Model);
+
+    ImGui::End();
+}
+void Scene::DrawGameObjectNode(Model* obj) 
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+    if (obj == selectedObj)
+        flags |= ImGuiTreeNodeFlags_Selected;
+    bool nodeOpen = ImGui::TreeNodeEx((void*)obj, flags, "%s", obj->name.c_str());
+
+    if (ImGui::IsItemClicked())
+        selectedObj = obj;
+
+    if (nodeOpen) {
+        ImGui::TreePop();
+    }
+}
+
 bool Scene::PostUpdate()
 {
     ImGui::Render();

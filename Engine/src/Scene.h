@@ -37,6 +37,7 @@ public:
 	void ApplyTextureToSelected(const std::string& path);
 
 	void FPS_graph();
+
 	void DrawConsole();
 
 	void LogToConsole(const std::string& msg) {
@@ -47,9 +48,15 @@ public:
 	Model* selectedModel = nullptr;
 	std::vector<std::string> consoleLog;
 	static Scene* instance;
+	void Hierarchy_Menu();
+	void DrawGameObjectNode(Model* model);
+
+	Model* selectedObj = nullptr;
+
 
 private:
 	std::vector<Model>models;
+
 	SDL_Texture* mouseTileTex = nullptr;
 	std::string tilePosDebug = "[0,0]";
 

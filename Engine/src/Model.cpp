@@ -84,7 +84,13 @@ void Model::loadModel(const std::string& path)
     }
 
     directory = path.substr(0, path.find_last_of('/'));
+
+    name = path.substr(path.find_last_of("/\\") + 1);
+    name = name.substr(0, name.find_last_of('.'));
+
     processNode(scene->mRootNode, scene);
+    center = (minAABB + maxAABB) * 0.5f;
+    size = maxAABB - minAABB;
 }
 
 // Procesa recursivamente todos los nodos
@@ -109,10 +115,20 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
+    minAABB = glm::vec3(FLT_MAX);
+    maxAABB = glm::vec3(-FLT_MAX);
 
     // Extraer vértices: posición, normales y coordenadas UV
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
+        glm::vec3 vertex(mesh->mVertices[i].x,
+            mesh->mVertices[i].y,
+            mesh->mVertices[i].z);
+
+        // Actualizar AABB
+        minAABB = glm::min(minAABB, vertex);
+        maxAABB = glm::max(maxAABB, vertex);
+
         // Posición
         vertices.push_back(mesh->mVertices[i].x);
         vertices.push_back(mesh->mVertices[i].y);

@@ -22,12 +22,18 @@ struct ModelMesh {
 class Model
 {
 public:
+    std::string name;
     // Constructor: carga el modelo desde un archivo usando Assimp
     Model(const std::string& path);
     // Dibuja el modelo con un shader y una cámara
     void Draw();
     void CleanUp();
     ModelMesh Mmesh;
+
+    glm::vec3 center;
+    glm::vec3 minAABB;
+    glm::vec3 maxAABB;
+    glm::vec3 size;
 
 private:
     std::string directory;

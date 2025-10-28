@@ -1,5 +1,6 @@
 #include"Input.h"
 #include"Camera.h"
+#include"Scene.h"
 
 Camera::Camera() : Module()
 {
@@ -33,8 +34,9 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
 
 void Camera::Inputs(SDL_Window* window)
 {
+    ImGuiIO& io = ImGui::GetIO();
 
-    if (Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) {
+    if (!io.WantCaptureMouse && Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) {
         SDL_HideCursor();
 
         if (firstClick) {
@@ -47,9 +49,19 @@ void Camera::Inputs(SDL_Window* window)
         float rotY = sensitivity * (float)(Application::GetInstance().input.get()->GetMousePosition().x - width / 2) / width;
 
         if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) {
+            glm::vec3 target;
+            glm::vec3 size;
+
 
             //glm::vec3 target = Position + Orientation * distanceToTarget;
-            glm::vec3 target = glm::vec3(0.0f);// cambiar por la posicion (0,0,0) del objeto que queremos centrar
+            if(!Application::GetInstance().scene.get()->selectedObj == NULL){
+                target = Application::GetInstance().scene.get()->selectedObj->center;
+                size = Application::GetInstance().scene.get()->selectedObj->size;
+                
+                //target.y -= size.y * 0.5;
+
+            }
+            else target = glm::vec3{0.0f};
 
             glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
 
