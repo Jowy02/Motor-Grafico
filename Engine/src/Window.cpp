@@ -50,6 +50,8 @@ bool Window::Awake()
         return -1;
     }
 
+    SDL_GL_SetSwapInterval(1);
+
     // Inicializar GLAD
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         //std::cerr << "Error inicializando GLAD\n";

@@ -307,6 +307,7 @@ FPS_graph();
 void Scene::FPS_graph()
 {
     ImGui::Begin("FPS Monitor");
+    ImGui::SetWindowSize(ImVec2(550, 400), ImGuiCond_Always);
     ImGui::Text("FPS actual: %.1f", currentFPS);
     if (!fpsHistory.empty()) {
         ImGui::PlotLines("FPS", fpsHistory.data(), fpsHistory.size(), 0, nullptr, 0.0f, 120.0f, ImVec2(500, 300));
