@@ -3,16 +3,6 @@
 #include "Application.h"
 #include <iostream>
 
-
-//
-//void processInput(bool& running, const SDL_Event& event)
-//{
-//    if (event.type == SDL_QUIT)
-//        running = false;
-//    else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-//        running = false;
-//}
-
 int main(int argc, char* argv[]) {
 	Application::EngineState state = Application::EngineState::CREATE;
 	int result = EXIT_FAILURE;

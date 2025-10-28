@@ -86,6 +86,8 @@ bool Input::PreUpdate()
 
 	while(SDL_PollEvent(&event) != 0)
 	{
+		ImGui_ImplSDL3_ProcessEvent(&event);
+
 		int btn = event.button.button; 
 		switch(event.type)
 		{
