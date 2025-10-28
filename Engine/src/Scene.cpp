@@ -27,12 +27,12 @@ bool Scene::Awake()
 bool Scene::Start()
 {
 
-    listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
+    //listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
    
-    std::string texPath = "../Images/Baker_house.png";
-    Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    //std::string texPath = "../Images/Baker_house.png";
+    //Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-    listFBX[0].Mmesh.texture = tex;
+    //listFBX[0].Mmesh.texture = tex;
 
 
 
@@ -48,7 +48,9 @@ bool Scene::Start()
     //}
 
 
-    //Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+    Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    models[0].Mmesh.texture = tex;
 
 	return true;
 }
@@ -60,18 +62,17 @@ void Scene::LoadFBX(const std::string& path) {
 
 void Scene::ApplyTextureToSelected(const std::string& path) {
    
-    if (!selectedObj == NULL) 
+    if (!Application::GetInstance().menus.get()->selectedObj == NULL)
     {
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
         for (auto& Model : models) {
-            if(Model.name == selectedObj->name)Model.Mmesh.texture = tex;
+            if(Model.name == Application::GetInstance().menus.get()->selectedObj->name)Model.Mmesh.texture = tex;
         }
     }
     else {
         Application::GetInstance().menus->LogToConsole("ERROR AL APLICAR TEXTURA, NINGUN OBJETO SELECIONADO");
     }
-  
 }
 
 
@@ -86,9 +87,6 @@ bool Scene::Update(float dt)
    
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-     for (auto& modelFBX : listFBX) {
-         modelFBX.Draw();
-     }
 
     //Image 2D
     for (int i = 0; i < images.size(); i++)
@@ -277,7 +275,8 @@ bool Scene::PostUpdate()
 
 bool Scene::CleanUp() {
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
-    listFBX.clear();
+
+    models.clear();
     imagesFiles.clear();
     for (auto& tex : images) {
         tex.Delete();

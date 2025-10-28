@@ -36,17 +36,14 @@ public:
 
 	void ApplyTextureToSelected(const std::string& path);
 
-
-	Model* selectedObj = nullptr;
-
+	std::vector<Model>models;
 
 private:
-	std::vector<Model>models;
+
 
 	SDL_Texture* mouseTileTex = nullptr;
 	std::string tilePosDebug = "[0,0]";
 
-	std::vector<Model>listFBX;
 	std::vector<std::string>imagesFiles;
 	std::vector<Texture >images;
 

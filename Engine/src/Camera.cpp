@@ -1,6 +1,8 @@
 #include"Input.h"
 #include"Camera.h"
 #include"Scene.h"
+#include"Menus.h"
+
 
 Camera::Camera() : Module()
 {
@@ -41,9 +43,9 @@ void Camera::Inputs(SDL_Window* window)
         glm::vec3 target;
         glm::vec3 size;
 
-        if (!Application::GetInstance().scene.get()->selectedObj == NULL) {
-            target = Application::GetInstance().scene.get()->selectedObj->center;
-            size = Application::GetInstance().scene.get()->selectedObj->size;
+        if (!Application::GetInstance().menus.get()->selectedObj == NULL) {
+            target = Application::GetInstance().menus.get()->selectedObj->center;
+            size = Application::GetInstance().menus.get()->selectedObj->size;
             target.y -= size.y * 0.25;
 
             // Calcula una distancia óptima según el tamaño del modelo
@@ -81,9 +83,9 @@ void Camera::Inputs(SDL_Window* window)
 
 
             //glm::vec3 target = Position + Orientation * distanceToTarget;
-            if(!Application::GetInstance().scene.get()->selectedObj == NULL){
-                target = Application::GetInstance().scene.get()->selectedObj->center;
-                size = Application::GetInstance().scene.get()->selectedObj->size;
+            if(!Application::GetInstance().menus.get()->selectedObj == NULL){
+                target = Application::GetInstance().menus.get()->selectedObj->center;
+                size = Application::GetInstance().menus.get()->selectedObj->size;
                 
                 target.y -= size.y * 0.25;
             }

@@ -57,7 +57,7 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
-
+    
     framesCounter++;
     timeAccumulator += dt;
 
@@ -107,7 +107,7 @@ void Menus::Hierarchy_Menu()
 {
     ImGui::Begin("Hierarchy");
 
-    for (auto& Model : models) DrawGameObjectNode(&Model);
+    for (auto& Model : Application::GetInstance().scene.get()->models) DrawGameObjectNode(&Model);
 
     ImGui::End();
 }
