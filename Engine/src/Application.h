@@ -16,6 +16,7 @@ class Input;
 class Camera;
 class Render;
 class Scene;
+class Menus;
 
 
 class Application
@@ -86,6 +87,7 @@ public:
 	std::shared_ptr<Render> render;
 	std::shared_ptr<Scene> scene;
 	std::shared_ptr<Camera> camera;
+	std::shared_ptr<Menus> menus;
 
 
 

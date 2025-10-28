@@ -4,6 +4,7 @@
 #include "Render.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Menus.h"
 
 
 // Constructor
@@ -23,6 +24,7 @@ Application::Application() {
     render = std::make_shared<Render>();
     scene = std::make_shared<Scene>();
     camera = std::make_shared<Camera>();
+    menus = std::make_shared<Menus>();
 
 
 
@@ -31,6 +33,7 @@ Application::Application() {
     AddModule(std::static_pointer_cast<Module>(window));
     AddModule(std::static_pointer_cast<Module>(input));
     AddModule(std::static_pointer_cast<Module>(scene));
+    AddModule(std::static_pointer_cast<Module>(menus));
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));
 }

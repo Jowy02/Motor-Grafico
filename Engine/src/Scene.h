@@ -36,25 +36,9 @@ public:
 
 	void ApplyTextureToSelected(const std::string& path);
 
-	void FPS_graph();
-
-	void DrawConsole();
-
-	void LogToConsole(const std::string& msg) {
-		consoleLog.push_back(msg);
-	}
-
-
-	std::vector<std::string> consoleLog;
-	static Scene* instance;
-	void Hierarchy_Menu();
-	void DrawGameObjectNode(Model* model);
 
 	Model* selectedObj = nullptr;
 
-	float GetRAMUsageMB();
-
-	void DrawSystemInfo();
 
 private:
 	std::vector<Model>models;
@@ -66,10 +50,4 @@ private:
 	std::vector<std::string>imagesFiles;
 	std::vector<Texture >images;
 
-	std::vector<float> fpsHistory;
-	uint32_t lastFrameTime = 0;
-	float currentFPS = 0.0f;
-	int framesCounter = 0;
-
-	float timeAccumulator = 0.0f;
 };

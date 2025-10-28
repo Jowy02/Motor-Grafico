@@ -9,7 +9,7 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
 #include <windows.h>
-
+#include "Menus.h"
 Scene::Scene() : Module()
 {
 }
@@ -27,12 +27,12 @@ bool Scene::Awake()
 bool Scene::Start()
 {
 
-    //listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
+    listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
    
-    //std::string texPath = "../Images/Baker_house.png";
-    //Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    std::string texPath = "../Images/Baker_house.png";
+    Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-    //listFBX[0].Mmesh.texture = tex;
+    listFBX[0].Mmesh.texture = tex;
 
 
 
@@ -47,22 +47,9 @@ bool Scene::Start()
     //    images.push_back(tex);
     //}
 
-    LogToConsole("Initializing ImGui...");
 
-    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+    //Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-
-    SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
-    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
-
-    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330");
-
-    LogToConsole("ImGui initialized successfully");
 	return true;
 }
 
@@ -82,7 +69,7 @@ void Scene::ApplyTextureToSelected(const std::string& path) {
         }
     }
     else {
-        LogToConsole("ERROR AL APLICAR TEXTURA, NINGUN OBJETO SELECIONADO"); 
+        Application::GetInstance().menus->LogToConsole("ERROR AL APLICAR TEXTURA, NINGUN OBJETO SELECIONADO");
     }
   
 }
@@ -90,11 +77,7 @@ void Scene::ApplyTextureToSelected(const std::string& path) {
 
 bool Scene::PreUpdate()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-	return true;
+    return true;
 }
 
 bool Scene::Update(float dt)
@@ -283,135 +266,24 @@ bool Scene::Update(float dt)
     //// Cada frame:
     //Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
-    framesCounter++;
-    timeAccumulator += dt;
-
-    if (timeAccumulator >= 1.0f) // cada segundo
-    {
-        currentFPS = (float)framesCounter / timeAccumulator;
-        fpsHistory.push_back(currentFPS);
-
-        if (fpsHistory.size() > 100) // límite para el gráfico
-            fpsHistory.erase(fpsHistory.begin());
-
-        framesCounter = 0;
-        timeAccumulator = 0.0f;
-
-        std::cout << "FPS: " << currentFPS << std::endl;
-
-    }
-
-
-    DrawConsole();
-    FPS_graph();
-    Hierarchy_Menu();
-    DrawSystemInfo();
-
 	return true;
 
-}
-
-void Scene::FPS_graph()
-{
-    ImGui::Begin("FPS Monitor");
-    ImGui::Text("FPS actual: %.1f", currentFPS);
-    if (!fpsHistory.empty()) {
-        ImGui::PlotLines("FPS", fpsHistory.data(), fpsHistory.size(), 0, nullptr, 0.0f, 120.0f, ImVec2(100, 50));
-    }
-    ImGui::End();
-}
-
-void Scene::DrawConsole()
-{
-    ImGui::Begin("Console");
-
-    for (const auto& line : consoleLog) {
-        ImGui::TextUnformatted(line.c_str());
-    }
-
-    ImGui::End();
-}
-void Scene::Hierarchy_Menu()
-{
-    ImGui::Begin("Hierarchy");
-
-    for (auto& Model : models) DrawGameObjectNode(&Model);
-
-    ImGui::End();
-}
-void Scene::DrawGameObjectNode(Model* obj) 
-{
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-
-    if (obj == selectedObj)
-        flags |= ImGuiTreeNodeFlags_Selected;
-    bool nodeOpen = ImGui::TreeNodeEx((void*)obj, flags, "%s", obj->name.c_str());
-
-    if (ImGui::IsItemClicked())
-        selectedObj = obj;
-
-    if (nodeOpen) {
-        ImGui::TreePop();
-    }
-}
-
-
-float Scene::GetRAMUsageMB()
-{
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&memInfo);
-    DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
-    return physMemUsed / (1024.0f * 1024.0f);
-}
-
-void Scene::DrawSystemInfo()
-{
-    ImGui::Begin("System Info");
-
-    // Memory usage
-    ImGui::Text("Memory Usage:");
-    ImGui::Text("RAM: %.2f MB", GetRAMUsageMB());
-
-    // Hardware info
-    ImGui::Separator();
-    ImGui::Text("Hardware:");
-    ImGui::Text("CPU: %s", SDL_GetPlatform());
-    ImGui::Text("GPU: %s", (const char*)glGetString(GL_RENDERER));
-    ImGui::Text("OpenGL Vendor: %s", (const char*)glGetString(GL_VENDOR));
-
-    // Library versions
-    ImGui::Separator();
-    ImGui::Text("Library Versions:");
-
-    ImGui::Text("SDL Version: %s", SDL_GetRevision());
-
-    ImGui::Text("OpenGL Version: %s", (const char*)glGetString(GL_VERSION));
-    ImGui::Text("DevIL Version: %d", IL_VERSION);
-
-    ImGui::End();
 }
 
 bool Scene::PostUpdate()
 {
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	return true;
+ 	return true;
 }
 
 bool Scene::CleanUp() {
-    LogToConsole("Scene::CleanUp started");
+    Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
     listFBX.clear();
     imagesFiles.clear();
     for (auto& tex : images) {
         tex.Delete();
     }
     images.clear();
-    LogToConsole("Shutting down ImGui...");
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
-    LogToConsole("Scene::CleanUp completed");
+
+    Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
 	return true;
 }

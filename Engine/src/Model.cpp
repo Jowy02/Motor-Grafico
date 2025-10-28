@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include <iostream>
 #include <cstring> 
-#include "Scene.h"
+#include "Menus.h"
 
 Model::Model(const std::string& path)
 {
@@ -72,14 +72,14 @@ void Model::loadModel(const std::string& path)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-        Application::GetInstance().scene->LogToConsole(std::string("ERROR: FBX load failed: ") + path);
-        Application::GetInstance().scene->LogToConsole(std::string("ERROR: Assimp load failed: ") + importer.GetErrorString());
+        Application::GetInstance().menus->LogToConsole(std::string("ERROR: FBX load failed: ") + path);
+        Application::GetInstance().menus->LogToConsole(std::string("ERROR: Assimp load failed: ") + importer.GetErrorString());
         return;
     }
     else {
-        Application::GetInstance().scene->LogToConsole("Loaded FBX: " + path);
+        Application::GetInstance().menus->LogToConsole("Loaded FBX: " + path);
 
-        Application::GetInstance().scene->LogToConsole("ASSIMP initialized");
+        Application::GetInstance().menus->LogToConsole("ASSIMP initialized");
 
     }
 

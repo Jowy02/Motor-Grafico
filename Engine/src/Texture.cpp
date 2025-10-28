@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Texture.h"
 #include <IL/il.h>
-#include "Scene.h"
+#include "Menus.h"
 #include "Application.h"
 
 Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
@@ -21,15 +21,15 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
 
     if (!ilLoadImage(imagePath)) {
         std::cout << "Error: No se pudo cargar la imagen: " << imagePath << std::endl;
-        Application::GetInstance().scene->LogToConsole("ERROR: texture load failed: " + std::string(imagePath));
-        Application::GetInstance().scene->LogToConsole("ERROR: DevIL load failed");
+        Application::GetInstance().menus->LogToConsole("ERROR: texture load failed: " + std::string(imagePath));
+        Application::GetInstance().menus->LogToConsole("ERROR: DevIL load failed");
 
         ilDeleteImages(1, &img);
         return;
     }
     else {
-        Application::GetInstance().scene->LogToConsole("Loaded texture: " + std::string(imagePath));
-        Application::GetInstance().scene->LogToConsole("DevIL initialized");         
+        Application::GetInstance().menus->LogToConsole("Loaded texture: " + std::string(imagePath));
+        Application::GetInstance().menus->LogToConsole("DevIL initialized");
     }
 
     ilConvertImage(format, pixelType);
