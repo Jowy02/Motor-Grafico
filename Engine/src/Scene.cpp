@@ -45,7 +45,12 @@ bool Scene::Start()
     //    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
     //    images.push_back(tex);
     //}
+
+   
+
     LogToConsole("Initializing ImGui...");
+
+    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -69,16 +74,17 @@ void Scene::LoadFBX(const std::string& path) {
 
 void Scene::ApplyTextureToSelected(const std::string& path) {
    
-    //if (!models.empty()) 
-    //{
+    if (!selectedObj == NULL) 
+    {
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-        models.back().Mmesh.texture = tex;
-    /*}*/
-    //else {
-    //    Texture tex(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    //    images.push_back(tex);
-    //}
+        for (auto& Model : models) {
+            if(Model.name == selectedObj->name)Model.Mmesh.texture = tex;
+        }
+    }
+    else {
+        LogToConsole("ERROR AL APLICAR TEXTURA, NINGUN OBJETO SELECIONADO"); 
+    }
   
 }
 

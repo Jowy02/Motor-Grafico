@@ -36,6 +36,29 @@ void Camera::Inputs(SDL_Window* window)
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
+    {
+        glm::vec3 target;
+        glm::vec3 size;
+
+        if (!Application::GetInstance().scene.get()->selectedObj == NULL) {
+            target = Application::GetInstance().scene.get()->selectedObj->center;
+            size = Application::GetInstance().scene.get()->selectedObj->size;
+            target.y -= size.y * 0.25;
+
+            // Calcula una distancia óptima según el tamaño del modelo
+            float idealDistance = glm::length(size) * 1.0f;
+
+            // Dirección actual de la cámara hacia el objeto
+            glm::vec3 direction = glm::normalize(Position - target);
+
+            // Coloca la cámara mirando al objeto a la distancia ideal
+            Position = target + direction * idealDistance;
+            Orientation = glm::normalize(target - Position);
+        }
+
+    }
+
     if (!io.WantCaptureMouse && Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) {
         SDL_HideCursor();
 
@@ -58,8 +81,7 @@ void Camera::Inputs(SDL_Window* window)
                 target = Application::GetInstance().scene.get()->selectedObj->center;
                 size = Application::GetInstance().scene.get()->selectedObj->size;
                 
-                //target.y -= size.y * 0.5;
-
+                target.y -= size.y * 0.25;
             }
             else target = glm::vec3{0.0f};
 

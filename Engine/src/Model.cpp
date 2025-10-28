@@ -24,7 +24,7 @@ void Model::Draw()
 
     model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));    //Centrar
 
-    //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1, 0, 0));   //Rotar
+    model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1, 0, 0));   //Rotar
 
     model = glm::scale(model, glm::vec3(0.5f)); //Escalar
 

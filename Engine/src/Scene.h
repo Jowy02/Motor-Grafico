@@ -44,8 +44,7 @@ public:
 		consoleLog.push_back(msg);
 	}
 
-public:
-	Model* selectedModel = nullptr;
+
 	std::vector<std::string> consoleLog;
 	static Scene* instance;
 	void Hierarchy_Menu();
