@@ -11,7 +11,6 @@
 
 Scene::Scene() : Module()
 {
-
 }
 // Destructor
 Scene::~Scene()
@@ -20,13 +19,13 @@ Scene::~Scene()
 
 bool Scene::Awake()
 {
-
 	return true;
 }
 
 
 bool Scene::Start()
 {
+
     //listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
    
     //std::string texPath = "../Images/Baker_house.png";
@@ -46,6 +45,7 @@ bool Scene::Start()
     //    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
     //    images.push_back(tex);
     //}
+    LogToConsole("Initializing ImGui...");
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -58,7 +58,7 @@ bool Scene::Start()
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-
+    LogToConsole("ImGui initialized successfully");
 	return true;
 }
 
@@ -94,7 +94,6 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
-
     for(auto& Model : models) Model.Draw();
    
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
@@ -298,7 +297,7 @@ if (timeAccumulator >= 1.0f) // cada segundo
 }
 
 FPS_graph();
-
+DrawConsole();
 
 	return true;
 
@@ -313,7 +312,16 @@ void Scene::FPS_graph()
     }
     ImGui::End();
 }
+void Scene::DrawConsole()
+{
+    ImGui::Begin("Console");
 
+    for (const auto& line : consoleLog) {
+        ImGui::TextUnformatted(line.c_str());
+    }
+
+    ImGui::End();
+}
 bool Scene::PostUpdate()
 {
     ImGui::Render();
@@ -323,16 +331,17 @@ bool Scene::PostUpdate()
 }
 
 bool Scene::CleanUp() {
+    LogToConsole("Scene::CleanUp started");
     listFBX.clear();
     imagesFiles.clear();
     for (auto& tex : images) {
         tex.Delete();
     }
     images.clear();
-
+    LogToConsole("Shutting down ImGui...");
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
-
+    LogToConsole("Scene::CleanUp completed");
 	return true;
 }

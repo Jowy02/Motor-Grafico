@@ -33,7 +33,6 @@ Application::Application() {
     AddModule(std::static_pointer_cast<Module>(scene));
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));
-
 }
 
 // Static method to get the instance of the Engine class, following the singletn pattern
@@ -59,7 +58,6 @@ bool Application::Awake() {
             break;
         }
     }
-
     return result;
 }
 
@@ -113,7 +111,6 @@ bool Application::CleanUp() {
             break;
         }
     }
-    
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();

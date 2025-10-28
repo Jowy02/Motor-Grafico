@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include <iostream>
 #include <cstring> 
+#include "Scene.h"
 
 Model::Model(const std::string& path)
 {
@@ -59,6 +60,7 @@ void Model::Draw()
 // Carga el modelo con Assimp
 void Model::loadModel(const std::string& path)
 {
+
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_Triangulate |
@@ -70,7 +72,15 @@ void Model::loadModel(const std::string& path)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+        Application::GetInstance().scene->LogToConsole(std::string("ERROR: FBX load failed: ") + path);
+        Application::GetInstance().scene->LogToConsole(std::string("ERROR: Assimp load failed: ") + importer.GetErrorString());
         return;
+    }
+    else {
+        Application::GetInstance().scene->LogToConsole("Loaded FBX: " + path);
+
+        Application::GetInstance().scene->LogToConsole("ASSIMP initialized");
+
     }
 
     directory = path.substr(0, path.find_last_of('/'));

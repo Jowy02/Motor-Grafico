@@ -37,10 +37,16 @@ public:
 	void ApplyTextureToSelected(const std::string& path);
 
 	void FPS_graph();
+	void DrawConsole();
+
+	void LogToConsole(const std::string& msg) {
+		consoleLog.push_back(msg);
+	}
 
 public:
 	Model* selectedModel = nullptr;
-
+	std::vector<std::string> consoleLog;
+	static Scene* instance;
 
 private:
 	std::vector<Model>models;
@@ -52,7 +58,7 @@ private:
 	std::vector<Texture >images;
 
 	std::vector<float> fpsHistory;
-	Uint32 lastFrameTime = 0;
+	uint32_t lastFrameTime = 0;
 	float currentFPS = 0.0f;
 	int framesCounter = 0;
 

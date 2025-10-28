@@ -1,6 +1,6 @@
 #include "Window.h"
 #include "Application.h"
-
+#include "Scene.h"
 
 Window::Window() : Module()
 {
@@ -19,55 +19,67 @@ bool Window::Awake()
 	bool ret = true;
 
     // --- Inicialización de SDL ---
+    Application::GetInstance().scene->LogToConsole("Initializing SDL...");
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        Application::GetInstance().scene->LogToConsole("ERROR: SDL initialization failed: " + std::string(SDL_GetError()));
         //std::cerr << "Error inicializando SDL: " << SDL_GetError() << "\n";
         return -1;
     }
+    Application::GetInstance().scene->LogToConsole("SDL initialized successfully");
 
     // Configuración del contexto OpenGL
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    Application::GetInstance().scene->LogToConsole("Configured OpenGL context attributes");
 
     // Crear ventana
+    Application::GetInstance().scene->LogToConsole("Creating SDL window...");
     window = SDL_CreateWindow("MyEngine",
         width, height,
         SDL_WINDOW_OPENGL);
 
     SDL_ShowWindow(window);
     if (!window) {
+        Application::GetInstance().scene->LogToConsole("ERROR: Failed to create SDL window: " + std::string(SDL_GetError()));
         //std::cerr << "Error creando ventana: " << SDL_GetError() << "\n";
         SDL_Quit();
         return -1;
     }
+    Application::GetInstance().scene->LogToConsole("SDL window created successfully");
 
     // Crear contexto OpenGL
+    Application::GetInstance().scene->LogToConsole("Creating OpenGL context...");
      context = SDL_GL_CreateContext(window);
     if (!context) {
+        Application::GetInstance().scene->LogToConsole("ERROR: Failed to create OpenGL context: " + std::string(SDL_GetError()));
         //std::cerr << "Error creando contexto OpenGL: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
+    Application::GetInstance().scene->LogToConsole("OpenGL context created successfully");
 
-    SDL_GL_SetSwapInterval(1);
-
+    SDL_GL_SetSwapInterval(1);  // Enable V-Sync
+     
     // Inicializar GLAD
+    Application::GetInstance().scene->LogToConsole("Initializing GLAD...");
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        Application::GetInstance().scene->LogToConsole("ERROR: GLAD initialization failed");
         //std::cerr << "Error inicializando GLAD\n";
         SDL_GL_DestroyContext(context);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
-
+    Application::GetInstance().scene->LogToConsole("GLAD initialized successfully");
 
 }
 
 // Called before quitting
 bool Window::CleanUp()
 {
-
+    Application::GetInstance().scene->LogToConsole("Cleaning up SDL and OpenGL resources...");
 	// Destroy window
 	if (window != NULL)
 	{
@@ -78,6 +90,7 @@ bool Window::CleanUp()
 
 	// Quit SDL subsystems
 	SDL_Quit();
+    Application::GetInstance().scene->LogToConsole("Window cleanup completed");
 	return true;
 }
 
