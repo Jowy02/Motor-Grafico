@@ -3,8 +3,7 @@
 #include "Window.h"
 #include "Scene.h"
 #include "Camera.h"
-
-
+#include "Menus.h"
 
 #define MAX_KEYS 300
 
@@ -124,9 +123,9 @@ bool Input::PreUpdate()
             case SDL_EVENT_DROP_FILE:
                
                 std::string path = event.drop.data;
-
                 std::string extension = path.substr(path.find_last_of('.') + 1);
                 if (extension == "fbx" || extension == "FBX") {
+					Application::GetInstance().menus.get()->selectedObj = NULL;
                     Application::GetInstance().scene->LoadFBX(path);
                 }
                 else if (extension == "png" || extension == "dds") {

@@ -1,4 +1,4 @@
-#include "Application.h"
+ï»¿#include "Application.h"
 #include "Render.h"
 #include "Window.h"
 #include "Scene.h"
@@ -35,8 +35,8 @@ bool Menus::Start()
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
 
-    SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
-    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
+    SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // AsegÃºrate de tener este mÃ©todo
+    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // TambiÃ©n necesitas esto
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -66,7 +66,7 @@ bool Menus::Update(float dt)
         currentFPS = (float)framesCounter / timeAccumulator;
         fpsHistory.push_back(currentFPS);
 
-        if (fpsHistory.size() > 100) // límite para el gráfico
+        if (fpsHistory.size() > 100) // lÃ­mite para el grÃ¡fico
             fpsHistory.erase(fpsHistory.begin());
 
         framesCounter = 0;
@@ -80,6 +80,7 @@ bool Menus::Update(float dt)
     FPS_graph();
     Hierarchy_Menu();
     DrawSystemInfo();
+    DrawInspector();
     return true;
 }
 
@@ -126,7 +127,31 @@ void Menus::DrawGameObjectNode(Model* obj)
         ImGui::TreePop();
     }
 }
+void Menus::DrawInspector()
+{
+    ImGui::Begin("Inspector");
 
+    if (!selectedObj == NULL) {
+        ImGui::Text("Seleccionado: %s", selectedObj->name.c_str());
+        ImGui::Separator();
+        if(ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f))selectedObj->UpdateTransform();
+        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f))selectedObj->UpdateTransform();
+        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f))selectedObj->UpdateTransform();
+
+        ImGui::Separator();
+
+        ImGui::Text("Size: (%.2f, %.2f, %.2f)",
+            selectedObj->size.x,
+            selectedObj->size.y,
+            selectedObj->size.z);
+
+    }
+    else {
+        ImGui::Text("Ningï¿½n objeto seleccionado");
+    }
+
+    ImGui::End();
+}
 
 float Menus::GetRAMUsageMB()
 {

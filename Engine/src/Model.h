@@ -27,8 +27,16 @@ public:
     Model(const std::string& path);
     // Dibuja el modelo con un shader y una cámara
     void Draw();
+    void UpdateTransform();
     void CleanUp();
+
     ModelMesh Mmesh;
+
+    glm::mat4 transformMatrix;
+
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
 
     glm::vec3 center;
     glm::vec3 minAABB;
