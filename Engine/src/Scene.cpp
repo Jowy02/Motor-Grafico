@@ -51,6 +51,7 @@ bool Scene::Start()
     Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
     Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    models[0].texturePath = "../Images/Baker_house.png";
     models[0].Mmesh.texture = tex;
 
 	return true;
@@ -68,7 +69,10 @@ void Scene::ApplyTextureToSelected(const std::string& path) {
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
         for (auto& Model : models) {
-            if(Model.name == Application::GetInstance().menus.get()->selectedObj->name)Model.Mmesh.texture = tex;
+            if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) {
+                Model.Mmesh.texture = tex;
+                Model.texturePath = path;
+            }
         }
     }
     else {

@@ -23,6 +23,7 @@ class Model
 {
 public:
     std::string name;
+    std::string texturePath;
     // Constructor: carga el modelo desde un archivo usando Assimp
     Model(const std::string& path);
     // Dibuja el modelo con un shader y una cámara

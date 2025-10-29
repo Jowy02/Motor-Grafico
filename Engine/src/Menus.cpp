@@ -165,13 +165,13 @@ void Menus::BuildDockSpace() {
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
 
-        // Paso 1: dividir verticalmente el nodo raíz
+        // Dividir verticalmente el nodo raíz
         ImGuiID dock_top, dock_bottom, dock_center;
         dock_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
         dock_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
         dock_center = dockspace_id; // lo que queda en el medio
 
-        // Paso 2: dividir horizontalmente el centro
+        // Dividir horizontalmente el centro
         ImGuiID dock_left, dock_right;
         dock_left = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Left, 0.2f, nullptr, &dock_center);
         dock_right = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Right, 0.2f, nullptr, &dock_center);
@@ -264,17 +264,28 @@ void Menus::DrawInspector()
 
     if (!selectedObj == NULL) {
         ImGui::Text("Seleccionado: %s", selectedObj->name.c_str());
+
         ImGui::Separator();
+
+        ImGui::Text("TRANSFORM");
         if(ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f))selectedObj->UpdateTransform();
         if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f))selectedObj->UpdateTransform();
         if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f))selectedObj->UpdateTransform();
 
         ImGui::Separator();
 
+        ImGui::Text("MESH");
         ImGui::Text("Size: (%.2f, %.2f, %.2f)",
             selectedObj->size.x,
             selectedObj->size.y,
             selectedObj->size.z);
+        //TO DO opción para visualizar la textura de los cuadrados blancos y negros
+
+        ImGui::Separator();
+
+        ImGui::Text("TEXTURE");
+        ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
+        //TO DO TAMAÑO TEXTURE
 
     }
     else {
