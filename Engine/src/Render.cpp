@@ -2,6 +2,8 @@
 #include "Window.h"
 #include "Render.h"
 #include "Texture.h"
+#include "Scene.h"
+#include "Model.h"
 
 #define VSYNC true
 
@@ -41,12 +43,6 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 SDL_Event event;
 
-struct MeshData
-{
-    GLuint VAO = 0, VBO = 0, EBO = 0;
-    bool initialized = false;
-};
-
 Render::Render() : Module()
 {
 	name = "render";
@@ -60,25 +56,6 @@ Render::Render() : Module()
 Render::~Render()
 {
 }
-GLfloat vertices2[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
-};
-
-// Indices for vertices order
-GLuint indices2[] =
-{
-    0, 1, 2,
-    0, 2, 3,
-    0, 1, 4,
-    1, 2, 4,
-    2, 3, 4,
-    3, 0, 4
-};
 // Called before render is available
 bool Render::Awake()
 {
@@ -100,26 +77,6 @@ bool Render::Awake()
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-
-    //float vertices[] = {
-    //     0.5f,  0.5f, 0.0f,  // top right
-    //     0.5f, -0.5f, 0.0f,  // bottom right
-    //    -0.5f, -0.5f, 0.0f,  // bottom left
-    //    -0.5f,  0.5f, 0.0f,   // top left 
-
-    //     0.5f,  0.5f, 0.0f,  // top right
-    //     0.5f, -0.5f, 0.0f,  // bottom right
-    //    -0.5f, -0.5f, 0.0f,  // bottom left
-    //    -0.5f,  0.5f, 0.0f   // top left 
-    //};
-    //unsigned int indices[] = {  // note that we start from 0!
-    //        0,1,2, 2,3,0,   // 36 of indices
-    //        0,3,4, 4,5,0,
-    //        0,5,6, 6,1,0,
-    //        1,6,7, 7,2,1,
-    //        7,4,3, 3,2,7,
-    //        4,7,6, 6,5,4
-    //};
 
     temp = Application::GetInstance().window.get()->window;
 
@@ -165,77 +122,273 @@ bool Render::Update(float dt)
 //    return true;
 //}
 
-bool Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
+gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
 {
     //Application::GetInstance().camera.get()->Inputs(temp);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
-    static MeshData mesh;
+    static gemotryMesh mesh;
+    mesh.indexCount = indexCount;
 
-    if (!mesh.initialized)
+    glGenVertexArrays(1, &mesh.VAO);
+    glGenBuffers(1, &mesh.VBO);
+    glGenBuffers(1, &mesh.EBO);
+
+    glBindVertexArray(mesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(float), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    // Posición
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Coordenadas de textura
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    return mesh;
+}
+gemotryMesh Render::CreateSphere()
+{
+    gemotryMesh mesh;
+
+    float radius = 1.0f;
+    unsigned int sectorCount = 32.0f;
+    unsigned int stackCount = 16.0f;
+
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
+    const float PI = 3.14159265359f;
+    float x, y, z, xy;                              // posición
+    float nx, ny, nz, lengthInv = 1.0f / radius;   // normales
+    float s, t;                                    // coordenadas de textura
+
+    float sectorStep = 2 * PI / sectorCount;
+    float stackStep = PI / stackCount;
+    float sectorAngle, stackAngle;
+
+    // Generar vértices
+    for (unsigned int i = 0; i <= stackCount; ++i)
     {
-        mesh.initialized = true;
+        stackAngle = PI / 2 - i * stackStep;        // empieza desde pi/2 hasta -pi/2
+        xy = radius * cosf(stackAngle);             // r * cos(u)
+        z = radius * sinf(stackAngle);              // r * sin(u)
 
-        glGenVertexArrays(1, &mesh.VAO);
-        glGenBuffers(1, &mesh.VBO);
-        glGenBuffers(1, &mesh.EBO);
+        for (unsigned int j = 0; j <= sectorCount; ++j)
+        {
+            sectorAngle = j * sectorStep;           // empieza desde 0 hasta 2pi
 
-        glBindVertexArray(mesh.VAO);
+            x = xy * cosf(sectorAngle);
+            y = xy * sinf(sectorAngle);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(float), vertices, GL_STATIC_DRAW);
+            // Posición
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+            // Color, aquí lo hacemos con un degradado simple
+            vertices.push_back((x / radius + 1.0f) / 2.0f);
+            vertices.push_back((y / radius + 1.0f) / 2.0f);
+            vertices.push_back((z / radius + 1.0f) / 2.0f);
 
-        // Posición
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        // Color
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        // Coordenadas de textura
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-
-        glBindVertexArray(0);
+            // UVs
+            s = (float)j / sectorCount;
+            t = (float)i / stackCount;
+            vertices.push_back(s);
+            vertices.push_back(t);
+        }
     }
 
-    // Usa tu shader
-    glUseProgram(shaderProgram);
+    // Generar índices
+    unsigned int k1, k2;
+    for (unsigned int i = 0; i < stackCount; ++i)
+    {
+        k1 = i * (sectorCount + 1);
+        k2 = k1 + sectorCount + 1;
 
-        glm::mat4 model = glm::mat4(1.0f);
-    
-        // Assigns different transformations to each matrix
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        // Enviar solo el modelo (la cámara ya envió view y projection)
-        int modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-        // Decidir si usar textura
-        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-        if (texture)
+        for (unsigned int j = 0; j < sectorCount; ++j, ++k1, ++k2)
         {
-            texture->texUnit(shaderProgram, "tex0", 0);
-            texture->Bind();
-            glUniform1i(useTexLoc, 1);
-        }
-        else
-        {
-            glUniform1i(useTexLoc, 0);
-        }
+            if (i != 0)
+            {
+                indices.push_back(k1);
+                indices.push_back(k2);
+                indices.push_back(k1 + 1);
+            }
 
-        // Outputs the matrices into the Vertex Shader
-    
-        // Binds texture so that is appears in rendering
-        glBindVertexArray(mesh.VAO);
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-    
+            if (i != (stackCount - 1))
+            {
+                indices.push_back(k1 + 1);
+                indices.push_back(k2);
+                indices.push_back(k2 + 1);
+            }
+        }
+    }
 
-    return true;
+    mesh.indexCount = indices.size();
+
+    glGenVertexArrays(1, &mesh.VAO);
+    glGenBuffers(1, &mesh.VBO);
+    glGenBuffers(1, &mesh.EBO);
+
+    glBindVertexArray(mesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    Model model("NULL");
+    model.Mmesh.EBO = mesh.EBO;
+    model.Mmesh.VBO = mesh.VBO;
+    model.Mmesh.VAO = mesh.VAO;
+    model.Mmesh.indexCount = mesh.indexCount;
+
+    model.name = "Sphere";
+
+    Application::GetInstance().scene.get()->models.push_back(model);
+
+    return mesh;
+}
+void Render::CreateTriangle() 
+{
+    GLfloat vertices2[] =
+    { //     COORDINATES     /        COLORS      /   TexCoord  //
+        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+    };
+
+    // Indices for vertices order
+    GLuint indices2[] =
+    {
+        0, 1, 2,
+        0, 2, 3,
+        0, 1, 4,
+        1, 2, 4,
+        2, 3, 4,
+        3, 0, 4
+    };
+    int vertexCount = sizeof(vertices2) / sizeof(float);
+    int indexCount = sizeof(indices2) / sizeof(unsigned int);
+  
+    Model model("NULL");
+    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
+    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
+    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
+    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
+    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+    model.name = "Triangle";
+
+    Application::GetInstance().scene.get()->models.push_back(model);
+}
+
+void Render::CreateCube()
+{
+    GLfloat vertices2[] =
+    { //     COORDINATES     /        COLORS      /   TexCoord  //
+       -0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 0
+        0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    1.0f, 0.0f, // 1
+        0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,    1.0f, 1.0f, // 2
+       -0.5f,  0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 1.0f, // 3
+       -0.5f, -0.5f,  0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 4
+        0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    1.0f, 0.0f, // 5
+        0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    1.0f, 1.0f, // 6
+       -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    0.0f, 1.0f  // 7
+    };
+
+    // Indices for vertices order
+    GLuint indices2[] =
+    {
+        // Cara trasera
+        0, 1, 2, 2, 3, 0,
+        // Cara delantera
+        4, 5, 6, 6, 7, 4,
+        // Cara izquierda
+        0, 4, 7, 7, 3, 0,
+        // Cara derecha
+        1, 5, 6, 6, 2, 1,
+        // Cara inferior
+        0, 1, 5, 5, 4, 0,
+        // Cara superior
+        3, 2, 6, 6, 7, 3
+    };
+
+    int vertexCount = sizeof(vertices2) / sizeof(float);
+    int indexCount = sizeof(indices2) / sizeof(unsigned int);
+
+    Model model("NULL");
+    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
+    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
+    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
+    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
+    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+    model.name = "Cube";
+
+    Application::GetInstance().scene.get()->models.push_back(model);
+}
+
+void Render::CreateDiamond()
+{
+    GLfloat vertices2[] =
+    { //     COORDINATES     /        COLORS      /   TexCoord  //
+         0.0f,  0.5f,  0.0f,     1.0f, 0.8f, 0.2f, 0.5f, 1.0f, // top
+         0.5f,  0.0f,  0.0f,     1.0f, 0.0f, 0.0f, 1.0f, 0.5f,
+         0.0f,  0.0f,  0.5f,     0.0f, 1.0f, 0.0f, 0.5f, 0.0f,
+        -0.5f,  0.0f,  0.0f,     0.0f, 0.0f, 1.0f, 0.0f, 0.5f,
+         0.0f,  0.0f, -0.5f,     1.0f, 0.5f, 0.5f, 0.5f, 0.5f,
+         0.0f, -0.5f,  0.0f,     0.3f, 0.3f, 0.3f, 0.5f, 0.5f  // bottom
+    };
+
+    // Indices for vertices order
+    GLuint indices2[] =
+    {
+        // Mitad superior
+        0, 1, 2,
+        0, 2, 3,
+        0, 3, 4,
+        0, 4, 1,
+        // Mitad inferior
+        5, 2, 1,
+        5, 3, 2,
+        5, 4, 3,
+        5, 1, 4
+    };
+
+    int vertexCount = sizeof(vertices2) / sizeof(float);
+    int indexCount = sizeof(indices2) / sizeof(unsigned int);
+
+    Model model("NULL");
+    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
+    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
+    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
+    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
+    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+    model.name = "Diamond";
+
+    Application::GetInstance().scene.get()->models.push_back(model);
 }
 
 bool Render::PostUpdate()

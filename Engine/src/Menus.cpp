@@ -123,7 +123,27 @@ void Menus::MainMenu() {
 
             ImGui::EndMenu();
         }
-
+        if (ImGui::BeginMenu("Create"))
+        {
+            selectedObj = NULL;
+            if (ImGui::MenuItem("Triangulo"))
+            {
+                Application::GetInstance().render.get()->CreateTriangle();
+            }
+            if (ImGui::MenuItem("Cubo"))
+            {
+                Application::GetInstance().render.get()->CreateCube();
+            }
+            if (ImGui::MenuItem("Rombo"))
+            {
+                Application::GetInstance().render.get()->CreateDiamond();
+            }
+            if (ImGui::MenuItem("Sphere"))
+            {
+                Application::GetInstance().render.get()->CreateSphere();
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }

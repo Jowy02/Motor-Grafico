@@ -8,7 +8,16 @@
 
 Model::Model(const std::string& path)
 {
-    loadModel(path);
+    if (path != "NULL")loadModel(path);
+    else {
+        position = { 0,0,0 };
+        rotation = { 0,0,0 };
+        scale = { 1,1,1 };
+
+        minAABB = { -1,-1,-1 };
+        maxAABB = { 1,1,1 };
+        UpdateTransform();
+    }
 }
 
 // Dibuja todas las mallas del modelo

@@ -14,7 +14,11 @@
 #include <vector>
 #include <cmath>
 
-
+struct gemotryMesh {
+	GLuint VAO = 0, VBO = 0, EBO = 0;
+	unsigned int indexCount = 0;
+	Texture* texture = nullptr;
+};
 
 class Render : public Module
 {
@@ -38,9 +42,13 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
-	bool DrawTriangle();
-	bool DrawElements();
-	bool Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr);
+	void CreateTriangle();
+	void CreateCube();
+	void CreateDiamond();
+
+	gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr);
+	gemotryMesh CreateSphere();
+
 
 	void SetViewPort(const SDL_Rect& rect);
 	void ResetViewPort();
