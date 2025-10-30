@@ -305,6 +305,12 @@ void Menus::DrawInspector()
             selectedObj->size.x,
             selectedObj->size.y,
             selectedObj->size.z);
+        Render* render = Application::GetInstance().render.get();
+        ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
+        ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
+
+
+
         //TO DO opción para visualizar la textura de los cuadrados blancos y negros
 
         ImGui::Separator();
@@ -362,7 +368,7 @@ void Menus::DrawAboutWindow()
     ImGui::Begin("About", &showAbout);
 
     // Engine name
-    ImGui::Text("Motor Gr�fico");
+    ImGui::Text("Game Engine");
     ImGui::Separator();
 
     // Version
@@ -371,7 +377,7 @@ void Menus::DrawAboutWindow()
     // Team members
     ImGui::Text("Team:");
     ImGui::BulletText("Joel Vicente");
-    ImGui::BulletText("Arthur C�rdoba");
+    ImGui::BulletText("Arthur Cór doba");
     ImGui::BulletText("Jana Puig");
 
     ImGui::Separator();

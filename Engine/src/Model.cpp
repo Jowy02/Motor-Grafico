@@ -264,6 +264,17 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
     }
 }
 
+glm::mat4 Model::GetModelMatrix() const {
+    glm::mat4 trans = glm::translate(glm::mat4(1.0f), position);
+    glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1, 0, 0));
+    glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0, 1, 0));
+    glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0, 0, 1));
+    glm::mat4 rot = rotZ * rotY * rotX;
+    glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), scale);
+    return trans * rot * scaleMat;
+}
+
+
 void Model::CleanUp()
 {
     if (Mmesh.texture)

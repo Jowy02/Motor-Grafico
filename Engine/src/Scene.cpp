@@ -49,11 +49,11 @@ bool Scene::Start()
     //}
 
 
-    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+   /* Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
     Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     models[0].texturePath = "../Images/Baker_house.png";
-    models[0].Mmesh.texture = tex;
+    models[0].Mmesh.texture = tex;*/
 
 	return true;
 }

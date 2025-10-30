@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Scene.h"
 #include "Model.h"
+#include <iostream>
 
 #define VSYNC true
 
@@ -40,6 +41,23 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "   else\n"
 "       FragColor = vec4(ourColor, 1.0);\n"
 "}\n\0";
+
+const char* normalVertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"uniform mat4 model_matrix;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = projection * view * model_matrix * vec4(aPos, 1.0);\n"
+"}\0";
+
+const char* normalFragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n" // Verde
+"}\0";
 
 SDL_Event event;
 
@@ -78,6 +96,22 @@ bool Render::Awake()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    GLuint normalVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(normalVertexShader, 1, &normalVertexShaderSource, NULL);
+    glCompileShader(normalVertexShader);
+
+    GLuint normalFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(normalFragmentShader, 1, &normalFragmentShaderSource, NULL);
+    glCompileShader(normalFragmentShader);
+
+    normalShaderProgram = glCreateProgram();
+    glAttachShader(normalShaderProgram, normalVertexShader);
+    glAttachShader(normalShaderProgram, normalFragmentShader);
+    glLinkProgram(normalShaderProgram);
+
+    glDeleteShader(normalVertexShader);
+    glDeleteShader(normalFragmentShader);
+
     temp = Application::GetInstance().window.get()->window;
 
     return true;
@@ -106,6 +140,10 @@ bool Render::Update(float dt)
     //Modelo se vea desde la posicón de la cámara correcta
     Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+
+
+    ShowFaceNormals();
+    ShowVertexNormals();
 
 	return true;
 }
@@ -146,6 +184,159 @@ gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GL
 
     return mesh;
 }
+
+gemotryMesh Render::DrawFaceNormals(const float* vertices, const unsigned int* indices, size_t indexCount, std::vector<float>& outLines)
+{
+    outLines.clear();
+    gemotryMesh normalMesh;
+
+    for (size_t i = 0; i < indexCount; i += 3)
+    {
+        int i0 = indices[i] * 8;
+        int i1 = indices[i + 1] * 8;
+        int i2 = indices[i + 2] * 8;
+
+        float x0 = vertices[i0], y0 = vertices[i0 + 1], z0 = vertices[i0 + 2];
+        float x1 = vertices[i1], y1 = vertices[i1 + 1], z1 = vertices[i1 + 2];
+        float x2 = vertices[i2], y2 = vertices[i2 + 1], z2 = vertices[i2 + 2];
+
+        float cx = (x0 + x1 + x2) / 3.0f;
+        float cy = (y0 + y1 + y2) / 3.0f;
+        float cz = (z0 + z1 + z2) / 3.0f;
+
+        float ux = x1 - x0, uy = y1 - y0, uz = z1 - z0;
+        float vx = x2 - x0, vy = y2 - y0, vz = z2 - z0;
+
+        float nx = uy * vz - uz * vy;
+        float ny = uz * vx - ux * vz;
+        float nz = ux * vy - uy * vx;
+
+        float length = sqrt(nx * nx + ny * ny + nz * nz);
+        if (length != 0.0f)
+        {
+            nx /= length;
+            ny /= length;
+            nz /= length;
+        }
+
+        float scale = 0.1f;
+        float ex = cx + nx * scale;
+        float ey = cy + ny * scale;
+        float ez = cz + nz * scale;
+        std::cout << "Normal: (" << nx << ", " << ny << ", " << nz << ")" << std::endl;
+
+        // Agregar línea de normal
+        outLines.push_back(cx); outLines.push_back(cy); outLines.push_back(cz);
+        outLines.push_back(ex); outLines.push_back(ey); outLines.push_back(ez);
+    }
+
+    std::cout << "Normal lines count: " << outLines.size() / 3 << std::endl;
+
+    // Crear VAO/VBO de normales
+    glGenVertexArrays(1, &normalMesh.VAO);
+    glGenBuffers(1, &normalMesh.VBO);
+
+    glBindVertexArray(normalMesh.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, normalMesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, outLines.size() * sizeof(float), outLines.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    normalMesh.indexCount = outLines.size() / 3;
+
+    return normalMesh;
+}
+void  Render::ShowFaceNormals() {
+    if (FaceNormals) {
+        glDisable(GL_DEPTH_TEST);
+
+        glUseProgram(normalShaderProgram);
+        //glLineWidth(3.0f);
+        GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
+        Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, normalShaderProgram);
+
+        for (auto& model : Application::GetInstance().scene.get()->models)
+        {
+            if (model.Normalmesh.VAO != 0)
+            {
+                glm::mat4 modelMat = model.GetModelMatrix();
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
+                glBindVertexArray(model.Normalmesh.VAO);
+                glDrawArrays(GL_LINES, 0, model.Normalmesh.indexCount);
+                glBindVertexArray(0);
+            }
+        }
+    }
+    
+}
+
+gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, std::vector<float>& outLines)
+{
+    outLines.clear();
+    gemotryMesh normalMesh;
+
+    for (size_t i = 0; i < vertexCount; i += 8) // Cada vértice tiene 8 atributos
+    {
+        float x = vertices[i];
+        float y = vertices[i + 1];
+        float z = vertices[i + 2];
+
+        float nx = 0.0f;
+        float ny = 1.0f;
+        float nz = 0.0f;
+
+        float scale = 0.1f;
+        float ex = x + nx * scale;
+        float ey = y + ny * scale;
+        float ez = z + nz * scale;
+
+        outLines.push_back(x); outLines.push_back(y); outLines.push_back(z);
+        outLines.push_back(ex); outLines.push_back(ey); outLines.push_back(ez);
+    }
+
+    glGenVertexArrays(1, &normalMesh.VAO);
+    glGenBuffers(1, &normalMesh.VBO);
+
+    glBindVertexArray(normalMesh.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, normalMesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, outLines.size() * sizeof(float), outLines.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
+    normalMesh.indexCount = outLines.size() / 3;
+    return normalMesh;
+}
+
+void  Render::ShowVertexNormals() {
+    if (VertexNormals) {
+        glDisable(GL_DEPTH_TEST);
+
+        glUseProgram(normalShaderProgram);
+        //glLineWidth(3.0f);
+        GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
+        Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, normalShaderProgram);
+
+        for (auto& model : Application::GetInstance().scene.get()->models)
+        {
+            if (model.Normalmesh.VAO != 0)
+            {
+                glm::mat4 modelMat = model.GetModelMatrix();
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
+
+                glBindVertexArray(model.VertexNormalmesh.VAO);
+                glDrawArrays(GL_LINES, 0, model.VertexNormalmesh.indexCount);
+                glBindVertexArray(0);
+            }
+        }
+    }
+
+}
+
+
 void Render::CreateSphere()
 {
     gemotryMesh mesh;
@@ -258,6 +449,8 @@ void Render::CreateSphere()
     model.Mmesh.indexCount = mesh.indexCount;
 
     model.name = "Sphere";
+    model.Normalmesh = DrawFaceNormals(vertices.data(), indices.data(), indices.size(), model.normalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), model.vertexNormalLines);
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -354,7 +547,9 @@ void Render::CreateTriangle()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
   
     Model model("NULL");
+
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+   
 
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;
@@ -362,6 +557,8 @@ void Render::CreateTriangle()
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
     model.name = "Triangle";
+    model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -410,6 +607,8 @@ void Render::CreateCube()
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
     model.name = "Cube";
+    model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -453,6 +652,8 @@ void Render::CreateDiamond()
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
     model.name = "Diamond";
+    model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -460,6 +661,7 @@ void Render::CreateDiamond()
 bool Render::PostUpdate()
 {
     SDL_GL_SwapWindow(temp);
+
     return true;
 }
 

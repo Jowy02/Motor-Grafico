@@ -10,7 +10,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Texture.h"
+#include "Render.h"
 
+struct gemotryMesh;
 
 struct ModelMesh {
     GLuint VAO = 0, VBO = 0, EBO = 0;
@@ -32,7 +34,8 @@ public:
     void CleanUp();
 
     ModelMesh Mmesh;
-
+    gemotryMesh Normalmesh;
+    gemotryMesh VertexNormalmesh;
     glm::mat4 transformMatrix;
 
     glm::vec3 position;
@@ -43,6 +46,10 @@ public:
     glm::vec3 minAABB;
     glm::vec3 maxAABB;
     glm::vec3 size;
+    std::vector<float> normalLines;
+    std::vector<float> vertexNormalLines;
+   
+    glm::mat4 GetModelMatrix()const;
 
 private:
     std::string directory;
