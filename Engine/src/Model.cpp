@@ -8,6 +8,7 @@
 
 Model::Model(const std::string& path)
 {
+    //Diferenciar entre un modelo cargado a una geometria generada de nuestra libreria.
     if (path != "NULL")loadModel(path);
     else {
         position = { 0,0,0 };
@@ -27,15 +28,6 @@ void Model::Draw()
     //Modelo se vea desde la posicón de la cámara correcta
     Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
-
-    // Matriz de modelo
-    glm::mat4 model = glm::mat4(1.0f);
-
-    model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));    //Centrar
-
-    model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1, 0, 0));   //Rotar
-
-    model = glm::scale(model, glm::vec3(0.5f)); //Escalar
 
     // Enviar la matriz al shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
@@ -149,7 +141,6 @@ void Model::loadModel(const std::string& path)
     UpdateTransform();
 }
 
-// Procesa recursivamente todos los nodos
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
     // Procesa todas las mallas del nodo

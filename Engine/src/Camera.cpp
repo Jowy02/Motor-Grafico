@@ -38,6 +38,7 @@ void Camera::Inputs(SDL_Window* window)
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    //Centrar la camara en el objeto seleccionado
     if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_F) == KEY_DOWN)
     {
         glm::vec3 target;
@@ -59,6 +60,7 @@ void Camera::Inputs(SDL_Window* window)
             Orientation = glm::normalize(target - Position);
         }
     }
+    //Aumentar la velocidad de movimiento de la camara
     if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
     {
         speed = MOVESPEED * 2;
@@ -77,12 +79,12 @@ void Camera::Inputs(SDL_Window* window)
         float rotX = sensitivity * (float)(Application::GetInstance().input.get()->GetMousePosition().y - height / 2) / height;
         float rotY = sensitivity * (float)(Application::GetInstance().input.get()->GetMousePosition().x - width / 2) / width;
 
+        //Rotación de la camara alrededor del objeto seleccioando
         if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) {
+
             glm::vec3 target;
             glm::vec3 size;
 
-
-            //glm::vec3 target = Position + Orientation * distanceToTarget;
             if(!Application::GetInstance().menus.get()->selectedObj == NULL){
                 target = Application::GetInstance().menus.get()->selectedObj->center;
                 size = Application::GetInstance().menus.get()->selectedObj->size;
@@ -102,6 +104,7 @@ void Camera::Inputs(SDL_Window* window)
             Position = target + offset;
             Orientation = glm::normalize(target - Position);
         }
+        //Rotación libre
         else{
             // Rotación vertical
             glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
@@ -124,7 +127,7 @@ void Camera::Inputs(SDL_Window* window)
         }
     }
     else if(Application::GetInstance().input.get()->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) {
-        // Movimiento del teclado
+        // Movimiento WASD
         if (Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
             Position += speed * Orientation;
         }

@@ -10,15 +10,6 @@
 // Constructor
 Application::Application() {
 
-
-    ////Measure the amount of ms that takes to execute the App constructor and LOG the result
-    //Timer timer = Timer();
-    //startupTime = Timer();
-    //frameTime = PerfTimer();
-    //lastSecFrameTime = PerfTimer();
-    //frames = 0;
-
-    // Modules
     window = std::make_shared<Window>();
     input = std::make_shared<Input>();
     render = std::make_shared<Render>();
@@ -55,7 +46,6 @@ bool Application::Awake() {
     //Iterates the module list and calls Awake on each module
     bool result = true;
     for (const auto& module : moduleList) {
-        //module.get()->LoadParameters(configFile.child("config").child(module.get()->name.c_str()));
         result = module.get()->Awake();
         if (!result) {
             break;
@@ -66,10 +56,6 @@ bool Application::Awake() {
 
 // Called before the first frame
 bool Application::Start() {
-
-
-    //Measure the amount of ms that takes to execute the App Start() and LOG the result
-
     //Iterates the module list and calls Start on each module
     bool result = true;
     for (const auto& module : moduleList) {
@@ -107,8 +93,6 @@ bool Application::Update() {
 // Called before quitting
 bool Application::CleanUp() {
 
-    //Measure the amount of ms that takes to execute the App CleanUp() and LOG the result
-
     //Iterates the module list and calls CleanUp on each module
     bool result = true;
     for (const auto& module : moduleList) {
@@ -138,12 +122,6 @@ void Application::PrepareUpdate()
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
- 
-    //if (frameDelay > frameTime)
-    //    SDL_Delay(frameDelay - frameTime);
-    //frameTime = SDL_GetTicks() - frameStart;
-    //dt = frameTime / 1000.0f; // en segundos
-
    window.get()->SetTitle("Motor Grafico");
 }
 

@@ -13,7 +13,6 @@
 #include <windows.h>
 #include "imgui_internal.h"
 
-
 Menus::Menus() : Module()
 {
 }
@@ -27,10 +26,8 @@ bool Menus::Awake()
     return true;
 }
 
-
 bool Menus::Start()
 {
-
     Application::GetInstance().menus->LogToConsole("Initializing ImGui...");
 
     IMGUI_CHECKVERSION();
@@ -40,7 +37,6 @@ bool Menus::Start()
 
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //Docking
     ImGui::StyleColorsDark();
-
 
     SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
     SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
@@ -68,8 +64,6 @@ bool Menus::Update(float dt)
     BuildDockSpace();
     MainMenu();
 
-   
-
     CalculateFPS(dt);
 
     if (showConsole) DrawConsole();
@@ -78,7 +72,6 @@ bool Menus::Update(float dt)
     if (showSystemInfo) DrawSystemInfo();
     if (showAbout) DrawAboutWindow();
     DrawInspector();
-
 
     return true;
 }
@@ -192,13 +185,12 @@ void Menus::BuildDockSpace() {
         ImGuiID dock_top, dock_bottom, dock_center;
         dock_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
         dock_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
-        dock_center = dockspace_id; // lo que queda en el medio
+        dock_center = dockspace_id;
 
         // Dividir horizontalmente el centro
         ImGuiID dock_left, dock_right;
         dock_left = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Left, 0.2f, nullptr, &dock_center);
         dock_right = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Right, 0.2f, nullptr, &dock_center);
-        // dock_center ahora es el centro real
 
         // Asignar ventanas
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
@@ -219,7 +211,6 @@ void Menus::BuildDockSpace() {
 
 void Menus::CalculateFPS(float dt)
 {
-
     framesCounter++;
     timeAccumulator += dt;
 
@@ -408,6 +399,5 @@ bool Menus::CleanUp() {
 
     LogToConsole("Scene::CleanUp completed");
 
-    
     return true;
 }
