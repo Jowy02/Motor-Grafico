@@ -71,4 +71,6 @@ private:
 	bool showHierarchy = true;
 	bool showSystemInfo = true;
 	bool showAbout = false;
+
+	bool initialization_exist = false;
 };

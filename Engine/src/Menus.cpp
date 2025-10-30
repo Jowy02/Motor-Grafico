@@ -32,7 +32,22 @@ bool Menus::Start()
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.IniFilename = "imgui_layout.ini";
+    std::string path = "imgui_layout.ini";
+
+    // Intentar abrir el archivo en modo lectura para saber si ya se ha inicializado o no
+    FILE* file = fopen(path.c_str(), "r");
+    if (file) {
+        fclose(file);  // cerrar el archivo si existe
+        initialization_exist = true;
+    }
+    else {
+        initialization_exist = false;
+    }
+
     ImGui::StyleColorsDark();
 
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //Docking
@@ -174,7 +189,7 @@ void Menus::BuildDockSpace() {
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     static bool layoutInitialized = false;
-    if (!layoutInitialized && ImGui::DockBuilderGetNode(dockspace_id) == nullptr)
+    if (!layoutInitialized && !initialization_exist)
     {
         ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
         ImGui::DockBuilderRemoveNode(dockspace_id);
@@ -196,8 +211,8 @@ void Menus::BuildDockSpace() {
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom);
-        ImGui::DockBuilderDockWindow("FPS Monitor", dock_top);
-        ImGui::DockBuilderDockWindow("Scene", dock_center);
+        ImGui::DockBuilderDockWindow("FPS Monitor", dock_bottom);
+        ImGui::DockBuilderDockWindow("System Info", dock_bottom);
 
         ImGui::DockBuilderFinish(dockspace_id);
 
