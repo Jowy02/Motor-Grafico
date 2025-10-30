@@ -25,6 +25,7 @@ Model::Model(const std::string& path)
 // Dibuja todas las mallas del modelo
 void Model::Draw()
 {
+    if (isHidden) return;
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
     // Enviar la matriz al shader

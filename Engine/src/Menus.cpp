@@ -311,7 +311,6 @@ void Menus::DrawInspector()
         ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
 
 
-
         //TO DO opción para visualizar la textura de los cuadrados blancos y negros
 
         ImGui::Separator();
@@ -322,6 +321,14 @@ void Menus::DrawInspector()
         if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox, "BlackWhite");
         if (ImGui::Checkbox("Normal Map", &checkbox2)) selectedObj->switchTexture(checkbox2, "NormalMap");
 
+        ImGui::Separator();
+        ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
+        if (ImGui::Button("Delete Model")) {
+            auto& sceneModels = Application::GetInstance().scene->models;
+            sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
+                [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
+            selectedObj = nullptr;
+        }
     }
     else {
         ImGui::Text("Ning�n objeto seleccionado");

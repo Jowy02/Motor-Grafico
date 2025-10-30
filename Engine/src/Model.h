@@ -57,6 +57,7 @@ public:
 
     void switchTexture(bool checker, std::string type);
     Texture* actualTexture = nullptr;
+    bool isHidden = false;
 
 private:
     std::string directory;
