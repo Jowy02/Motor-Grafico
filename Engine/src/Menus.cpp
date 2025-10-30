@@ -389,10 +389,9 @@ void Menus::DrawAboutWindow()
     ImGui::Separator();
 
     // License
-    ImGui::Text("License...");
-    ImGui::TextWrapped(
-        "...."
-    );
+    if (ImGui::MenuItem("MIT Licence"))
+        ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/blob/main/LICENCE.md", 0, 0, SW_SHOWNORMAL);
+
 
     ImGui::End();
 }
