@@ -54,6 +54,7 @@ bool Scene::Start()
     Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     models[0].texturePath = "../Images/Baker_house.png";
     models[0].Mmesh.texture = tex;
+    models[0].actualTexture = tex;
 
 	return true;
 }
@@ -72,6 +73,7 @@ void Scene::ApplyTextureToSelected(const std::string& path) {
         for (auto& Model : models) {
             if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) {
                 Model.Mmesh.texture = tex;
+                Model.actualTexture = tex;
                 Model.texturePath = path;
             }
         }

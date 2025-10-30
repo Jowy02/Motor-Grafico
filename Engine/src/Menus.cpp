@@ -313,7 +313,8 @@ void Menus::DrawInspector()
         ImGui::Text("TEXTURE");
         ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
         //TO DO TAMAÑO TEXTURE
-        if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox);
+        if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox, "BlackWhite");
+        if (ImGui::Checkbox("Normal Map", &checkbox2)) selectedObj->switchTexture(checkbox2, "NormalMap");
 
     }
     else {

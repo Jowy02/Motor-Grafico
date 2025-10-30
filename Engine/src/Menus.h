@@ -75,6 +75,7 @@ private:
 	bool showAbout = false;
 
 	bool checkbox = false;
+	bool checkbox2 = false;
 
 	bool initialization_exist = false;
 };

@@ -51,9 +51,7 @@ void Model::Draw()
     if(name != "Grid")glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
     else glDrawElements(GL_LINES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
 
-    
     glBindVertexArray(0);
-
 
     if (Mmesh.texture)
         Mmesh.texture->Unbind();
@@ -264,14 +262,21 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 }
-void Model::switchTexture(bool checker) 
+void Model::switchTexture(bool checker, std::string type) 
 {
-    if (checker) {
-        actualTexture = Mmesh.texture;
-        Mmesh.texture = blackWhite;
+    if (type == "BlackWhite")
+    {
+        if (checker) {
+            Mmesh.texture = blackWhite;
+        }
+        else Mmesh.texture = actualTexture;
     }
-    else {
-        Mmesh.texture = actualTexture;
+    if (type == "NormalMap")
+    {
+        if (checker) {
+            Mmesh.texture = normalMap;
+        }
+        else Mmesh.texture = actualTexture;
     }
 }
 

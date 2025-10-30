@@ -44,13 +44,14 @@ public:
     glm::vec3 maxAABB;
     glm::vec3 size;
 
-    void switchTexture(bool checker);
+    void switchTexture(bool checker, std::string type);
+    Texture* actualTexture = nullptr;
 
 private:
     std::string directory;
 
     Texture* blackWhite = nullptr;
-    Texture* actualTexture = nullptr;
+    Texture* normalMap = nullptr;
 
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
