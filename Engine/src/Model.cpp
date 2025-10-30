@@ -19,8 +19,9 @@ Model::Model(const std::string& path)
         maxAABB = { 1,1,1 };
         UpdateTransform();
     }
-}
 
+    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+}
 // Dibuja todas las mallas del modelo
 void Model::Draw()
 {
@@ -50,9 +51,7 @@ void Model::Draw()
     if(name != "Grid")glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
     else glDrawElements(GL_LINES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
 
-    
     glBindVertexArray(0);
-
 
     if (Mmesh.texture)
         Mmesh.texture->Unbind();
@@ -263,6 +262,24 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 }
+void Model::switchTexture(bool checker, std::string type) 
+{
+    if (type == "BlackWhite")
+    {
+        if (checker) {
+            Mmesh.texture = blackWhite;
+        }
+        else Mmesh.texture = actualTexture;
+    }
+    if (type == "NormalMap")
+    {
+        if (checker) {
+            Mmesh.texture = normalMap;
+        }
+        else Mmesh.texture = actualTexture;
+    }
+}
+
 
 glm::mat4 Model::GetModelMatrix() const {
     glm::mat4 trans = glm::translate(glm::mat4(1.0f), position);

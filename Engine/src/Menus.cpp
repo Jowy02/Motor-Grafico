@@ -88,6 +88,7 @@ bool Menus::Update(float dt)
     if (showAbout) DrawAboutWindow();
     DrawInspector();
 
+    DrawSystemConfig();
     return true;
 }
 
@@ -318,6 +319,8 @@ void Menus::DrawInspector()
         ImGui::Text("TEXTURE");
         ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
         //TO DO TAMAÑO TEXTURE
+        if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox, "BlackWhite");
+        if (ImGui::Checkbox("Normal Map", &checkbox2)) selectedObj->switchTexture(checkbox2, "NormalMap");
 
     }
     else {
@@ -362,7 +365,40 @@ void Menus::DrawSystemInfo()
 
     ImGui::End();
 }
+void Menus::DrawSystemConfig()
+{
+    ImGui::Begin("System Config", &showSystemInfo);
 
+    // Window Config
+    ImGui::Text("Window");
+    int with = Application::GetInstance().window.get()->width;
+    int height = Application::GetInstance().window.get()->height;
+
+    ImGui::DragInt("Width", &with, 0.1f);
+    ImGui::DragInt("Height", &height, 0.1f);
+    Application::GetInstance().window.get()->GetWindowSize(with,height);
+
+    // Camera Config
+    ImGui::Separator();
+    ImGui::Text("Camera");
+
+    ImGui::DragFloat("Move Speed", &Application::GetInstance().camera.get()->MOVESPEED, 0.05f, 0.0f, 1.0f);
+    ImGui::DragFloat("Sensitivity", &Application::GetInstance().camera.get()->sensitivity, 0.05f,0.0f,1.0f);
+
+    glm::vec3 Position = Application::GetInstance().camera.get()->Position;
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)",
+        Position.x,
+        Position.y,
+        Position.z);
+
+    glm::vec3 Orientation = Application::GetInstance().camera.get()->Orientation;
+    ImGui::Text("Orientation: (%.2f, %.2f, %.2f)",
+        Orientation.x,
+        Orientation.y,
+        Orientation.z);
+
+    ImGui::End();
+}
 void Menus::DrawAboutWindow()
 {
     ImGui::Begin("About", &showAbout);
@@ -378,6 +414,7 @@ void Menus::DrawAboutWindow()
     ImGui::Text("Team:");
     ImGui::BulletText("Joel Vicente");
     ImGui::BulletText("Arthur Cór doba");
+    ImGui::BulletText("Arthur Cordoba");
     ImGui::BulletText("Jana Puig");
 
     ImGui::Separator();

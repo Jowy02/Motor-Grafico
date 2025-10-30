@@ -51,8 +51,14 @@ public:
    
     glm::mat4 GetModelMatrix()const;
 
+    void switchTexture(bool checker, std::string type);
+    Texture* actualTexture = nullptr;
+
 private:
     std::string directory;
+
+    Texture* blackWhite = nullptr;
+    Texture* normalMap = nullptr;
 
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
