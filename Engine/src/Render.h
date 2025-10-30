@@ -14,6 +14,8 @@
 #include <vector>
 #include <cmath>
 
+
+
 struct gemotryMesh {
 	GLuint VAO = 0, VBO = 0, EBO = 0;
 	unsigned int indexCount = 0;
@@ -62,7 +64,7 @@ public:
 	unsigned int normalShaderProgram;
 
 	gemotryMesh DrawFaceNormals(const GLfloat* vertices, const GLuint* indices, size_t indexCount, std::vector<float>& outLines);
-	gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, std::vector<float>& outLines);
+	gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines);
 
 	void ShowFaceNormals();
 	void ShowVertexNormals();

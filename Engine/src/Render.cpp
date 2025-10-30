@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Model.h"
 #include <iostream>
+#include "Menus.h"
 
 #define VSYNC true
 
@@ -248,34 +249,33 @@ gemotryMesh Render::DrawFaceNormals(const float* vertices, const unsigned int* i
 
     return normalMesh;
 }
-void  Render::ShowFaceNormals() {
+
+void Render::ShowFaceNormals() {
     if (FaceNormals) {
-        glDisable(GL_DEPTH_TEST);
-
+       //glDisable(GL_DEPTH_TEST);
         glUseProgram(normalShaderProgram);
-        //glLineWidth(3.0f);
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
-        Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, normalShaderProgram);
+        Application::GetInstance().camera.get()->Matrix(45.0f, 1.0f, 100.0f, normalShaderProgram);
 
-        for (auto& model : Application::GetInstance().scene.get()->models)
-        {
-            if (model.Normalmesh.VAO != 0)
-            {
-                glm::mat4 modelMat = model.GetModelMatrix();
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
-                glBindVertexArray(model.Normalmesh.VAO);
-                glDrawArrays(GL_LINES, 0, model.Normalmesh.indexCount);
-                glBindVertexArray(0);
-            }
+        Model* selected = Application::GetInstance().menus.get()->selectedObj;
+        if (selected && selected->Normalmesh.VAO != 0) {
+            glm::mat4 modelMat = selected->GetModelMatrix();
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
+
+            glBindVertexArray(selected->Normalmesh.VAO);
+            glDrawArrays(GL_LINES, 0, selected->Normalmesh.indexCount);
+            glBindVertexArray(0);
         }
     }
-    
 }
 
-gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, std::vector<float>& outLines)
+gemotryMesh Render::DrawVertexNormalsFromMesh (const float* vertices,size_t vertexCount, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines)
 {
     outLines.clear();
     gemotryMesh normalMesh;
+
+    const bool hasTangents = !tangents.empty();
+    const bool hasBitangents = !bitangents.empty();
 
     for (size_t i = 0; i < vertexCount; i += 8) // Cada vértice tiene 8 atributos
     {
@@ -283,17 +283,29 @@ gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vert
         float y = vertices[i + 1];
         float z = vertices[i + 2];
 
-        float nx = 0.0f;
-        float ny = 1.0f;
-        float nz = 0.0f;
+        float nx = vertices[i + 3];
+        float ny = vertices[i + 4];
+        float nz = vertices[i + 5];
 
         float scale = 0.1f;
-        float ex = x + nx * scale;
-        float ey = y + ny * scale;
-        float ez = z + nz * scale;
 
+        // Normal (verde)
         outLines.push_back(x); outLines.push_back(y); outLines.push_back(z);
-        outLines.push_back(ex); outLines.push_back(ey); outLines.push_back(ez);
+        outLines.push_back(x + nx * scale); outLines.push_back(y + ny * scale); outLines.push_back(z + nz * scale);
+
+        // Tangente (rojo)
+        if (hasTangents) {
+            const glm::vec3& t = tangents[i / 8];
+            outLines.push_back(x); outLines.push_back(y); outLines.push_back(z);
+            outLines.push_back(x + t.x * scale); outLines.push_back(y + t.y * scale); outLines.push_back(z + t.z * scale);
+        }
+
+        // Bitangente (azul)
+        if (hasBitangents) {
+            const glm::vec3& b = bitangents[i / 8];
+            outLines.push_back(x); outLines.push_back(y); outLines.push_back(z);
+            outLines.push_back(x + b.x * scale); outLines.push_back(y + b.y * scale); outLines.push_back(z + b.z * scale);
+        }
     }
 
     glGenVertexArrays(1, &normalMesh.VAO);
@@ -311,26 +323,23 @@ gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vert
     return normalMesh;
 }
 
+
 void  Render::ShowVertexNormals() {
     if (VertexNormals) {
-        glDisable(GL_DEPTH_TEST);
 
+        //glDisable(GL_DEPTH_TEST);
         glUseProgram(normalShaderProgram);
-        //glLineWidth(3.0f);
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
-        Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, normalShaderProgram);
+        Application::GetInstance().camera.get()->Matrix(45.0f, 1.0f, 100.0f, normalShaderProgram);
 
-        for (auto& model : Application::GetInstance().scene.get()->models)
-        {
-            if (model.Normalmesh.VAO != 0)
-            {
-                glm::mat4 modelMat = model.GetModelMatrix();
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
+        Model* selected = Application::GetInstance().menus.get()->selectedObj;
+        if (selected && selected->Normalmesh.VAO != 0) {
+            glm::mat4 modelMat = selected->GetModelMatrix();
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
 
-                glBindVertexArray(model.VertexNormalmesh.VAO);
-                glDrawArrays(GL_LINES, 0, model.VertexNormalmesh.indexCount);
-                glBindVertexArray(0);
-            }
+            glBindVertexArray(selected->VertexNormalmesh.VAO);
+            glDrawArrays(GL_LINES, 0, selected->VertexNormalmesh.indexCount);
+            glBindVertexArray(0);
         }
     }
 
@@ -450,7 +459,7 @@ void Render::CreateSphere()
 
     model.name = "Sphere";
     model.Normalmesh = DrawFaceNormals(vertices.data(), indices.data(), indices.size(), model.normalLines);
-    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), model.vertexNormalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), model.tangents, model.bitangents, model.vertexNormalLines);
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -558,7 +567,8 @@ void Render::CreateTriangle()
     model.Mmesh.texture = mesh.texture;
     model.name = "Triangle";
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
-    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount,model.tangents, model.bitangents, model.vertexNormalLines);
+
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -608,7 +618,8 @@ void Render::CreateCube()
     model.Mmesh.texture = mesh.texture;
     model.name = "Cube";
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
-    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.tangents, model.bitangents, model.vertexNormalLines);
+
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }
@@ -653,7 +664,8 @@ void Render::CreateDiamond()
     model.Mmesh.texture = mesh.texture;
     model.name = "Diamond";
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
-    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.vertexNormalLines);
+    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.tangents, model.bitangents, model.vertexNormalLines);
+
 
     Application::GetInstance().scene.get()->models.push_back(model);
 }

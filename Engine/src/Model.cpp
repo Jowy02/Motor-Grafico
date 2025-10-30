@@ -195,6 +195,28 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 
+    if (mesh->mTangents != nullptr) {
+        hasTangents = true;
+        tangents.clear();
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+            tangents.push_back(glm::vec3(
+                mesh->mTangents[i].x,
+                mesh->mTangents[i].y,
+                mesh->mTangents[i].z));
+        }
+    }
+
+    if (mesh->mBitangents != nullptr) {
+        hasBitangents = true;
+        bitangents.clear();
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+            bitangents.push_back(glm::vec3(
+                mesh->mBitangents[i].x,
+                mesh->mBitangents[i].y,
+                mesh->mBitangents[i].z));
+        }
+    }
+
     // Extraer índices
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
@@ -202,6 +224,9 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
+
+    VertexNormalmesh = Application::GetInstance().render.get()->DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), tangents, bitangents, vertexNormalLines);
+    Normalmesh = Application::GetInstance().render.get()->DrawFaceNormals(vertices.data(), indices.data(), indices.size(), normalLines);
 
     // Crear buffers OpenGL
 

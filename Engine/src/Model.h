@@ -48,7 +48,11 @@ public:
     glm::vec3 size;
     std::vector<float> normalLines;
     std::vector<float> vertexNormalLines;
-   
+    std::vector<glm::vec3> tangents;
+    std::vector<glm::vec3> bitangents;
+    bool hasTangents = false;
+    bool hasBitangents = false;
+
     glm::mat4 GetModelMatrix()const;
 
     void switchTexture(bool checker, std::string type);
