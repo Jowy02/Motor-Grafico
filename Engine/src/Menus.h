@@ -51,6 +51,8 @@ public:
 	float GetRAMUsageMB();
 
 	void DrawSystemInfo();
+	void DrawSystemConfig();
+
 	void DrawAboutWindow();
 
 	void MainMenu();
@@ -71,6 +73,8 @@ private:
 	bool showHierarchy = true;
 	bool showSystemInfo = true;
 	bool showAbout = false;
+
+	bool checkbox = false;
 
 	bool initialization_exist = false;
 };

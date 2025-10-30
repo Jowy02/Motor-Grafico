@@ -14,8 +14,6 @@
 #include<glm/gtc/matrix_transform.hpp> 
 #include<glm/gtc/type_ptr.hpp>
 
-#define MOVESPEED 0.1f
-
 class Camera : public Module
 {
 public:
@@ -44,6 +42,7 @@ public:
 	int height;
 
 	// Adjust the speed of the camera and it's sensitivity when looking around
+	float MOVESPEED = 0.1f;
 	float speed = MOVESPEED;
 	float sensitivity = 0.1f;
 	

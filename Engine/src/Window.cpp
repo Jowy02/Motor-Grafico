@@ -73,7 +73,6 @@ bool Window::Awake()
         return -1;
     }
     Application::GetInstance().menus->LogToConsole("GLAD initialized successfully");
-
 }
 
 // Called before quitting
@@ -92,6 +91,14 @@ bool Window::CleanUp()
 	SDL_Quit();
     Application::GetInstance().menus->LogToConsole("Window cleanup completed");
 	return true;
+}
+
+void Window::GetWindowSize(int with, int height)
+{
+    SDL_SetWindowSize(window, with, height);
+
+    this->width = with;
+    this->height = height;
 }
 
 // Set new window title

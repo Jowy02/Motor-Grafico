@@ -19,8 +19,9 @@ Model::Model(const std::string& path)
         maxAABB = { 1,1,1 };
         UpdateTransform();
     }
-}
 
+    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+}
 // Dibuja todas las mallas del modelo
 void Model::Draw()
 {
@@ -263,6 +264,17 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 }
+void Model::switchTexture(bool checker) 
+{
+    if (checker) {
+        actualTexture = Mmesh.texture;
+        Mmesh.texture = blackWhite;
+    }
+    else {
+        Mmesh.texture = actualTexture;
+    }
+}
+
 
 void Model::CleanUp()
 {

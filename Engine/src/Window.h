@@ -29,7 +29,7 @@ public:
 	void SetTitle(const char* title);
 
 	// Retrive window size
-	void GetWindowSize(int& width, int& height) const;
+	void GetWindowSize(int width, int height);
 
 	// Retrieve window scale
 	int GetScale() const;

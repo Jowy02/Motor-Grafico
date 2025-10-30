@@ -44,8 +44,13 @@ public:
     glm::vec3 maxAABB;
     glm::vec3 size;
 
+    void switchTexture(bool checker);
+
 private:
     std::string directory;
+
+    Texture* blackWhite = nullptr;
+    Texture* actualTexture = nullptr;
 
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
