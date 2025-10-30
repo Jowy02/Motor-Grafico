@@ -22,8 +22,6 @@ Input::~Input()
 	delete[] keyboard;
 }
 
-
-// Called before render is available
 bool Input::Awake()
 {
 	//LOG("Init SDL input event system");
@@ -39,14 +37,12 @@ bool Input::Awake()
 	return ret;
 }
 
-// Called before the first frame
 bool Input::Start()
 {
 	//SDL_StopTextInput();
 	return true;
 }
 
-// Called each loop iteration
 bool Input::PreUpdate()
 {
 

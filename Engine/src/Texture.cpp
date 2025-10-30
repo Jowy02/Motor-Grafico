@@ -8,7 +8,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
 {
     type = texType;
 
-    // Inicializa DevIL (solo una vez en todo el programa)
+    // Inicializar DevIL (solo una vez en todo el programa)
     static bool ilInitialized = false;
     if (!ilInitialized) {
         ilInit();

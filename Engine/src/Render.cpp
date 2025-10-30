@@ -103,6 +103,10 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
+    //Modelo se vea desde la posicón de la cámara correcta
+    Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
+    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+
 	return true;
 }
 

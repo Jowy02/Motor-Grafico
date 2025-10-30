@@ -25,9 +25,6 @@ Model::Model(const std::string& path)
 void Model::Draw()
 {
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-    //Modelo se vea desde la posicón de la cámara correcta
-    Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
-    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
     // Enviar la matriz al shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
