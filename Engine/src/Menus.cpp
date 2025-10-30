@@ -9,8 +9,11 @@
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
+
 #include <windows.h>
 #include "imgui_internal.h"
+
+
 Menus::Menus() : Module()
 {
 }
@@ -230,9 +233,6 @@ void Menus::CalculateFPS(float dt)
 
         framesCounter = 0;
         timeAccumulator = 0.0f;
-
-        std::cout << "FPS: " << currentFPS << std::endl;
-
     }
 }
 void Menus::FPS_graph()

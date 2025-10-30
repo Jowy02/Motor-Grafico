@@ -42,13 +42,15 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	gemotryMesh CreateMesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
+
 	void CreateTriangle();
 	void CreateCube();
 	void CreateDiamond();
+	void CreateSphere();
 
 	gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr);
-	gemotryMesh CreateSphere();
-
+	gemotryMesh GenerateGrid(int size, int divisions);
 
 	void SetViewPort(const SDL_Rect& rect);
 	void ResetViewPort();

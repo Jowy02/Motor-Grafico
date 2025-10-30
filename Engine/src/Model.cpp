@@ -57,7 +57,10 @@ void Model::Draw()
     // Dibujar todos los meshes
 
     glBindVertexArray(Mmesh.VAO);
-    glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
+
+    if(name != "Grid")glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
+    else glDrawElements(GL_LINES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
+
     
     glBindVertexArray(0);
 

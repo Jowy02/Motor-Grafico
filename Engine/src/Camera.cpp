@@ -16,7 +16,7 @@ bool Camera::Awake()
 {
     Camera::width = Application::GetInstance().window.get()->width;
     Camera::height = Application::GetInstance().window.get()->height;
-    Position = {0,0,3};
+    Position = {0,2,10};
     return true;
 }
 

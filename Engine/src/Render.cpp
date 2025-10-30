@@ -87,7 +87,7 @@ bool Render::Awake()
 bool Render::Start()
 {
     glEnable(GL_DEPTH_TEST);
-
+    GenerateGrid(10,20);
 	return true;
 }
 
@@ -103,24 +103,8 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
-
 	return true;
 }
-
-//bool Render::DrawTriangle() 
-//{
-//    glBindVertexArray(VAO);
-//    glDrawArrays(GL_TRIANGLES, 0, 3);
-//    return true;
-//}
-//bool Render::DrawElements() 
-//{
-//    glBindVertexArray(VAO);
-//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//    glBindVertexArray(0);
-//
-//    return true;
-//}
 
 gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
 {
@@ -158,7 +142,7 @@ gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GL
 
     return mesh;
 }
-gemotryMesh Render::CreateSphere()
+void Render::CreateSphere()
 {
     gemotryMesh mesh;
 
@@ -251,8 +235,10 @@ gemotryMesh Render::CreateSphere()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
@@ -267,6 +253,67 @@ gemotryMesh Render::CreateSphere()
     model.name = "Sphere";
 
     Application::GetInstance().scene.get()->models.push_back(model);
+}
+gemotryMesh Render::GenerateGrid(int size, int divisions)
+{
+    gemotryMesh mesh;
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
+    float half = size / 2.0f;
+    float step = (float)size / divisions;
+
+    // Ejes X y Z (plano Y=0)
+    for (int i = 0; i <= divisions; ++i)
+    {
+        float pos = -half + i * step;
+
+        // Línea paralela al eje X
+        vertices.insert(vertices.end(), { -half, 0.0f, pos,  0.5f, 0.5f, 0.5f, 0.0f, 0.0f });
+        vertices.insert(vertices.end(), { half, 0.0f, pos,  0.5f, 0.5f, 0.5f, 1.0f, 0.0f });
+
+        // Línea paralela al eje Z
+        vertices.insert(vertices.end(), { pos, 0.0f, -half,  0.5f, 0.5f, 0.5f, 0.0f, 1.0f });
+        vertices.insert(vertices.end(), { pos, 0.0f,  half,  0.5f, 0.5f, 0.5f, 1.0f, 1.0f });
+    }
+
+    // Generar índices secuenciales (2 por línea)
+    for (unsigned int i = 0; i < vertices.size() / 8; ++i)
+        indices.push_back(i);
+
+    // === Buffers OpenGL ===
+    glGenVertexArrays(1, &mesh.VAO);
+    glGenBuffers(1, &mesh.VBO);
+    glGenBuffers(1, &mesh.EBO);
+
+    glBindVertexArray(mesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    mesh.indexCount = indices.size();
+
+    Model model("NULL");
+    model.Mmesh.VAO = mesh.VAO;
+    model.Mmesh.EBO = mesh.EBO;
+    model.Mmesh.VBO = mesh.VBO;
+    model.Mmesh.indexCount = mesh.indexCount;
+    model.Mmesh.texture = mesh.texture;
+    model.name = "Grid";
+    Application::GetInstance().scene.get()->models.push_back(model);
+
 
     return mesh;
 }
@@ -295,11 +342,13 @@ void Render::CreateTriangle()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
   
     Model model("NULL");
-    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
-    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
-    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
-    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
-    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+
+    model.Mmesh.VAO = mesh.VAO;
+    model.Mmesh.EBO = mesh.EBO;
+    model.Mmesh.VBO = mesh.VBO;
+    model.Mmesh.indexCount = mesh.indexCount;
+    model.Mmesh.texture = mesh.texture;
     model.name = "Triangle";
 
     Application::GetInstance().scene.get()->models.push_back(model);
@@ -340,11 +389,14 @@ void Render::CreateCube()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
     Model model("NULL");
-    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
-    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
-    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
-    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
-    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+
+    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+
+    model.Mmesh.VAO = mesh.VAO;
+    model.Mmesh.EBO = mesh.EBO;
+    model.Mmesh.VBO = mesh.VBO;
+    model.Mmesh.indexCount = mesh.indexCount;
+    model.Mmesh.texture = mesh.texture;
     model.name = "Cube";
 
     Application::GetInstance().scene.get()->models.push_back(model);
@@ -381,11 +433,13 @@ void Render::CreateDiamond()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
     Model model("NULL");
-    model.Mmesh.VAO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VAO;
-    model.Mmesh.EBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).EBO;
-    model.Mmesh.VBO = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).VBO;
-    model.Mmesh.indexCount = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).indexCount;
-    model.Mmesh.texture = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f).texture;
+    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+
+    model.Mmesh.VAO = mesh.VAO;
+    model.Mmesh.EBO = mesh.EBO;
+    model.Mmesh.VBO = mesh.VBO;
+    model.Mmesh.indexCount = mesh.indexCount;
+    model.Mmesh.texture = mesh.texture;
     model.name = "Diamond";
 
     Application::GetInstance().scene.get()->models.push_back(model);
@@ -400,9 +454,9 @@ bool Render::PostUpdate()
 // Called before quitting
 bool Render::CleanUp()
 {
-  /*  glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);*/
+    glDeleteBuffers(1, &EBO);
 
     return true;
 }
