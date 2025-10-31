@@ -6,21 +6,16 @@
 #include "Camera.h"
 #include "Menus.h"
 
-
 // Constructor
-Application::Application() {
-
+Application::Application() 
+{
     window = std::make_shared<Window>();
     input = std::make_shared<Input>();
     render = std::make_shared<Render>();
     scene = std::make_shared<Scene>();
     camera = std::make_shared<Camera>();
     menus = std::make_shared<Menus>();
-
-
-
-    // Ordered for awake / Start / Update
-    // Reverse order of CleanUp
+    // Ordered for awake / Start / Update // Reverse order of CleanUp
     AddModule(std::static_pointer_cast<Module>(window));
     AddModule(std::static_pointer_cast<Module>(input));
     AddModule(std::static_pointer_cast<Module>(menus));
@@ -30,46 +25,47 @@ Application::Application() {
 }
 
 // Static method to get the instance of the Engine class, following the singletn pattern
-Application& Application::GetInstance() {
-    static Application instance; // Guaranteed to be destroyed and instantiated on first use
+Application& Application::GetInstance() 
+{
+    static Application instance;
     return instance;
 }
 
-void Application::AddModule(std::shared_ptr<Module> module) {
+void Application::AddModule(std::shared_ptr<Module> module) 
+{
     module->Init();
     moduleList.push_back(module);
 }
 
 // Called before render is available
-bool Application::Awake() {
-
-    //Iterates the module list and calls Awake on each module
+bool Application::Awake() 
+{
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->Awake();
-        if (!result) {
+        if (!result)
             break;
-        }
     }
     return result;
 }
 
 // Called before the first frame
-bool Application::Start() {
-    //Iterates the module list and calls Start on each module
+bool Application::Start() 
+{
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->Start();
-        if (!result) {
+        if (!result)
             break;
-        }
     }
     return result;
 }
 
 // Called each loop iteration
-bool Application::Update() {
-
+bool Application::Update() 
+{
     bool ret = true;
     if (requestExit)
         return false;
@@ -91,17 +87,15 @@ bool Application::Update() {
 }
 
 // Called before quitting
-bool Application::CleanUp() {
-
-    //Iterates the module list and calls CleanUp on each module
+bool Application::CleanUp() 
+{
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->CleanUp();
-        if (!result) {
+        if (!result)
             break;
-        }
     }
-
     return result;
 }
 
@@ -110,7 +104,7 @@ void Application::PrepareUpdate()
 {
     uint64_t now = SDL_GetPerformanceCounter();
     if (perfLastTime == 0)
-        perfLastTime = now; // primera vez
+        perfLastTime = now;
 
     dt = (float)(now - perfLastTime) / (float)SDL_GetPerformanceFrequency();
     perfLastTime = now;
@@ -128,44 +122,38 @@ void Application::FinishUpdate()
 // Call modules before each loop iteration
 bool Application::PreUpdate()
 {
-    //Iterates the module list and calls PreUpdate on each module
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->PreUpdate();
-        if (!result) {
+        if (!result)
             break;
-        }
     }
-
     return result;
 }
 
 // Call modules on each loop iteration
 bool Application::DoUpdate()
 {
-    //Iterates the module list and calls Update on each module
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->Update(dt);
-        if (!result) {
+        if (!result)
             break;
-        }
     }
-
     return result;
 }
 
 // Call modules after each loop iteration
 bool Application::PostUpdate()
 {
-    //Iterates the module list and calls PostUpdate on each module
     bool result = true;
-    for (const auto& module : moduleList) {
+    for (const auto& module : moduleList) 
+    {
         result = module.get()->PostUpdate();
-        if (!result) {
+        if (!result)
             break;
-        }
     }
-
     return result;
 }

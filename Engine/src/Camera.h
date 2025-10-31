@@ -10,9 +10,9 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_events.h"
 
-#include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp> 
-#include<glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp> 
+#include <glm/gtc/type_ptr.hpp>
 
 class Camera : public Module
 {
@@ -22,12 +22,8 @@ public:
 	// Destructor
 	virtual ~Camera();
 
-	// Called before render is available
 	bool Awake();
-
-	// Called before quitting
 	bool CleanUp();
-
 
 	// Stores the main vectors of the camera
 	glm::vec3 Position;

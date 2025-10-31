@@ -25,6 +25,8 @@ Input::~Input()
 bool Input::Awake()
 {
 	//LOG("Init SDL input event system");
+	Application::GetInstance().menus->LogToConsole(std::string("ERROR: Assimp load failed: "));
+
 	bool ret = true;
 	SDL_Init(0);
 
@@ -45,7 +47,6 @@ bool Input::Start()
 
 bool Input::PreUpdate()
 {
-
 	static SDL_Event event;
 	float speed = Application::GetInstance().camera.get()->speed;
 	glm::vec3 Orientation = Application::GetInstance().camera.get()->Orientation;
@@ -107,45 +108,36 @@ bool Input::PreUpdate()
 
             case SDL_EVENT_MOUSE_WHEEL:
 
-                if (event.wheel.y > 0.0f) {
+                if (event.wheel.y > 0.0f)
 					Application::GetInstance().camera.get()->Position += speed * Orientation;
-                    
-                }
-                else if (event.wheel.y < 0.0f) {
+                else if (event.wheel.y < 0.0f)
 					Application::GetInstance().camera.get()->Position += speed * -Orientation;
-                }
             break;
 
             case SDL_EVENT_DROP_FILE:
                
                 std::string path = event.drop.data;
                 std::string extension = path.substr(path.find_last_of('.') + 1);
-                if (extension == "fbx" || extension == "FBX") {
+                if (extension == "fbx" || extension == "FBX") 
+				{
 					Application::GetInstance().menus.get()->selectedObj = NULL;
                     Application::GetInstance().scene->LoadFBX(path);
                 }
-                else if (extension == "png" || extension == "dds") {
+                else if (extension == "png" || extension == "dds")
                     Application::GetInstance().scene->ApplyTextureToSelected(path);
-                }
-                //TODO: do we need to free the drag&drop event??
-                //SDL_free(&event);
-                
             break;
 		}
 	}
 
-
 	return true;
 }
 
-// Called before quitting
 bool Input::CleanUp()
 {
 	//LOG("Quitting SDL event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
 }
-
 
 bool Input::GetWindowEvent(EventWindow ev)
 {

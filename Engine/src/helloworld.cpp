@@ -1,9 +1,9 @@
-
-#define SDL_MAIN_HANDLED   // evita conflicto con SDL_main
+#define SDL_MAIN_HANDLED   // Prevents conflict with SDL_main
 #include "Application.h"
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
 	Application::EngineState state = Application::EngineState::CREATE;
 	int result = EXIT_FAILURE;
 
@@ -14,21 +14,21 @@ int main(int argc, char* argv[]) {
 			// Allocate the engine --------------------------------------------
 		case Application::EngineState::CREATE:
 			state = Application::EngineState::AWAKE;
-
 			break;
 
-			// Awake all modules -----------------------------------------------
+			// Awake all modules ----------------------------------------------
 		case Application::EngineState::AWAKE:
 			if (Application::GetInstance().Awake() == true)
+			{
 				state = Application::EngineState::START;
+			}
 			else
 			{
 				state = Application::EngineState::FAIL;
 			}
-
 			break;
 
-			// Call all modules before first frame  ----------------------------
+			// Call all modules before first frame  ---------------------------
 		case Application::EngineState::START:
 			if (Application::GetInstance().Start() == true)
 			{
@@ -40,13 +40,15 @@ int main(int argc, char* argv[]) {
 			}
 			break;
 
-			// Loop all modules until we are asked to leave ---------------------
+			// Loop all modules until we are asked to leave -------------------
 		case Application::EngineState::LOOP:
 			if (Application::GetInstance().Update() == false)
+			{
 				state = Application::EngineState::CLEAN;
+			}
 			break;
 
-			// Cleanup allocated memory -----------------------------------------
+			// Cleanup allocated memory ---------------------------------------
 		case Application::EngineState::CLEAN:
 			if (Application::GetInstance().CleanUp() == true)
 			{
@@ -54,11 +56,12 @@ int main(int argc, char* argv[]) {
 				state = Application::EngineState::EXIT;
 			}
 			else
+			{
 				state = Application::EngineState::FAIL;
-
+			}
 			break;
 
-			// Exit with errors and shame ---------------------------------------
+			// Exit with errors and shame -------------------------------------
 		case Application::EngineState::FAIL:
 			result = EXIT_FAILURE;
 			state = Application::EngineState::EXIT;

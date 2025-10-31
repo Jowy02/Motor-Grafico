@@ -282,50 +282,53 @@ void Menus::DrawInspector()
 {
     ImGui::Begin("Inspector");
 
-    if (!selectedObj == NULL) 
+    if (selectedObj != nullptr)
     {
         ImGui::Text("Selected: %s", selectedObj->name.c_str());
-
         ImGui::Separator();
 
         ImGui::Text("TRANSFORM");
-        if(ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f))selectedObj->UpdateTransform();
-        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f))selectedObj->UpdateTransform();
-        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f))selectedObj->UpdateTransform();
+        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) 
+            selectedObj->UpdateTransform();
+        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) 
+            selectedObj->UpdateTransform();
+        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) 
+            selectedObj->UpdateTransform();
 
         ImGui::Separator();
-
         ImGui::Text("MESH");
-        ImGui::Text("Size: (%.2f, %.2f, %.2f)",
-            selectedObj->size.x,
-            selectedObj->size.y,
-            selectedObj->size.z);
+        ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
 
         Render* render = Application::GetInstance().render.get();
         ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
         ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
 
         ImGui::Separator();
-
         ImGui::Text("TEXTURE");
         ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
-       
-        if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox, "BlackWhite");
-        if (ImGui::Checkbox("Normal Map", &checkbox2)) selectedObj->switchTexture(checkbox2, "NormalMap");
+        if (ImGui::Checkbox("Default texture", &checkbox)) 
+            selectedObj->switchTexture(checkbox, "BlackWhite");
+        if (ImGui::Checkbox("Normal Map", &checkbox2)) 
+            selectedObj->switchTexture(checkbox2, "NormalMap");
 
         ImGui::Separator();
         ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
+
         if (ImGui::Button("Delete Model")) 
         {
             auto& sceneModels = Application::GetInstance().scene->models;
-            sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
+            sceneModels.erase(
+                std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const Model& m) { return &m == selectedObj; }),
+                sceneModels.end()
+            );
             selectedObj = nullptr;
         }
     }
-    else 
+    else
+    {
         ImGui::Text("No object selected");
-
+    }
     ImGui::End();
 }
 
@@ -356,12 +359,9 @@ void Menus::DrawSystemInfo()
     // Library Versions
     ImGui::Separator();
     ImGui::Text("Library Versions:");
-
     ImGui::Text("SDL Version: %s", SDL_GetRevision());
-
     ImGui::Text("OpenGL Version: %s", (const char*)glGetString(GL_VERSION));
     ImGui::Text("DevIL Version: %d", IL_VERSION);
-
     ImGui::End();
 }
 
@@ -415,7 +415,6 @@ void Menus::DrawAboutWindow()
     ImGui::BulletText("Joel Vicente");
     ImGui::BulletText("Arthur Cordoba");
     ImGui::BulletText("Jana Puig");
-
     ImGui::Separator();
 
     // Libraries Used
@@ -427,13 +426,11 @@ void Menus::DrawAboutWindow()
     ImGui::BulletText("DevIL");
     ImGui::BulletText("GLM");
     ImGui::BulletText("GLAD");
-
     ImGui::Separator();
 
     // License
     if (ImGui::MenuItem("MIT Licence"))
         ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/blob/main/LICENCE.md", 0, 0, SW_SHOWNORMAL);
-
 
     ImGui::End();
 }
