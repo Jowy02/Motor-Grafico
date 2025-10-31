@@ -52,6 +52,8 @@ public:
 
 	gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr);
 	gemotryMesh CreateGrid(int size, int divisions);
+	gemotryMesh SetBuffers(gemotryMesh Mesh, std::vector<float> vertices, std::vector<unsigned int> indices);
+
 
 	void SetViewPort(const SDL_Rect& rect);
 	void ResetViewPort();

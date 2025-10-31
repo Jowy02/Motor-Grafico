@@ -149,43 +149,6 @@ bool Render::Update(float dt)
 	return true;
 }
 
-gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
-{
-    //Application::GetInstance().camera.get()->Inputs(temp);
-    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
-
-    static gemotryMesh mesh;
-    mesh.indexCount = indexCount;
-
-    glGenVertexArrays(1, &mesh.VAO);
-    glGenBuffers(1, &mesh.VBO);
-    glGenBuffers(1, &mesh.EBO);
-
-    glBindVertexArray(mesh.VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(float), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
-    // Posición
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Coordenadas de textura
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
-
-    return mesh;
-}
-
 gemotryMesh Render::DrawFaceNormals(const float* vertices, const unsigned int* indices, size_t indexCount, std::vector<float>& outLines)
 {
     outLines.clear();
@@ -224,14 +187,14 @@ gemotryMesh Render::DrawFaceNormals(const float* vertices, const unsigned int* i
         float ex = cx + nx * scale;
         float ey = cy + ny * scale;
         float ez = cz + nz * scale;
-        std::cout << "Normal: (" << nx << ", " << ny << ", " << nz << ")" << std::endl;
+       // std::cout << "Normal: (" << nx << ", " << ny << ", " << nz << ")" << std::endl;
 
         // Agregar línea de normal
         outLines.push_back(cx); outLines.push_back(cy); outLines.push_back(cz);
         outLines.push_back(ex); outLines.push_back(ey); outLines.push_back(ez);
     }
 
-    std::cout << "Normal lines count: " << outLines.size() / 3 << std::endl;
+   // std::cout << "Normal lines count: " << outLines.size() / 3 << std::endl;
 
     // Crear VAO/VBO de normales
     glGenVertexArrays(1, &normalMesh.VAO);
@@ -323,7 +286,6 @@ gemotryMesh Render::DrawVertexNormalsFromMesh (const float* vertices,size_t vert
     return normalMesh;
 }
 
-
 void  Render::ShowVertexNormals() {
     if (VertexNormals) {
 
@@ -345,7 +307,6 @@ void  Render::ShowVertexNormals() {
 
 }
 
-
 void Render::CreateSphere()
 {
     gemotryMesh mesh;
@@ -359,8 +320,8 @@ void Render::CreateSphere()
 
     const float PI = 3.14159265359f;
     float x, y, z, xy;                              // posición
-    float nx, ny, nz, lengthInv = 1.0f / radius;   // normales
-    float s, t;                                    // coordenadas de textura
+    float nx, ny, nz, lengthInv = 1.0f / radius;    // normales
+    float s, t;                                     // coordenadas de textura
 
     float sectorStep = 2 * PI / sectorCount;
     float stackStep = PI / stackCount;
@@ -425,31 +386,7 @@ void Render::CreateSphere()
 
     mesh.indexCount = indices.size();
 
-    glGenVertexArrays(1, &mesh.VAO);
-    glGenBuffers(1, &mesh.VBO);
-    glGenBuffers(1, &mesh.EBO);
-
-    glBindVertexArray(mesh.VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
-    // Posición
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Coordenadas de textura
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
+    mesh = SetBuffers(mesh, vertices, indices);
 
     Model model("NULL");
     model.Mmesh.EBO = mesh.EBO;
@@ -490,32 +427,7 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     for (unsigned int i = 0; i < vertices.size() / 8; ++i)
         indices.push_back(i);
 
-    // === Buffers OpenGL ===
-    glGenVertexArrays(1, &mesh.VAO);
-    glGenBuffers(1, &mesh.VBO);
-    glGenBuffers(1, &mesh.EBO);
-
-    glBindVertexArray(mesh.VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
-    // Posición
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Coordenadas de textura
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
+    mesh = SetBuffers(mesh, vertices,indices);
 
     mesh.indexCount = indices.size();
 
@@ -558,7 +470,6 @@ void Render::CreateTriangle()
     Model model("NULL");
 
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
-   
 
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;
@@ -666,8 +577,76 @@ void Render::CreateDiamond()
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, model.tangents, model.bitangents, model.vertexNormalLines);
 
-
     Application::GetInstance().scene.get()->models.push_back(model);
+}
+
+gemotryMesh Render::SetBuffers(gemotryMesh Mesh , std::vector<float> vertices, std::vector<unsigned int> indices)
+{
+    // === Buffers OpenGL ===
+    glGenVertexArrays(1, &Mesh.VAO);
+    glGenBuffers(1, &Mesh.VBO);
+    glGenBuffers(1, &Mesh.EBO);
+
+    glBindVertexArray(Mesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, Mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    // Posición
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Coordenadas de textura
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    return Mesh;
+}
+
+gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
+{
+    //Application::GetInstance().camera.get()->Inputs(temp);
+    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+
+    static gemotryMesh mesh;
+    mesh.indexCount = indexCount;
+
+    glGenVertexArrays(1, &mesh.VAO);
+    glGenBuffers(1, &mesh.VBO);
+    glGenBuffers(1, &mesh.EBO);
+
+    glBindVertexArray(mesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(float), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    // Posición
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Coordenadas de textura
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    return mesh;
 }
 
 bool Render::PostUpdate()
