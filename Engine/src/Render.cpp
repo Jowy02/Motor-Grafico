@@ -813,7 +813,7 @@ std::vector<glm::vec3> Render::CalculateVertexNormalsPrueva(const GLfloat* verti
 }
 
 
-std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(const GLfloat* vertices, const GLuint* indices, const std::vector<glm::vec3>& vertexNormals, int vertexCount, int indexCount)
+std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> Render::CalculateTangentsAndBitangents(const GLfloat* vertices, const GLuint* indices, const std::vector<glm::vec3>& vertexNormals, int vertexCount, int indexCount)
 {
       int stride = 8; // x, y, z, r, g, b, u, v
     int numVertices = vertexCount / stride;
