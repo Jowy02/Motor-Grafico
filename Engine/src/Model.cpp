@@ -178,6 +178,7 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         vertices.push_back(mesh->mVertices[i].y);
         vertices.push_back(mesh->mVertices[i].z);
 
+
         // Normal
         vertices.push_back(mesh->mNormals[i].x);
         vertices.push_back(mesh->mNormals[i].y);
@@ -194,7 +195,11 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vertices.push_back(0.0f);
             vertices.push_back(0.0f);
         }
+
+
     }
+
+
 
     // Extract tangents if available
     if (mesh->mTangents != nullptr) 
@@ -229,7 +234,7 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
     }
 
     // Draw vertex and face normals for debugging
-    VertexNormalmesh = Application::GetInstance().render.get()->DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), tangents, bitangents, vertexNormalLines);
+    VertexNormalmesh = Application::GetInstance().render.get()->DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), tangents, bitangents, {}, vertexNormalLines);
     Normalmesh = Application::GetInstance().render.get()->DrawFaceNormals(vertices.data(), indices.data(), indices.size(), normalLines);
 
     // Create OpenGL buffers

@@ -51,8 +51,13 @@ public:
     // --- MESH DRAWING ---
     gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr); // Draw 3D mesh
     gemotryMesh DrawFaceNormals(const GLfloat* vertices, const GLuint* indices, size_t indexCount, std::vector<float>& outLines); // Draw face normals
-    gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines); // Draw vertex normals
+    gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& vertexNormals, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines); // Draw vertex normals
+  
 
+    std::vector<glm::vec3> Render::CalculateVertexNormalsPrueva(const GLfloat* vertices, const GLuint* indices, int vertexCount, int indexCount, float smoothingAngleDeg);
+
+
+    std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(  const GLfloat* vertices,  const GLuint* indices, const std::vector<glm::vec3>& vertexNormals ,int vertexCount, int indexCount);
     bool FaceNormals = false;    
     bool VertexNormals = false;  
 
@@ -72,4 +77,5 @@ private:
     double prevTime = 0.0;   // Time tracking for updates
 
     SDL_Window* temp = nullptr; // Temporary window pointer
+
 };
