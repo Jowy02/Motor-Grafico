@@ -135,11 +135,11 @@ void Menus::MainMenu()
         if (ImGui::BeginMenu("Create"))
         {
             selectedObj = NULL;
-            if (ImGui::MenuItem("Triangulo"))
+            if (ImGui::MenuItem("Triangle"))
                 Application::GetInstance().render.get()->CreateTriangle();
-            if (ImGui::MenuItem("Cubo"))
+            if (ImGui::MenuItem("Cube"))
                 Application::GetInstance().render.get()->CreateCube();
-            if (ImGui::MenuItem("Rombo"))
+            if (ImGui::MenuItem("Diamond"))
                 Application::GetInstance().render.get()->CreateDiamond();
             if (ImGui::MenuItem("Sphere"))
                 Application::GetInstance().render.get()->CreateSphere();
@@ -284,7 +284,7 @@ void Menus::DrawInspector()
 
     if (!selectedObj == NULL) 
     {
-        ImGui::Text("Seleccionado: %s", selectedObj->name.c_str());
+        ImGui::Text("Selected: %s", selectedObj->name.c_str());
 
         ImGui::Separator();
 
@@ -324,7 +324,7 @@ void Menus::DrawInspector()
         }
     }
     else 
-        ImGui::Text("Ning�n objeto seleccionado");
+        ImGui::Text("No object selected");
 
     ImGui::End();
 }
