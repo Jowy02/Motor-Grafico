@@ -1,6 +1,8 @@
 #pragma once
+
 #include <memory>
 #include <list>
+
 #include "Module.h"
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_events.h"
@@ -9,7 +11,7 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
 
-// Modules
+// Forward declarations for modules
 class Window;
 class Input;
 class Camera;
@@ -20,100 +22,81 @@ class Menus;
 class Application
 {
 public:
+    // Singleton access
+    static Application& GetInstance();
 
-	// Public method to get the instance of the Singleton
-	static Application& GetInstance();
+    // Module management
+    void AddModule(std::shared_ptr<Module> module);
 
-	void AddModule(std::shared_ptr<Module> module);
+    // Lifecycle
+    bool Awake();       // Called before render is available
+    bool Start();       // Called before the first frame
+    bool Update();      // Called each loop iteration
+    bool CleanUp();     // Called before quitting
 
-	// Called before render is available
-	bool Awake();
-
-	// Called before the first frame
-	bool Start();
-
-	// Called each loop iteration
-	bool Update();
-
-	// Called before quitting
-	bool CleanUp();
-	
 private:
+    // Private constructor to enforce singleton
+    Application();
 
-	// Private constructor to prevent instantiation
-	// Constructor
-	Application();
+    // Delete copy operations
+    Application(const Application&) = delete;
+    Application& operator=(const Application&) = delete;
 
-	// Delete copy constructor and assignment operator to prevent copying
-	Application(const Application&) = delete;
-	Application& operator=(const Application&) = delete;
+    // Internal update steps
+    void PrepareUpdate(); // Before loop iteration
+    void FinishUpdate();  // After loop iteration
 
-	// Call modules before each loop iteration
-	void PrepareUpdate();
+    bool PreUpdate();     // Update modules before main update
+    bool DoUpdate();      // Update modules
+    bool PostUpdate();    // Update modules after main update
 
-	// Call modules before each loop iteration
-	void FinishUpdate();
-
-	// Call modules before each loop iteration
-	bool PreUpdate();
-
-	// Call modules on each loop iteration
-	bool DoUpdate();
-
-	// Call modules after each loop iteration
-	bool PostUpdate();
-
-	std::list<std::shared_ptr<Module>> moduleList;
+    std::list<std::shared_ptr<Module>> moduleList;
 
 public:
+    // Engine states
+    enum EngineState
+    {
+        CREATE = 1,
+        AWAKE,
+        START,
+        LOOP,
+        CLEAN,
+        FAIL,
+        EXIT
+    };
 
-	enum EngineState
-	{
-		CREATE = 1,
-		AWAKE,
-		START,
-		LOOP,
-		CLEAN,
-		FAIL,
-		EXIT
-	};
+    // --- MODULES ---
+    std::shared_ptr<Window> window;
+    std::shared_ptr<Input> input;
+    std::shared_ptr<Render> render;
+    std::shared_ptr<Scene> scene;
+    std::shared_ptr<Camera> camera;
+    std::shared_ptr<Menus> menus;
 
-	// --- MODULES ---
-	std::shared_ptr<Window> window;
-	std::shared_ptr<Input> input;
-	std::shared_ptr<Render> render;
-	std::shared_ptr<Scene> scene;
-	std::shared_ptr<Camera> camera;
-	std::shared_ptr<Menus> menus;
-
-	bool requestExit = false;
+    bool requestExit = false;
 
 private:
+    // Timing
+    float dt = 0.0f;       // Delta time
+    int frames = 0;
 
-	
-	float dt;	// Delta time
-	int frames;	// Frames since startup
+    int frameCount = 0;
+    int framesPerSecond = 0;
+    int lastSecFrameCount = 0;
 
-	// Calculate timing measures
+    bool showControls = false;
 
-	int frameCount = 0;
-	int framesPerSecond = 0;
-	int lastSecFrameCount = 0;
+    float averageFps = 0.0f;
+    int secondsSinceStartup = 0;
 
-	bool showControls = false;
+    const int maxFrameDuration = 16; // Max frame duration in milliseconds
 
-	float averageFps = 0.0f;
-	int secondsSinceStartup = 0;
+    Uint32 frameStart = 0;
+    Uint32 frameTime = 0;
 
-	//Maximun frame duration in miliseconds.
-	int maxFrameDuration = 16;
+    // FPS limiting
+    const int targetFPS = 60;
+    const int frameDelay = 1000 / targetFPS;
 
-	Uint32 frameStart = 0;
-	Uint32 frameTime = 0;
-
-	//Limitar fps
-	const int targetFPS = 60;
-	const int frameDelay = 1000 / targetFPS;
-	
-	uint64_t perfLastTime = 0;
+    uint64_t perfLastTime = 0;
 };

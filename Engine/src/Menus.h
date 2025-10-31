@@ -1,81 +1,71 @@
 #pragma once
+
 #include "Module.h"
 #include "Model.h"
-#include <vector>
 #include "Texture.h"
+#include <vector>
+#include <string>
 
 struct SDL_Texture;
 
 class Menus : public Module
 {
 public:
-	Menus();
+    Menus();
+    virtual ~Menus();
 
-	// Destructor
-	virtual ~Menus();
+    // Lifecycle methods
+    bool Awake() override;      // Called before render is available
+    bool Start() override;      // Called before the first frame
+    bool Update(float dt);      // Called each frame
+    bool PreUpdate() override;  // Called before all Updates
+    bool PostUpdate() override; // Called after all Updates
+    bool CleanUp() override;    // Called before quitting
 
-	// Called before render is available
-	bool Awake();
+    // --- Console / Logging ---
+    void DrawConsole();
+    void LogToConsole(const std::string& msg) { consoleLog.push_back(msg); }
+    std::vector<std::string> consoleLog;
 
-	// Called before the first frame
-	bool Start();
+    // --- FPS / Performance ---
+    void CalculateFPS(float dt);
+    void FPS_graph();
+    float currentFPS = 0.0f;
 
-	bool Update(float dt);
-	
-	// Called before all Updates
-	bool PreUpdate();
+    // --- Scene / Hierarchy ---
+    void Hierarchy_Menu();
+    void DrawGameObjectNode(Model* model);
+    void DrawInspector();
+    Model* selectedObj = nullptr;
 
-	// Called before all Updates
-	bool PostUpdate();
+    // --- System Info ---
+    float GetRAMUsageMB();
+    void DrawSystemInfo();
+    void DrawSystemConfig();
+    void DrawAboutWindow();
 
-	// Called before quitting
-	bool CleanUp();
+    // --- GUI / Docking ---
+    void MainMenu();
+    void BuildDockSpace();
 
-
-	void CalculateFPS(float dt);
-	void FPS_graph();
-
-	void DrawConsole();
-
-	void LogToConsole(const std::string& msg) {
-		consoleLog.push_back(msg);
-	}
-
-	std::vector<std::string> consoleLog;
-	void Hierarchy_Menu();
-	void DrawGameObjectNode(Model* model);
-	void DrawInspector();
-
-	Model* selectedObj = nullptr;
-
-	float GetRAMUsageMB();
-
-	void DrawSystemInfo();
-	void DrawSystemConfig();
-
-	void DrawAboutWindow();
-
-	void MainMenu();
-	void BuildDockSpace();
 private:
-	std::vector<Model>models;
+    std::vector<Model> models;           // Loaded models
+    std::vector<float> fpsHistory;       // FPS history for graphs
 
-	std::vector<float> fpsHistory;
-	uint32_t lastFrameTime = 0;
-	float currentFPS = 0.0f;
-	int framesCounter = 0;
+    uint32_t lastFrameTime = 0;
+    int framesCounter = 0;
+    float timeAccumulator = 0.0f;
 
-	float timeAccumulator = 0.0f;
+    // GUI visibility flags
+    bool showConsole = true;
+    bool showFPS = true;
+    bool showHierarchy = true;
+    bool showSystemInfo = true;
+    bool showAbout = false;
 
+    // Example checkbox states
+    bool checkbox = false;
+    bool checkbox2 = false;
 
-	bool showConsole = true;
-	bool showFPS = true;
-	bool showHierarchy = true;
-	bool showSystemInfo = true;
-	bool showAbout = false;
-
-	bool checkbox = false;
-	bool checkbox2 = false;
-
-	bool initialization_exist = false;
+    bool initialization_exist = false;
 };

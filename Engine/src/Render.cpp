@@ -480,7 +480,7 @@ void Render::ShowFaceNormals()
     }
 }
 
-void  Render::ShowVertexNormals()
+void Render::ShowVertexNormals()
 {
     if (VertexNormals)
     {

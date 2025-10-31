@@ -9,9 +9,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
 #include "Texture.h"
 #include "Render.h"
 
+// Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
 
 struct ModelMesh {
@@ -20,32 +22,37 @@ struct ModelMesh {
     Texture* texture = nullptr;
 };
 
-
 class Model
 {
 public:
+    // --- General info ---
     std::string name;
     std::string texturePath;
-    // Constructor: carga el modelo desde un archivo usando Assimp
+
+    // --- Core functions ---
     Model(const std::string& path);
-    // Dibuja el modelo con un shader y una cámara
     void Draw();
     void UpdateTransform();
     void CleanUp();
 
+    // --- Meshes ---
     ModelMesh Mmesh;
     gemotryMesh Normalmesh;
     gemotryMesh VertexNormalmesh;
-    glm::mat4 transformMatrix;
 
+    // --- Transformations ---
+    glm::mat4 transformMatrix;
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
 
+    // --- Bounding box ---
     glm::vec3 center;
     glm::vec3 minAABB;
     glm::vec3 maxAABB;
     glm::vec3 size;
+
+    // --- Normals and tangents ---
     std::vector<float> normalLines;
     std::vector<float> vertexNormalLines;
     std::vector<glm::vec3> tangents;
@@ -53,18 +60,22 @@ public:
     bool hasTangents = false;
     bool hasBitangents = false;
 
-    glm::mat4 GetModelMatrix()const;
-
-    void switchTexture(bool checker, std::string type);
+    // --- Textures and visibility ---
     Texture* actualTexture = nullptr;
+    void switchTexture(bool checker, std::string type);
     bool isHidden = false;
 
+    glm::mat4 GetModelMatrix() const;
+
 private:
+    // --- Internal data ---
     std::string directory;
 
+    // --- Extra textures ---
     Texture* blackWhite = nullptr;
     Texture* normalMap = nullptr;
 
+    // --- Model loading (Assimp) ---
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);

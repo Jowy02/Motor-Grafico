@@ -3,62 +3,25 @@
 
 class GuiControl;
 
-
 class Module
 {
 public:
+    Module() : active(false) {}
 
-	Module() : active(false)
-	{
-	}
+    // Activate the module
+    void Init() { active = true; } 
 
-	void Init()
-	{
-		active = true;
-	}
+    virtual bool Awake() { return true; }            // Called before render is available
+    virtual bool Start() { return true; }            // Called before the first frame
+    virtual bool PreUpdate() { return true; }        // Called before each loop iteration
+    virtual bool Update(float dt) { return true; }   // Called each loop iteration
+    virtual bool PostUpdate() { return true; }       // Called after each loop iteration
+    virtual bool CleanUp() { return true; }          // Called before quitting
 
-	// Called before render is available
-	virtual bool Awake()
-	{
-		return true;
-	}
+    // GUI callback for mouse clicks
+    virtual bool OnGuiMouseClickEvent(GuiControl* control) { return true; } 
 
-	// Called before the first frame
-	virtual bool Start()
-	{
-		return true;
-	}
-
-	// Called each loop iteration
-	virtual bool PreUpdate()
-	{
-		return true;
-	}
-
-	// Called each loop iteration
-	virtual bool Update(float dt)
-	{
-		return true;
-	}
-
-	// Called each loop iteration
-	virtual bool PostUpdate()
-	{
-		return true;
-	}
-
-	// Called before quitting
-	virtual bool CleanUp()
-	{
-		return true;
-	}
-	virtual bool OnGuiMouseClickEvent(GuiControl* control)
-	{
-		return true;
-	}
 public:
-
-	std::string name;
-	bool active;
-	//L05 TODO 4a: Declare a pugi::xml_node to store the module configuration parameters
+    std::string name; // Module name
+    bool active;      // Whether the module is active
 };

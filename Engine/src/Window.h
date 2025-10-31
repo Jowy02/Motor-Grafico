@@ -1,6 +1,6 @@
 #pragma once
 
-#define SDL_MAIN_HANDLED   // evita conflicto con SDL_main
+#define SDL_MAIN_HANDLED   // Prevents conflict with SDL_main
 
 #include "Module.h"
 #include "SDL3/SDL_Video.h"
@@ -13,36 +13,30 @@
 class Window : public Module
 {
 public:
+    // --- Constructors / Destructors ---
+    Window();
+    virtual ~Window();
 
-	Window();
+    // --- Main lifecycle ---
+    bool Awake();     // Called before render is available
+    bool CleanUp();   // Called before quitting
 
-	// Destructor
-	virtual ~Window();
+    // --- Window control ---
+    void SetTitle(const char* title);
+    void SetScreen(bool fullscreen);
+    void GetWindowSize(int width, int height);
+    int GetScale() const;
 
-	// Called before render is available
-	bool Awake();
+    // --- Accessors ---
+    SDL_Window* GetSDLWindow() const { return window; }
+    SDL_GLContext GetGLContext() const { return context; }
 
-	// Called before quitting
-	bool CleanUp();
+    // --- Window data ---
+    SDL_Window* window = nullptr;
+    int width = 1600;
+    int height = 900;
 
-	// Changae title
-	void SetTitle(const char* title);
-
-	// Retrive window size
-	void GetWindowSize(int width, int height);
-
-	// Retrieve window scale
-	int GetScale() const;
-
-	SDL_Window* GetSDLWindow() const { return window; }
-	SDL_GLContext GetGLContext() const { return context; }
-	// The window we'll be rendering to
-	SDL_Window* window;
-	void SetScreen(bool fullscreen);
-
-	int width = 1600;
-	int height = 900;
 private:
-	SDL_GLContext context;
-
+    // --- OpenGL context ---
+    SDL_GLContext context;
 };

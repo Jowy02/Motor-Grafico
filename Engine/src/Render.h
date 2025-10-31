@@ -14,62 +14,62 @@
 #include <vector>
 #include <cmath>
 
-struct gemotryMesh 
+// Simple mesh structure for GPU buffers
+struct gemotryMesh
 {
-	GLuint VAO = 0, VBO = 0, EBO = 0;
-	unsigned int indexCount = 0;
-	Texture* texture = nullptr;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
+    unsigned int indexCount = 0;
+    Texture* texture = nullptr;
 };
 
 class Render : public Module
 {
 public:
-	Render();
+    Render();
+    virtual ~Render(); // Destructor
 
-	// Destructor
-	virtual ~Render();
+    // --- LIFE CYCLE ---
+    bool Awake() override;            // Called before render is available
+    bool Start() override;            // Called before the first frame
+    bool PreUpdate() override;        // Called before each loop iteration
+    bool Update(float dt) override;   // Called each loop iteration
+    bool PostUpdate() override;       // Called after each loop iteration
+    bool CleanUp() override;          // Called before quitting
 
-	bool Awake();
-	bool Start();
-	bool PreUpdate();
-	bool Update(float dt);
-	bool PostUpdate();
-	bool CleanUp();
+    // ---- MESH CREATION ---
+    void CreateTriangle();      
+    void CreateCube();          
+    void CreateDiamond();       
+    void CreateSphere();        
+    gemotryMesh CreateGrid(int size, int divisions); 
+    gemotryMesh SetBuffers(gemotryMesh Mesh, std::vector<float> vertices, std::vector<unsigned int> indices); // Initialize VAO/VBO/EBO
 
-	void CreateTriangle();
-	void CreateCube();
-	void CreateDiamond();
-	void CreateSphere();
+    // --- NORMAL VISUALIZATION ---
+    void ShowFaceNormals();      // Toggle face normals visualization
+    void ShowVertexNormals();    // Toggle vertex normals visualization
 
-	gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr);
-	gemotryMesh CreateGrid(int size, int divisions);
-	gemotryMesh SetBuffers(gemotryMesh Mesh, std::vector<float> vertices, std::vector<unsigned int> indices);
+    // --- MESH DRAWING ---
+    gemotryMesh Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture = nullptr); // Draw 3D mesh
+    gemotryMesh DrawFaceNormals(const GLfloat* vertices, const GLuint* indices, size_t indexCount, std::vector<float>& outLines); // Draw face normals
+    gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines); // Draw vertex normals
 
-	void SetViewPort(const SDL_Rect& rect);
-	void ResetViewPort();
+    bool FaceNormals = false;    
+    bool VertexNormals = false;  
 
-	SDL_Renderer* renderer;
-	SDL_Rect camera;
-	SDL_Rect viewport;
-	SDL_Color background;
-	unsigned int shaderProgram;
-	unsigned int normalShaderProgram;
-
-	gemotryMesh DrawFaceNormals(const GLfloat* vertices, const GLuint* indices, size_t indexCount, std::vector<float>& outLines);
-	gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines);
-
-	void ShowFaceNormals();
-	void ShowVertexNormals();
-	bool FaceNormals = false;
-	bool VertexNormals = false;
+    // --- SDL / OpenGL objects ---
+    SDL_Renderer* renderer = nullptr; 
+    SDL_Rect camera;                  
+    SDL_Rect viewport;                
+    SDL_Color background;             
+    unsigned int shaderProgram = 0;   
+    unsigned int normalShaderProgram = 0;
 
 private:
-	unsigned int VBO, VAO, EBO;
+    unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers
+    unsigned int vertexShader = 0;          // Vertex shader ID
+    unsigned int fragmentShader = 0;        // Fragment shader ID
 
-	unsigned int vertexShader;
-	unsigned int fragmentShader;
+    double prevTime = 0.0;   // Time tracking for updates
 
-	double prevTime;
-
-	SDL_Window* temp;
+    SDL_Window* temp = nullptr; // Temporary window pointer
 };
