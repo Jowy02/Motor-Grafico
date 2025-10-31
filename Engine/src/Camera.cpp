@@ -117,9 +117,8 @@ void Camera::Inputs(SDL_Window* window)
             float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
                 (glm::length(newOrientation) * glm::length(Up))));
 
-            if (fabs(angleBetween - 90.0f) <= 85.0f) {
+            if (fabs(angleBetween - 90.0f) <= 85.0f)
                 Orientation = newOrientation;
-            }
 
             // Rota horizontalmente (yaw)
             glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY), Up);

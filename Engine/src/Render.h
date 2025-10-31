@@ -14,8 +14,6 @@
 #include <vector>
 #include <cmath>
 
-
-
 struct gemotryMesh {
 	GLuint VAO = 0, VBO = 0, EBO = 0;
 	unsigned int indexCount = 0;

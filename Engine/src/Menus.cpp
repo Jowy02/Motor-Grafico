@@ -16,6 +16,7 @@
 Menus::Menus() : Module()
 {
 }
+
 // Destructor
 Menus::~Menus()
 {
@@ -38,10 +39,10 @@ bool Menus::Start()
     io.IniFilename = "imgui_layout.ini";
     std::string path = "imgui_layout.ini";
 
-    // Intentar abrir el archivo en modo lectura para saber si ya se ha inicializado o no
+    // Try opening the file in read mode to check if ImGui was previously initialized
     FILE* file = fopen(path.c_str(), "r");
     if (file) {
-        fclose(file);  // cerrar el archivo si existe
+        fclose(file);
         initialization_exist = true;
     }
     else {
@@ -50,11 +51,11 @@ bool Menus::Start()
 
     ImGui::StyleColorsDark();
 
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; //Docking
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
     ImGui::StyleColorsDark();
 
-    SDL_Window* window = Application::GetInstance().window->GetSDLWindow(); // Asegúrate de tener este método
-    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext(); // También necesitas esto
+    SDL_Window* window = Application::GetInstance().window->GetSDLWindow();
+    SDL_GLContext gl_context = Application::GetInstance().window->GetGLContext();
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -62,7 +63,6 @@ bool Menus::Start()
     LogToConsole("ImGui initialized successfully");
     return true;
 }
-
 
 bool Menus::PreUpdate()
 {
@@ -75,7 +75,7 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
-    //Dock space
+    // Dock Space
     BuildDockSpace();
     MainMenu();
 
@@ -92,18 +92,19 @@ bool Menus::Update(float dt)
     return true;
 }
 
-void Menus::MainMenu() {
+void Menus::MainMenu() 
+{
     if (ImGui::BeginMainMenuBar())
-    {
+    {   
+        // --- FILE MENU ---
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("Exit"))
-            {
                 Application::GetInstance().requestExit = true;
-            }
             ImGui::EndMenu();
         }
 
+        // --- VIEW MENU ---
         if (ImGui::BeginMenu("View"))
         {
             ImGui::MenuItem("Console", nullptr, &showConsole);
@@ -113,54 +114,45 @@ void Menus::MainMenu() {
             ImGui::EndMenu();
         }
 
-        // Help menu
+        // --- HELP MENU ---
         if (ImGui::BeginMenu("Help"))
         {
-            // Open GitHub documentation
             if (ImGui::MenuItem("GitHub Documentation"))
                 ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico", 0, 0, SW_SHOWNORMAL);
 
-            // Open GitHub issues page
             if (ImGui::MenuItem("Report a Bug"))
                 ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/issues", 0, 0, SW_SHOWNORMAL);
 
-            // Open GitHub releases page
             if (ImGui::MenuItem("Download Latest"))
                 ShellExecuteA(0, "open", "https://github.com/Jowy02/Motor-Grafico/releases", 0, 0, SW_SHOWNORMAL);
 
             ImGui::Separator();
-
-            // About window toggle
             ImGui::MenuItem("About", nullptr, &showAbout);
-
             ImGui::EndMenu();
         }
+
+        // --- GEOMETRY CREATION MENU ---
         if (ImGui::BeginMenu("Create"))
         {
             selectedObj = NULL;
             if (ImGui::MenuItem("Triangulo"))
-            {
                 Application::GetInstance().render.get()->CreateTriangle();
-            }
             if (ImGui::MenuItem("Cubo"))
-            {
                 Application::GetInstance().render.get()->CreateCube();
-            }
             if (ImGui::MenuItem("Rombo"))
-            {
                 Application::GetInstance().render.get()->CreateDiamond();
-            }
             if (ImGui::MenuItem("Sphere"))
-            {
                 Application::GetInstance().render.get()->CreateSphere();
-            }
+            
             ImGui::EndMenu();
         }
+
         ImGui::EndMainMenuBar();
     }
 }
 
-void Menus::BuildDockSpace() {
+void Menus::BuildDockSpace() 
+{
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -178,10 +170,10 @@ void Menus::BuildDockSpace() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
     ImGuiStyle& style = ImGui::GetStyle();
-    style.WindowPadding = ImVec2(0.0f, 0.0f);      // Sin margen interno en ventanas
-    //style.FramePadding = ImVec2(0.0f, 0.0f);       // Sin margen en botones y elementos
-    //style.ItemSpacing = ImVec2(0.0f, 0.0f);        // Sin espacio entre elementos
-    style.WindowBorderSize = 0.0f;                 // Sin borde de ventana
+    style.WindowPadding = ImVec2(0.0f, 0.0f);      // No internal padding for windows
+    // style.FramePadding = ImVec2(0.0f, 0.0f);    // No padding for buttons or elements
+    // style.ItemSpacing = ImVec2(0.0f, 0.0f);     // No spacing between items
+    style.WindowBorderSize = 0.0f;                 // No border for windows
     style.IndentSpacing = 0.0f;
 
     ImGui::Begin("MainDockSpace", nullptr, window_flags);
@@ -190,6 +182,7 @@ void Menus::BuildDockSpace() {
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     static bool layoutInitialized = false;
+
     if (!layoutInitialized && !initialization_exist)
     {
         ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
@@ -197,18 +190,18 @@ void Menus::BuildDockSpace() {
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
 
-        // Dividir verticalmente el nodo raíz
+        // Split the root node vertically
         ImGuiID dock_top, dock_bottom, dock_center;
         dock_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
         dock_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
         dock_center = dockspace_id;
 
-        // Dividir horizontalmente el centro
+        // Split the center area horizontally
         ImGuiID dock_left, dock_right;
         dock_left = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Left, 0.2f, nullptr, &dock_center);
         dock_right = ImGui::DockBuilderSplitNode(dock_center, ImGuiDir_Right, 0.2f, nullptr, &dock_center);
 
-        // Asignar ventanas
+        // Assign windows to each docking area
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom);
@@ -217,38 +210,37 @@ void Menus::BuildDockSpace() {
 
         ImGui::DockBuilderFinish(dockspace_id);
 
-
         layoutInitialized = true;
     }
 
     ImGui::End();
 }
 
-
 void Menus::CalculateFPS(float dt)
 {
     framesCounter++;
     timeAccumulator += dt;
 
-    if (timeAccumulator >= 1.0f) // cada segundo
+    if (timeAccumulator >= 1.0f)
     {
         currentFPS = (float)framesCounter / timeAccumulator;
         fpsHistory.push_back(currentFPS);
 
-        if (fpsHistory.size() > 100) // límite para el gráfico
+        if (fpsHistory.size() > 100)
             fpsHistory.erase(fpsHistory.begin());
 
         framesCounter = 0;
         timeAccumulator = 0.0f;
     }
 }
+
 void Menus::FPS_graph()
 {
     ImGui::Begin("FPS Monitor", &showFPS);
     ImGui::Text("FPS actual: %.1f", currentFPS);
-    if (!fpsHistory.empty()) {
+    if (!fpsHistory.empty()) 
         ImGui::PlotLines("FPS", fpsHistory.data(), fpsHistory.size(), 0, nullptr, 0.0f, 120.0f, ImVec2(100, 50));
-    }
+    
     ImGui::End();
 }
 
@@ -256,12 +248,12 @@ void Menus::DrawConsole()
 {
     ImGui::Begin("Console", &showConsole);
 
-    for (const auto& line : consoleLog) {
+    for (const auto& line : consoleLog) 
         ImGui::TextUnformatted(line.c_str());
-    }
 
     ImGui::End();
 }
+
 void Menus::Hierarchy_Menu()
 {
     ImGui::Begin("Hierarchy", &showHierarchy);
@@ -270,6 +262,7 @@ void Menus::Hierarchy_Menu()
 
     ImGui::End();
 }
+
 void Menus::DrawGameObjectNode(Model* obj)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -281,15 +274,16 @@ void Menus::DrawGameObjectNode(Model* obj)
     if (ImGui::IsItemClicked())
         selectedObj = obj;
 
-    if (nodeOpen) {
+    if (nodeOpen)
         ImGui::TreePop();
-    }
 }
+
 void Menus::DrawInspector()
 {
     ImGui::Begin("Inspector");
 
-    if (!selectedObj == NULL) {
+    if (!selectedObj == NULL) 
+    {
         ImGui::Text("Seleccionado: %s", selectedObj->name.c_str());
 
         ImGui::Separator();
@@ -306,33 +300,31 @@ void Menus::DrawInspector()
             selectedObj->size.x,
             selectedObj->size.y,
             selectedObj->size.z);
+
         Render* render = Application::GetInstance().render.get();
         ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
         ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
-
-
-        //TO DO opción para visualizar la textura de los cuadrados blancos y negros
 
         ImGui::Separator();
 
         ImGui::Text("TEXTURE");
         ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
-        //TO DO TAMAÑO TEXTURE
+       
         if (ImGui::Checkbox("Default texture", &checkbox)) selectedObj->switchTexture(checkbox, "BlackWhite");
         if (ImGui::Checkbox("Normal Map", &checkbox2)) selectedObj->switchTexture(checkbox2, "NormalMap");
 
         ImGui::Separator();
         ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
-        if (ImGui::Button("Delete Model")) {
+        if (ImGui::Button("Delete Model")) 
+        {
             auto& sceneModels = Application::GetInstance().scene->models;
             sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
                 [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
             selectedObj = nullptr;
         }
     }
-    else {
+    else 
         ImGui::Text("Ning�n objeto seleccionado");
-    }
 
     ImGui::End();
 }
@@ -350,18 +342,18 @@ void Menus::DrawSystemInfo()
 {
     ImGui::Begin("System Info", &showSystemInfo);
 
-    // Memory usage
+    // Memory Usage
     ImGui::Text("Memory Usage:");
     ImGui::Text("RAM: %.2f MB", GetRAMUsageMB());
 
-    // Hardware info
+    // Hardware Info
     ImGui::Separator();
     ImGui::Text("Hardware:");
     ImGui::Text("CPU: %s", SDL_GetPlatform());
     ImGui::Text("GPU: %s", (const char*)glGetString(GL_RENDERER));
     ImGui::Text("OpenGL Vendor: %s", (const char*)glGetString(GL_VENDOR));
 
-    // Library versions
+    // Library Versions
     ImGui::Separator();
     ImGui::Text("Library Versions:");
 
@@ -372,6 +364,7 @@ void Menus::DrawSystemInfo()
 
     ImGui::End();
 }
+
 void Menus::DrawSystemConfig()
 {
     ImGui::Begin("System Config", &showSystemInfo);
@@ -410,23 +403,22 @@ void Menus::DrawAboutWindow()
 {
     ImGui::Begin("About", &showAbout);
 
-    // Engine name
+    // Engine Name
     ImGui::Text("Game Engine");
     ImGui::Separator();
 
     // Version
     ImGui::Text("Version: 1.0.0");
 
-    // Team members
+    // Team Members
     ImGui::Text("Team:");
     ImGui::BulletText("Joel Vicente");
-    ImGui::BulletText("Arthur Cór doba");
     ImGui::BulletText("Arthur Cordoba");
     ImGui::BulletText("Jana Puig");
 
     ImGui::Separator();
 
-    // Libraries used
+    // Libraries Used
     ImGui::Text("Libraries used:");
     ImGui::BulletText("SDL3");
     ImGui::BulletText("OpenGL");
@@ -454,7 +446,8 @@ bool Menus::PostUpdate()
     return true;
 }
 
-bool Menus::CleanUp() {
+bool Menus::CleanUp() 
+{
     LogToConsole("Shutting down ImGui...");
 
     ImGui_ImplOpenGL3_Shutdown();

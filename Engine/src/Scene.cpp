@@ -11,9 +11,11 @@
 #include "imgui_impl_opengl3.h"
 #include <windows.h>
 #include "Menus.h"
+
 Scene::Scene() : Module()
 {
 }
+
 // Destructor
 Scene::~Scene()
 {
@@ -24,31 +26,8 @@ bool Scene::Awake()
 	return true;
 }
 
-
 bool Scene::Start()
 {
-
-    //listFBX.push_back(Model("../FBX/BakerHouse.fbx"));
-   
-    //std::string texPath = "../Images/Baker_house.png";
-    //Texture* tex = new Texture(texPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-
-    //listFBX[0].Mmesh.texture = tex;
-
-
-
-    //std::string parentDir = std::string("../Images/");
-    //imagesFiles.push_back(std::string("textura.png"));
-
-    //for (size_t i = 0; i < imagesFiles.size(); ++i)
-    //{
-    //    std::string fullPath = parentDir + imagesFiles[i];
-    //    // Crear la textura con tu clase Texture (usa DevIL internamente)
-    //    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
-    //    images.push_back(tex);
-    //}
-
-
     Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
     Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -60,30 +39,32 @@ bool Scene::Start()
 	return true;
 }
 
-void Scene::LoadFBX(const std::string& path) {
+void Scene::LoadFBX(const std::string& path) 
+{
     Model model(path.c_str());
     models.push_back(model);
 }
 
-void Scene::ApplyTextureToSelected(const std::string& path) {
+void Scene::ApplyTextureToSelected(const std::string& path) 
+{
    
     if (!Application::GetInstance().menus.get()->selectedObj == NULL)
     {
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-        for (auto& Model : models) {
-            if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) {
+        for (auto& Model : models) 
+        {
+            if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) 
+            {
                 Model.Mmesh.texture = tex;
                 Model.actualTexture = tex;
                 Model.texturePath = path;
             }
         }
     }
-    else {
-        Application::GetInstance().menus->LogToConsole("ERROR AL APLICAR TEXTURA, NINGUN OBJETO SELECIONADO");
-    }
+    else 
+        Application::GetInstance().menus->LogToConsole("ERROR APPLYING TEXTURE, NO OBJECT SELECTED");
 }
-
 
 bool Scene::PreUpdate()
 {
@@ -93,98 +74,8 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
     for(auto& Model : models) Model.Draw();
-   
-    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-
-    //Image 2D
-    for (int i = 0; i < images.size(); i++)
-    {
-        images[i].texUnit(shaderProgram, "tex0", 0);
-        images[i].Bind();
-
-        GLfloat vertices2[] =
-        { 
-            -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, // inferior izquierda
-             0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, // inferior derecha
-             0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f, // superior derecha
-            -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
-        };
-
-        //// Indices para formar dos triángulos
-        GLuint indices2[] =
-        {
-            0, 1, 2,  // primer triángulo
-            2, 3, 0   // segundo triángulo
-        };
-
-        int vertexCount = sizeof(vertices2) / sizeof(float);
-        int indexCount = sizeof(indices2) / sizeof(unsigned int);
-        Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 0.0f, &images[i]);
-
-        images[i].Unbind();
-    }
-
-    //Imatge 3d
-    //for (int i = 0; i < images.size(); i++)
-    //{
-    //    GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-
-    //    // Configuramos la textura (asumiendo que brickTex es tu Texture ya cargada)
-
-    //    images[i].texUnit(shaderProgram, "tex0", 0);
-    //    images[i].Bind();
-
-    //    // Vertices de la pirámide: posición (x,y,z), color (r,g,b), textura (u,v)
-    //    GLfloat vertices[] =
-    //    { //     COORDINATES     /        COLORS      /   TexCoord  //
-    //        -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    //        -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 1.0f,
-    //         0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 1.0f,
-    //         0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-    //         0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
-    //    };
-
-    //    // Indices for vertices order
-    //    GLuint indices[] =
-    //    {
-    //        0, 1, 2,
-    //        0, 2, 3,
-    //        0, 1, 4,
-    //        1, 2, 4,
-    //        2, 3, 4,
-    //        3, 0, 4
-    //    };
-
-    //    int vertexCount = sizeof(vertices) / sizeof(float);
-    //    int indexCount = sizeof(indices) / sizeof(unsigned int);
-
-    //    const Uint8* state = SDL_GetKeyboardState(NULL);
-    //    glm::vec3 dir = Application::GetInstance().camera->Orientation;
-    //    float rotation = glm::degrees(atan2(dir.x, dir.z));
-
-    //    // Transformaciones
-    //    glm::mat4 model = glm::mat4(1.0f);
-    //    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-    //    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)Application::GetInstance().window.get()->width / Application::GetInstance().window.get()->height, 0.1f, 100.0f);
-
-    //    model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    //    // Enviar matrices al shader
-    //    int modelLoc = glGetUniformLocation(shaderProgram, "model");
-    //    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    //    int viewLoc = glGetUniformLocation(shaderProgram, "view");
-    //    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    //    int projLoc = glGetUniformLocation(shaderProgram, "proj");
-    //    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-
-    //    // Dibujar la pirámide
-    //    Application::GetInstance().render.get()->Draw3D(vertices, vertexCount, indices, indexCount, 60.0f, &images[i]);
-
-
-    //}
 
 	return true;
-
 }
 
 bool Scene::PostUpdate()
@@ -192,14 +83,14 @@ bool Scene::PostUpdate()
  	return true;
 }
 
-bool Scene::CleanUp() {
+bool Scene::CleanUp() 
+{
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
 
     models.clear();
     imagesFiles.clear();
-    for (auto& tex : images) {
+    for (auto& tex : images) 
         tex.Delete();
-    }
     images.clear();
 
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
