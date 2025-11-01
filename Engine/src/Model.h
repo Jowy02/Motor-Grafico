@@ -73,7 +73,7 @@ private:
 
     // --- Extra textures ---
     Texture* blackWhite = nullptr;
-    Texture* normalMap = nullptr;
+    Texture* noTexture = nullptr;
 
     // --- Model loading (Assimp) ---
     void loadModel(const std::string& path);

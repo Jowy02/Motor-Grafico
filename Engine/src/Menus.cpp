@@ -309,8 +309,8 @@ void Menus::DrawInspector()
         ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
         if (ImGui::Checkbox("Default texture", &checkbox)) 
             selectedObj->switchTexture(checkbox, "BlackWhite");
-        if (ImGui::Checkbox("Normal Map", &checkbox2)) 
-            selectedObj->switchTexture(checkbox2, "NormalMap");
+        if (ImGui::Checkbox("Hide texture", &checkbox2)) 
+            selectedObj->switchTexture(checkbox2, "Hide");
 
         ImGui::Separator();
         ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
