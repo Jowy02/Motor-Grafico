@@ -62,6 +62,8 @@ private:
     bool showHierarchy = true;
     bool showSystemInfo = true;
     bool showAbout = false;
+    bool showInspector = true;
+    bool showSystemConfig = true;
 
     // Example checkbox states
     bool checkbox = false;
