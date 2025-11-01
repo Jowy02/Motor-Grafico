@@ -148,7 +148,7 @@ bool Render::Update(float dt)
 }
 
 // ---- MESH CREATION ---
-void Render::CreateTriangle() 
+void Render::CreatePyramid()
 {
     GLfloat vertices2[] =
     { //     COORDINATES     /        COLORS      /   TexCoord  //
@@ -184,7 +184,7 @@ void Render::CreateTriangle()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
-    model.name = "Triangle";
+    model.name = "Pyramid";
 
     float baseSize = 1.0f;
     float height = 0.8f;

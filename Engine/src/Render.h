@@ -37,7 +37,7 @@ public:
     bool CleanUp() override;          // Called before quitting
 
     // ---- MESH CREATION ---
-    void CreateTriangle();      
+    void CreatePyramid();
     void CreateCube();          
     void CreateDiamond();       
     void CreateSphere();        

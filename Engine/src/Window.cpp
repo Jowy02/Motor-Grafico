@@ -37,7 +37,7 @@ bool Window::Awake()
     Application::GetInstance().menus->LogToConsole("Creating SDL window...");
     window = SDL_CreateWindow("MyEngine",
         width, height,
-        SDL_WINDOW_OPENGL);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
 
     SDL_ShowWindow(window);
     if (!window) {
@@ -93,7 +93,7 @@ bool Window::CleanUp()
     return true;
 }
 
-void Window::GetWindowSize(int width, int height)
+void Window::SetWindowSize(int width, int height)
 {
     SDL_SetWindowSize(window, width, height);
 
@@ -101,6 +101,11 @@ void Window::GetWindowSize(int width, int height)
     this->height = height;
 }
 
+void Window::GetWindowSize(int width, int height)
+{
+     width = this->width;
+     height = this->height;
+}
 // Set new window title
 void Window::SetTitle(const char* new_title)
 {

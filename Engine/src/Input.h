@@ -16,6 +16,7 @@ enum EventWindow
     WE_QUIT = 0,
     WE_HIDE,
     WE_SHOW,
+    WE_RESIZED,
     WE_COUNT
 };
 
@@ -48,9 +49,9 @@ public:
     glm::vec2 GetMousePosition();
     glm::vec2 GetMouseMotion();
 
+    bool windowEvents[WE_COUNT];
 private:
     // --- Window and input state ---
-    bool windowEvents[WE_COUNT];
     KeyState* keyboard;
     KeyState mouseButtons[NUM_MOUSE_BUTTONS];
 

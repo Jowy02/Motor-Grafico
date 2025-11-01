@@ -90,6 +90,9 @@ bool Input::PreUpdate()
 			case SDL_EVENT_QUIT:
 				windowEvents[WE_QUIT] = true;
 			break;
+			case SDL_EVENT_WINDOW_RESIZED:
+				windowEvents[WE_RESIZED] = true;
+				break;
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				if (btn >= 1 && btn <= NUM_MOUSE_BUTTONS)

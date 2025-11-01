@@ -25,6 +25,7 @@ public:
     void SetTitle(const char* title);
     void SetScreen(bool fullscreen);
     void GetWindowSize(int width, int height);
+    void SetWindowSize(int width, int height);
     int GetScale() const;
 
     // --- Accessors ---

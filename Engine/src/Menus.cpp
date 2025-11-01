@@ -135,8 +135,8 @@ void Menus::MainMenu()
         if (ImGui::BeginMenu("Create"))
         {
             selectedObj = NULL;
-            if (ImGui::MenuItem("Triangle"))
-                Application::GetInstance().render.get()->CreateTriangle();
+            if (ImGui::MenuItem("Pyramid"))
+                Application::GetInstance().render.get()->CreatePyramid();
             if (ImGui::MenuItem("Cube"))
                 Application::GetInstance().render.get()->CreateCube();
             if (ImGui::MenuItem("Diamond"))
@@ -377,7 +377,7 @@ void Menus::DrawSystemConfig()
 
     ImGui::DragInt("Width", &with, 0.1f);
     ImGui::DragInt("Height", &height, 0.1f);
-    Application::GetInstance().window.get()->GetWindowSize(with,height);
+    Application::GetInstance().window.get()->SetWindowSize(with,height);
 
     // Camera Config
     ImGui::Separator();
