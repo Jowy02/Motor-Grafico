@@ -302,9 +302,9 @@ void Model::switchTexture(bool checker, std::string type)
         if (checker) Mmesh.texture = blackWhite;
         else Mmesh.texture = actualTexture;
     }
-    if (type == "NormalMap")
+    if (type == "Hide")
     {
-        if (checker) Mmesh.texture = normalMap;
+        if (checker) Mmesh.texture = noTexture;
         else Mmesh.texture = actualTexture;
     }
 }
@@ -336,6 +336,8 @@ void Model::CleanUp()
     Mmesh.VAO = 0;
     Mmesh.VBO = 0;
     Mmesh.EBO = 0;
+
     Mmesh.texture = nullptr;
+    actualTexture = nullptr;
     blackWhite = nullptr;
 }

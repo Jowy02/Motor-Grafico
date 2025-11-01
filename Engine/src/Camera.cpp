@@ -54,12 +54,12 @@ void Camera::Inputs(SDL_Window* window)
     // Increase camera speed with Shift
     speed = (input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) ? MOVESPEED * 2 : MOVESPEED;
 
-    bool leftMouse = input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT;
-    bool rightMouse = input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT;
+    float rotX = sensitivity * (float)(input->GetMousePosition().y - height / 2) / height;
+    float rotY = sensitivity * (float)(input->GetMousePosition().x - width / 2) / width;
 
-    if (!io.WantCaptureMouse && leftMouse)
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT && input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
     {
-        SDL_HideCursor();
+        SDL_SetWindowRelativeMouseMode(window, true);
 
         if (firstClick)
         {
@@ -67,52 +67,51 @@ void Camera::Inputs(SDL_Window* window)
             firstClick = false;
         }
 
-        float rotX = sensitivity * (float)(input->GetMousePosition().y - height / 2) / height;
-        float rotY = sensitivity * (float)(input->GetMousePosition().x - width / 2) / width;
+        glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3{ 0.0f };
+        glm::vec3 size = selectedObj ? selectedObj->size : glm::vec3{ 0.0f };
+        if (selectedObj) target.y -= size.y * 0.25f;
 
-        if (input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
-        {
-            glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3{ 0.0f };
-            glm::vec3 size = selectedObj ? selectedObj->size : glm::vec3{ 0.0f };
-            if (selectedObj) target.y -= size.y * 0.25f;
+        glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
+        glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY * 180.0f), Up);
+        glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX * 180.0f), right);
 
-            glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
-            glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY * 180.0f), Up);
-            glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX * 180.0f), right);
+        glm::vec3 offset = Position - target;
+        offset = glm::vec3(yaw * pitch * glm::vec4(offset, 1.0f));
 
-            glm::vec3 offset = Position - target;
-            offset = glm::vec3(yaw * pitch * glm::vec4(offset, 1.0f));
-
-            Position = target + offset;
-            Orientation = glm::normalize(target - Position);
-        }
-        else
-        {
-            glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
-            glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX * 180.0f), right);
-            glm::vec3 newOrientation = glm::vec3(pitch * glm::vec4(Orientation, 0.0f));
-
-            float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
-                (glm::length(newOrientation) * glm::length(Up))));
-            if (fabs(angleBetween - 90.0f) <= 85.0f) Orientation = newOrientation;
-
-            glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY * 180.0f), Up);
-            Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
-        }
+        Position = target + offset;
+        Orientation = glm::normalize(target - Position);
+        
     }
-    else if (rightMouse)
+    else if (input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT)
     {
+        SDL_SetWindowRelativeMouseMode(window, true);
+
         if (input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) Position += speed * Orientation;
         if (input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) Position += speed * -Orientation;
         if (input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) Position += speed * -glm::normalize(glm::cross(Orientation, Up));
         if (input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) Position += speed * glm::normalize(glm::cross(Orientation, Up));
         if (input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) Position += speed * Up;
         if (input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) Position += speed * -Up;
+
+        //Free Look
+        glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
+        glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX * 20.0f), right);
+        glm::vec3 newOrientation = glm::vec3(pitch * glm::vec4(Orientation, 0.0f));
+
+        float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
+            (glm::length(newOrientation) * glm::length(Up))));
+        if (fabs(angleBetween - 90.0f) <= 85.0f) Orientation = newOrientation;
+
+        glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY * 20.0f), Up);
+        Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
     }
     else
     {
-        SDL_ShowCursor();
-        firstClick = true;
+       
+       if(SDL_GetWindowRelativeMouseMode(window))
+           SDL_SetWindowRelativeMouseMode(window, false);
+
+       firstClick = true;
     }
 }
 
