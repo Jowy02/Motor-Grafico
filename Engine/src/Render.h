@@ -62,9 +62,7 @@ public:
     bool VertexNormals = false;  
 
     // --- SDL / OpenGL objects ---
-    SDL_Renderer* renderer = nullptr; 
-    SDL_Rect camera;                  
-    SDL_Rect viewport;                
+    SDL_Renderer* renderer = nullptr;               
     SDL_Color background;             
     unsigned int shaderProgram = 0;   
     unsigned int normalShaderProgram = 0;

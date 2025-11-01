@@ -38,7 +38,8 @@ void Camera::Inputs(SDL_Window* window)
 
     if (Application::GetInstance().input.get()->GetWindowEvent(WE_RESIZED)) {
         SDL_GetWindowSize(window,&width,&height);
-        Application::GetInstance().input.get()->windowEvents[WE_RESIZED] = false;;
+        glViewport(0, 0, width, height);
+        Application::GetInstance().input.get()->windowEvents[WE_RESIZED] = false;
     }
 
     // Center the camera on the selected object
@@ -77,6 +78,7 @@ void Camera::Inputs(SDL_Window* window)
         glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3{ 0.0f };
         glm::vec3 size = selectedObj ? selectedObj->size : glm::vec3{ 0.0f };
         if (selectedObj) target.y -= size.y * 0.25f;
+
 
         glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
         glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY ), Up);

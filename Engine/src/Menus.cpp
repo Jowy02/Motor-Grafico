@@ -372,13 +372,15 @@ void Menus::DrawSystemConfig()
 
     // Window Config
     ImGui::Text("Window");
-    int with = Application::GetInstance().window.get()->width;
-    int height = Application::GetInstance().window.get()->height;
+    int width = 0, height = 0;
+    SDL_GetWindowSize(Application::GetInstance().window.get()->window, &width, &height);
 
-    ImGui::DragInt("Width", &with, 0.1f);
-    ImGui::DragInt("Height", &height, 0.1f);
-    Application::GetInstance().window.get()->SetWindowSize(with,height);
-
+    if (ImGui::DragInt("Width", &width, 0.1f) || ImGui::DragInt("Height", &height, 0.1f))
+    {
+        Application::GetInstance().window.get()->SetWindowSize(width, height);
+        glViewport(0, 0, width, height);
+    }
+      
     // Camera Config
     ImGui::Separator();
     ImGui::Text("Camera");

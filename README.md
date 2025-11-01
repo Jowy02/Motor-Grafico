@@ -50,7 +50,7 @@ Future iterations of the project will expand its capabilities to support more ad
 
 ### **Camera**
 - **Unity-like camera controls:**  
-  - **Right Mouse Button** → Free look + **WASD** movement (FPS-style).  
+  - **Right Mouse Button** → Free look + **WASD** movement (FPS-style), Space bar to go up and LCNTRL to go down.  
   - **Mouse Wheel** → Zoom in / out.  
   - **Alt + Left Mouse Button** → Orbit around the selected object.  
   - **F** → Focus on the selected geometry.  
