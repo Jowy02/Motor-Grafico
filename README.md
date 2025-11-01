@@ -15,7 +15,14 @@
      * Alt + Left Click = Move around the object
      * F = Center camera on selected object
      * Left Shift = Multiply by 2 camera speed
+
+### Functionalities
+     * Descripcion de los menus y sus funciones que se describen en el pdf de la entrega
+
+### Aditional Functionalities
+     * Funciones adicionales como el hide y la eliminacion de los gameobjects y sus transformaciones
     
+
 ## Credits
 **All contributors working on this project**:
 
