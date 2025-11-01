@@ -86,9 +86,8 @@ bool Menus::Update(float dt)
     if (showHierarchy) Hierarchy_Menu();
     if (showSystemInfo) DrawSystemInfo();
     if (showAbout) DrawAboutWindow();
-    DrawInspector();
-
-    DrawSystemConfig();
+    if(showInspector)DrawInspector();
+    if(showSystemConfig)DrawSystemConfig();
     return true;
 }
 
@@ -111,6 +110,9 @@ void Menus::MainMenu()
             ImGui::MenuItem("FPS Monitor", nullptr, &showFPS);
             ImGui::MenuItem("Hierarchy", nullptr, &showHierarchy);
             ImGui::MenuItem("System Info", nullptr, &showSystemInfo);
+            ImGui::MenuItem("System Config", nullptr, &showSystemConfig);
+            ImGui::MenuItem("System Inspector", nullptr, &showInspector);
+
             ImGui::EndMenu();
         }
 
@@ -295,35 +297,37 @@ void Menus::DrawInspector()
             selectedObj->UpdateTransform();
         if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) 
             selectedObj->UpdateTransform();
-
-        ImGui::Separator();
-        ImGui::Text("MESH");
-        ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
-
-        Render* render = Application::GetInstance().render.get();
-        ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
-        ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
-
-        ImGui::Separator();
-        ImGui::Text("TEXTURE");
-        ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
-        if (ImGui::Checkbox("Default texture", &checkbox)) 
-            selectedObj->switchTexture(checkbox, "BlackWhite");
-        if (ImGui::Checkbox("Hide texture", &checkbox2)) 
-            selectedObj->switchTexture(checkbox2, "Hide");
-
-        ImGui::Separator();
-        ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
-
-        if (ImGui::Button("Delete Model")) 
+        if (selectedObj->name != "Grid")
         {
-            auto& sceneModels = Application::GetInstance().scene->models;
-            sceneModels.erase(
-                std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const Model& m) { return &m == selectedObj; }),
-                sceneModels.end()
-            );
-            selectedObj = nullptr;
+            ImGui::Separator();
+            ImGui::Text("MESH");
+            ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
+
+            Render* render = Application::GetInstance().render.get();
+            ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
+            ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
+
+            ImGui::Separator();
+            ImGui::Text("TEXTURE");
+            ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
+            if (ImGui::Checkbox("Default texture", &checkbox))
+                selectedObj->switchTexture(checkbox, "BlackWhite");
+            if (ImGui::Checkbox("Hide texture", &checkbox2))
+                selectedObj->switchTexture(checkbox2, "Hide");
+
+            ImGui::Separator();
+            ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
+
+            if (ImGui::Button("Delete Model"))
+            {
+                auto& sceneModels = Application::GetInstance().scene->models;
+                sceneModels.erase(
+                    std::remove_if(sceneModels.begin(), sceneModels.end(),
+                        [&](const Model& m) { return &m == selectedObj; }),
+                    sceneModels.end()
+                );
+                selectedObj = nullptr;
+            }
         }
     }
     else
