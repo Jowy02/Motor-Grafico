@@ -69,28 +69,32 @@ void Camera::Inputs(SDL_Window* window)
     {
         SDL_SetWindowRelativeMouseMode(window, true);
 
-        if (firstClick)
-        {
-            SDL_WarpMouseInWindow(window, width / 2, height / 2);
-            firstClick = false;
-        }
-
-        glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3{ 0.0f };
-        glm::vec3 size = selectedObj ? selectedObj->size : glm::vec3{ 0.0f };
-        if (selectedObj) target.y -= size.y * 0.25f;
-
-
-        glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
-        glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY ), Up);
-        glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX ), right);
-
+        glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3(0.0f);
         glm::vec3 offset = Position - target;
-        offset = glm::vec3(yaw * pitch * glm::vec4(offset, 1.0f));
+        float radius = glm::length(offset);
+
+        float pitch = glm::degrees(asin(offset.y / radius));
+        float yaw = glm::degrees(atan2(offset.z, offset.x));
+
+        float sensitivity = 0.2f;
+        pitch += sensitivity * dy;
+        yaw += sensitivity * dx;
+
+        // Limita pitch
+        pitch = glm::clamp(pitch, -89.0f, 89.0f);
+
+        // Reconstruye posición de cámara
+        float pitchRad = glm::radians(pitch);
+        float yawRad = glm::radians(yaw);
+
+        offset.x = radius * cos(pitchRad) * cos(yawRad);
+        offset.y = radius * sin(pitchRad);
+        offset.z = radius * cos(pitchRad) * sin(yawRad);
 
         Position = target + offset;
         Orientation = glm::normalize(target - Position);
-        
     }
+
     else if (input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT)
     {
         SDL_SetWindowRelativeMouseMode(window, true);

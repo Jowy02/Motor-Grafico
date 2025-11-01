@@ -48,7 +48,7 @@ bool Input::Start()
 bool Input::PreUpdate()
 {
 	auto camera = Application::GetInstance().camera.get();
-	auto selectedObj = Application::GetInstance().menus->selectedObj;
+	auto selectedObj = Application::GetInstance().menus->selectedObj;  
 	glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3(0.0f);
 
 	static SDL_Event event;
@@ -110,42 +110,6 @@ bool Input::PreUpdate()
 			case SDL_EVENT_MOUSE_MOTION:
 				
 				SDL_GetMouseState(&mouseX, &mouseY);
-				 //Orbit: ALT + Click izquierdo
-				{
-					Uint32 mouseState = SDL_GetMouseState(NULL, NULL);
-					if ((mouseState & SDL_BUTTON_LEFT) && keys[SDL_SCANCODE_LALT])
-					{
-						float dx, dy;
-						SDL_GetRelativeMouseState(&dx, &dy);
-
-						float sensitivity = 0.2f;
-
-						// Calcula offset
-						glm::vec3 offset = camera->Position - target;
-						float radius = glm::length(offset);
-
-						float pitch = glm::degrees(asin(offset.y / radius));
-						float yaw = glm::degrees(atan2(offset.z, offset.x));
-
-						// Aplica rotaciones
-						pitch += sensitivity * dy;
-						yaw += sensitivity * dx;
-
-						// Limita pitch
-						pitch = glm::clamp(pitch, -89.0f, 89.0f);
-
-						// Reconstruye offset
-						float pitchRad = glm::radians(pitch);
-						float yawRad = glm::radians(yaw);
-
-						offset.x = radius * cos(pitchRad) * cos(yawRad);
-						offset.y = radius * sin(pitchRad);
-						offset.z = radius * cos(pitchRad) * sin(yawRad);
-
-						camera->Position = target + offset;
-						camera->Orientation = glm::normalize(target - camera->Position);
-					}
-				}
 				break;
 
             case SDL_EVENT_MOUSE_WHEEL:
