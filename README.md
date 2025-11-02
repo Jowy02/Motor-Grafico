@@ -1,8 +1,8 @@
-# Grafic Engine
+# SuperNova Engine
 **Github project page**: [https:///github.com/Jowy02/Motor-Grafico](https:///github.com/Jowy02/Motor-Grafico)
 
 ## Description
-Grafic Engine is a geometry visualization tool developed as the foundation for a future 3D game engine.
+SuperNova is a geometry visualization tool developed as the foundation for a future 3D game engine.
 In this first stage, the project aims to deliver a functional geometry visualizer featuring drag & drop model loading, an orbital camera system, and a basic UI editor built with ImGui.
 
 The current release allows users to load and explore 3D models using a smooth and intuitive camera system.
