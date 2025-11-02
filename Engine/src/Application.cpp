@@ -116,7 +116,7 @@ void Application::PrepareUpdate()
 // ---------------------------------------------
 void Application::FinishUpdate()
 {
-   window.get()->SetTitle("Motor Grafico");
+   window.get()->SetTitle("SuperNova_Engine");
 }
 
 // Call modules before each loop iteration

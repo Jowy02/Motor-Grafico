@@ -411,7 +411,7 @@ void Menus::DrawAboutWindow()
     ImGui::Begin("About", &showAbout);
 
     // Engine Name
-    ImGui::Text("Game Engine");
+    ImGui::Text("SuperNova_Engine");
     ImGui::Separator();
 
     // Version
