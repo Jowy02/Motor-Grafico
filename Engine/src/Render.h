@@ -72,6 +72,11 @@ private:
     unsigned int vertexShader = 0;          // Vertex shader ID
     unsigned int fragmentShader = 0;        // Fragment shader ID
 
+    int numPyramid = 0;
+    int numCube = 0;
+    int numDiamond = 0;
+    int numSphere = 0;
+
     double prevTime = 0.0;   // Time tracking for updates
 
     SDL_Window* temp = nullptr; // Temporary window pointer
