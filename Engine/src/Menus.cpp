@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Model.h"
 #include "Menus.h"
+#include "Input.h"
 #include <iostream> 
 
 #include "imgui.h"
@@ -275,7 +276,12 @@ void Menus::DrawGameObjectNode(Model* obj)
     bool nodeOpen = ImGui::TreeNodeEx((void*)obj, flags, "%s", obj->name.c_str());
 
     if (ImGui::IsItemClicked())
-        selectedObj = obj;
+    {
+        if (selectedObj != obj)selectedObj = obj;
+        else selectedObj = NULL;
+    }
+    else if(selectedObj != NULL && Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE)== KEY_DOWN)
+        selectedObj = NULL;
 
     if (nodeOpen)
         ImGui::TreePop();
