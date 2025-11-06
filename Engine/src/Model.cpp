@@ -28,7 +28,21 @@ Model::Model(const std::string& path)
 void Model::Draw()
 {
     if (isHidden) return;
+   
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+
+    if (hasTransparency) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
+    }
+        
+    else {
+        glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
+    }
+
+
 
     // Send the transformation matrix to the shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
@@ -57,6 +71,9 @@ void Model::Draw()
 
     if (Mmesh.texture)
         Mmesh.texture->Unbind();
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
 }
 
 // Update the transformation matrix and recalculate AABB, center, and size
@@ -262,6 +279,10 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    //// Alpha
+    //glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
+    //glEnableVertexAttribArray(3);
+
     glBindVertexArray(0);
 
     Mmesh.indexCount = indices.size();
@@ -285,11 +306,17 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
             std::cout << "Loading texture from material: " << filename << std::endl;
 
             Mmesh.texture = new Texture(filename.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+          
+            if (Mmesh.texture)
+                hasTransparency = Mmesh.texture->hasAlpha;
+
         }
         else
         {
             std::cout << "No diffuse texture found in the material." << std::endl;
             Mmesh.texture = nullptr;
+            hasTransparency = false;
+
         }
     }
 }

@@ -12,10 +12,10 @@
 // --- SHADERS ---
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
+"layout (location = 1) in vec4 aColor;\n"
 "layout (location = 2) in vec2 aTexCoord;\n"
 
-"out vec3 ourColor;\n"
+"out vec4 ourColor;\n"
 "out vec2 TexCoord;\n"
 
 "uniform mat4 model_matrix;\n"
@@ -31,7 +31,7 @@ const char* vertexShaderSource = "#version 330 core\n"
 "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
-"in vec3 ourColor;\n"
+"in vec4 ourColor;\n"
 "in vec2 TexCoord;\n"
 "out vec4 FragColor;\n"
 "uniform sampler2D tex0;\n"
@@ -39,9 +39,19 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "void main()\n"
 "{\n"
 "   if(useTexture)\n"
-"       FragColor = texture(tex0, TexCoord);\n"
+"   {\n"
+"      vec4 texColor = texture(tex0, TexCoord); \n"
+"       if(texColor.a<0.1)\n"
+"       {\n"
+"        discard;\n"
+"       }\n"
+"        FragColor = vec4(texColor.rgb, 0.9);\n"
+"   }\n"
 "   else\n"
-"       FragColor = vec4(ourColor, 1.0);\n"
+"{\n"
+
+"       FragColor = ourColor;\n"
+"}\n"
 "}\n\0";
 
 const char* normalVertexShaderSource = "#version 330 core\n"
@@ -122,13 +132,18 @@ bool Render::Awake()
 bool Render::Start()
 {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     CreateGrid(10,20);
 	return true;
 }
 
 bool Render::PreUpdate()
 {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(shaderProgram);
 
@@ -137,9 +152,14 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
+    auto& scene = *Application::GetInstance().scene; // referencia a la escena actual
+    auto& models = scene.models;
+
+
     // Model is seen from the correct camera position
     Application::GetInstance().camera.get()->Inputs(Application::GetInstance().window.get()->window);
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+    
 
     ShowFaceNormals();
     ShowVertexNormals();
@@ -213,34 +233,48 @@ void Render::CreatePyramid()
 
 void Render::CreateCube()
 {
+    //GLfloat vertices2[] =
+    //{ //     COORDINATES     /        COLORS      /   TexCoord  //
+    //   -0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 0
+    //    0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    1.0f, 0.0f, // 1
+    //    0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 2
+    //   -0.5f,  0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 1.0f, // 3
+    //   -0.5f, -0.5f,  0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 4
+    //    0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 0.0f, // 5
+    //    0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 6
+    //   -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      0.0f, 1.0f  // 7
+    //};
+
+    //// Indices for vertex order
+    //GLuint indices2[] =
+    //{
+    //    // Back face
+    //    0, 1, 2, 2, 3, 0,
+    //    // Front face
+    //    4, 5, 6, 6, 7, 4,
+    //    // Left face
+    //    0, 4, 7, 7, 3, 0,
+    //    // Right face
+    //    1, 5, 6, 6, 2, 1,
+    //    // Bottom face
+    //    0, 1, 5, 5, 4, 0,
+    //    // Top face
+    //    3, 2, 6, 6, 7, 3
+    //};
+
     GLfloat vertices2[] =
-    { //     COORDINATES     /        COLORS      /   TexCoord  //
-       -0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 0
-        0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    1.0f, 0.0f, // 1
-        0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 2
-       -0.5f,  0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 1.0f, // 3
-       -0.5f, -0.5f,  0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 4
-        0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 0.0f, // 5
-        0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 6
-       -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      0.0f, 1.0f  // 7
+    {
+        -0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 1.0f
     };
 
-    // Indices for vertex order
-    GLuint indices2[] =
-    {
-        // Back face
-        0, 1, 2, 2, 3, 0,
-        // Front face
-        4, 5, 6, 6, 7, 4,
-        // Left face
-        0, 4, 7, 7, 3, 0,
-        // Right face
-        1, 5, 6, 6, 2, 1,
-        // Bottom face
-        0, 1, 5, 5, 4, 0,
-        // Top face
-        3, 2, 6, 6, 7, 3
+    GLuint indices2[] = {
+        0, 1, 2,
+        2, 3, 0
     };
+
 
     int vertexCount = sizeof(vertices2) / sizeof(float);
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
@@ -551,11 +585,26 @@ gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GL
 {
     // Set the camera projection and view matrices
     //Application::GetInstance().camera.get()->Inputs(temp); // (commented out input handling)
+    glUseProgram(shaderProgram);
+
+    if (texture != nullptr)
+    {
+        glUniform1i(glGetUniformLocation(shaderProgram, "useTexture"), true);
+        glUniform1i(glGetUniformLocation(shaderProgram, "tex0"), 0);
+        texture->Bind();
+    }
+    else
+    {
+        glUniform1i(glGetUniformLocation(shaderProgram, "useTexture"), false);
+    }
+
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
     static gemotryMesh mesh;
     mesh.indexCount = indexCount;
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // Generate buffers
     glGenVertexArrays(1, &mesh.VAO);
     glGenBuffers(1, &mesh.VBO);
@@ -586,7 +635,8 @@ gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GL
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
-
+    if (texture != nullptr)
+        texture->Unbind();
     return mesh;
 }
 
@@ -714,10 +764,88 @@ gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vert
     return normalMesh;
 }
 
+void  Render::OrderModels()
+{
+ 
+    Model model("NULL");
+    auto& scene = *Application::GetInstance().scene;  // Referencia a la escena actual
+    auto& models = scene.models;
+
+    glm::vec3 cameraPos = Application::GetInstance().camera.get()->Position;
+
+    modelOrder.clear();
+
+    for (int i = 0; i < model.Mmesh.indexCount; ++i)
+    {
+        Model& model = Application::GetInstance().scene->models[i];
+        if (model.hasTransparency)
+        {
+            float distance = glm::length(cameraPos - model.position);
+            modelOrder.push_back({ distance, i });
+        }
+
+        //float distance = glm::length(cameraPos - model.position);
+        //modelOrder.push_back({ distance, i });
+    }
+
+    // ordenar de mayor a menor distancia
+    for (int i = 0; i < modelOrder.size(); ++i)
+    {
+        for (int j = i + 1; j < modelOrder.size(); ++j)
+        {
+            if (modelOrder[i].first < modelOrder[j].first)
+            {
+                std::swap(modelOrder[i], modelOrder[j]);
+            }
+        }
+    }
+
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);        // sin blending
+    glEnable(GL_DEPTH_TEST);    // usar z-buffer
+    glDepthMask(GL_TRUE);
+
+    for (auto& m : models)
+    {
+       
+        if (!m.hasTransparency)
+            m.Draw();
+    }
+    glEnable(GL_BLEND);                             // activar blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // fórmula más común
+    //glEnable(GL_ALPHA_TEST);                        // activar alpha test
+    //glAlphaFunc(GL_GREATER, 0.1f);                  // descartar píxeles con alfa < 0.1
+    glDepthMask(GL_FALSE);
+
+    for (auto& pair : modelOrder)
+    {
+        float dist = pair.first;
+        int index = pair.second;
+        Model& model = models[index];
+        if (model.hasTransparency)
+        {
+
+            Model& model = models[pair.second];
+            model.Draw();
+
+           /* glEnable(GL_BLEND);
+            model.Draw();
+            glDisable(GL_BLEND);*/
+        }
+    }
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+}
+
 
 // --- DEATH CYCLE ---
 bool Render::PostUpdate()
 {
+   
+    OrderModels();
     // Swap the window buffers (double buffering)
     SDL_GL_SwapWindow(temp);
 

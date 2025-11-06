@@ -10,7 +10,7 @@ public:
     // --- Texture data ---
     GLuint ID = 0;
     GLenum type = 0;
-
+    bool hasAlpha = false;
     // --- Constructor ---
     Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
 
