@@ -27,7 +27,7 @@ class Render : public Module
 public:
     Render();
     virtual ~Render(); // Destructor
-
+    
     // --- LIFE CYCLE ---
     bool Awake() override;            // Called before render is available
     bool Start() override;            // Called before the first frame
