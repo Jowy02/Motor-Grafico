@@ -206,8 +206,10 @@ void Render::CreatePyramid()
 
    model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
+   model.modelId = Application::GetInstance().scene.get()->models.size();
 
-    Application::GetInstance().scene.get()->models.push_back(model);
+   Application::GetInstance().scene.get()->models.push_back(model);
+
     numPyramid += 1;
 }
 
@@ -258,7 +260,6 @@ void Render::CreateCube()
     std::string name = "Cube" + std::to_string(numCube);
     model.name = name;
 
-
     auto vertexNormals = CalculateVertexNormalsPrueva(vertices2, indices2, vertexCount, indexCount, 30.0f);
     auto tangentData = CalculateTangentsAndBitangents(vertices2, indices2, vertexNormals, vertexCount, indexCount);
     std::vector<glm::vec3> tangents = tangentData.first;
@@ -267,8 +268,9 @@ void Render::CreateCube()
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
-
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+
     numCube += 1;
 }
 
@@ -323,7 +325,9 @@ void Render::CreateDiamond()
  
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+
     numDiamond += 1;
 }
 
@@ -426,6 +430,7 @@ void Render::CreateSphere()
     model.Normalmesh = DrawFaceNormals(vertices.data(), indices.data(), indices.size(), model.normalLines);
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
     numSphere += 1;
 }
@@ -465,9 +470,9 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
     model.name = "Grid";
+    model.modelId = Application::GetInstance().scene.get()->models.size();
 
     Application::GetInstance().scene.get()->models.push_back(model);
-
     return mesh;
 }
 

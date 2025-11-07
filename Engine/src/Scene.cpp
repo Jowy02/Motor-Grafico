@@ -35,6 +35,7 @@ bool Scene::Start()
 
     models[0].Mmesh.texture = tex;
     models[0].actualTexture = tex;
+    models[0].modelId = 0;
 
 	return true;
 }
@@ -42,6 +43,7 @@ bool Scene::Start()
 void Scene::LoadFBX(const std::string& path) 
 {
     Model model(path.c_str());
+    model.modelId = models.size();
     models.push_back(model);
 }
 
@@ -54,7 +56,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
 
         for (auto& Model : models) 
         {
-            if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) 
+            if (Model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId)
             {
                 Model.Mmesh.texture = tex;
                 Model.actualTexture = tex;

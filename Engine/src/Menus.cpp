@@ -293,7 +293,7 @@ void Menus::DrawInspector()
 
     if (selectedObj != nullptr)
     {
-        ImGui::Text("Selected: %s", selectedObj->name.c_str());
+        ImGui::Text("Selected: %s  id: %d", selectedObj->name.c_str(), selectedObj->modelId);
         ImGui::Separator();
 
         ImGui::Text("TRANSFORM");
