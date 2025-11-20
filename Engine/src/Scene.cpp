@@ -87,8 +87,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
         for (auto& model : models)
         {
 
-            if (Model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId)
-            {
+            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId) {
                 model.Mmesh.texture = tex;
                 model.actualTexture = tex;
                 model.texturePath = path;
