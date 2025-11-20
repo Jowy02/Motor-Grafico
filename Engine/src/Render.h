@@ -58,6 +58,8 @@ public:
 
 
     std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(  const GLfloat* vertices,  const GLuint* indices, const std::vector<glm::vec3>& vertexNormals ,int vertexCount, int indexCount);
+ 
+    void OrderModels();
     bool FaceNormals = false;    
     bool VertexNormals = false;  
 
@@ -80,5 +82,6 @@ private:
     double prevTime = 0.0;   // Time tracking for updates
 
     SDL_Window* temp = nullptr; // Temporary window pointer
+    std::vector<std::pair<float, int>> modelOrder;
 
 };

@@ -10,6 +10,7 @@ public:
     // --- Texture data ---
     GLuint ID = 0;
     GLenum type = 0;
+    bool hasAlpha = false;
     int width = 0;
     int height = 0;
 
