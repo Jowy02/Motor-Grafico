@@ -79,6 +79,11 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
     //std::cout << "Loaded: " << imagePath
     //    << " (" << width << "x" << height << ")\n";
 
+    std::cout << "Loaded: " << imagePath
+        << " (" << ilGetInteger(IL_IMAGE_WIDTH) << "x"
+        << ilGetInteger(IL_IMAGE_HEIGHT) << ")\n";
+    width = ilGetInteger(IL_IMAGE_WIDTH);
+    height = ilGetInteger(IL_IMAGE_HEIGHT);
 
     glGenTextures(1, &ID);
     glActiveTexture(slot);
@@ -102,6 +107,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
     glGenerateMipmap(texType);
 
     glBindTexture(texType, 0);
+    
     ilDeleteImages(1, &img);
 }
 
@@ -113,7 +119,6 @@ void Texture::texUnit(GLuint shaderProgram, const char* uniform, GLuint unit)
     GLuint texUni = glGetUniformLocation(shaderProgram, uniform);
     glUniform1i(texUni, unit);
 }
-
 void Texture::Bind()
 {
     glBindTexture(type, ID);

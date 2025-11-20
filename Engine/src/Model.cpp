@@ -212,11 +212,7 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vertices.push_back(0.0f);
             vertices.push_back(0.0f);
         }
-
-
     }
-
-
 
     // Extract tangents if available
     if (mesh->mTangents != nullptr) 

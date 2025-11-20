@@ -35,6 +35,7 @@ bool Scene::Start()
 
     models[0].Mmesh.texture = tex;
     models[0].actualTexture = tex;
+    models[0].modelId = 0;
 
 //    std::string parentDir = std::string("../Images/");
 //imagesFiles.push_back(std::string("textura.png"));
@@ -53,6 +54,7 @@ bool Scene::Start()
 void Scene::LoadFBX(const std::string& path) 
 {
     Model model(path.c_str());
+    model.modelId = models.size();
     models.push_back(model);
 }
 
@@ -84,7 +86,8 @@ void Scene::ApplyTextureToSelected(const std::string& path)
 
         for (auto& model : models)
         {
-            if (model.name == selected->name)
+
+            if (Model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId)
             {
                 model.Mmesh.texture = tex;
                 model.actualTexture = tex;
@@ -126,11 +129,11 @@ bool Scene::Update(float dt)
     //        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
     //    };
 
-    //    //// Indices para formar dos triángulos
+    //    //// Indices para formar dos triï¿½ngulos
     //    GLuint indices2[] =
     //    {
-    //        0, 1, 2,  // primer triángulo
-    //        2, 3, 0   // segundo triángulo
+    //        0, 1, 2,  // primer triï¿½ngulo
+    //        2, 3, 0   // segundo triï¿½ngulo
     //    };
 
     //    int vertexCount = sizeof(vertices2) / sizeof(float);

@@ -27,7 +27,7 @@ class Render : public Module
 public:
     Render();
     virtual ~Render(); // Destructor
-
+    
     // --- LIFE CYCLE ---
     bool Awake() override;            // Called before render is available
     bool Start() override;            // Called before the first frame
@@ -73,6 +73,11 @@ private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers
     unsigned int vertexShader = 0;          // Vertex shader ID
     unsigned int fragmentShader = 0;        // Fragment shader ID
+
+    int numPyramid = 0;
+    int numCube = 0;
+    int numDiamond = 0;
+    int numSphere = 0;
 
     double prevTime = 0.0;   // Time tracking for updates
 

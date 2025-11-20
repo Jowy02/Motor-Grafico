@@ -28,6 +28,7 @@ public:
     // --- General info ---
     std::string name;
     std::string texturePath;
+    int modelId;
 
     // --- Core functions ---
     Model(const std::string& path);

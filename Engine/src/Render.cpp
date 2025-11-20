@@ -204,7 +204,9 @@ void Render::CreatePyramid()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
-    model.name = "Pyramid";
+    std::string name = "Pyramid" + std::to_string(numPyramid);
+
+    model.name = name;
 
     float baseSize = 1.0f;
     float height = 0.8f;
@@ -224,10 +226,11 @@ void Render::CreatePyramid()
 
    model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
    model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
+   model.modelId = Application::GetInstance().scene.get()->models.size();
 
+   Application::GetInstance().scene.get()->models.push_back(model);
 
-
-    Application::GetInstance().scene.get()->models.push_back(model);
+    numPyramid += 1;
 }
 
 
@@ -288,8 +291,8 @@ void Render::CreateCube()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
-    model.name = "Cube";
-
+    std::string name = "Cube" + std::to_string(numCube);
+    model.name = name;
 
     auto vertexNormals = CalculateVertexNormalsPrueva(vertices2, indices2, vertexCount, indexCount, 30.0f);
     auto tangentData = CalculateTangentsAndBitangents(vertices2, indices2, vertexNormals, vertexCount, indexCount);
@@ -299,8 +302,10 @@ void Render::CreateCube()
     model.Normalmesh = DrawFaceNormals(vertices2, indices2, indexCount, model.normalLines);
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
-
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+
+    numCube += 1;
 }
 
 void Render::CreateDiamond()
@@ -341,7 +346,9 @@ void Render::CreateDiamond()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
-    model.name = "Diamond";
+    std::string name = "Diamond" + std::to_string(numDiamond);
+
+    model.name = name;
 
     auto vertexNormals = CalculateVertexNormalsPrueva(vertices2, indices2, vertexCount, indexCount, 30.0f);
     auto tangentData = CalculateTangentsAndBitangents(vertices2, indices2, vertexNormals, vertexCount, indexCount);
@@ -352,7 +359,10 @@ void Render::CreateDiamond()
  
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices2, vertexCount, vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+
+    numDiamond += 1;
 }
 
 void Render::CreateSphere()
@@ -443,10 +453,8 @@ void Render::CreateSphere()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.indexCount = mesh.indexCount;
-
-    model.name = "Sphere";
-
-
+    std::string name = "Sphere" + std::to_string(numSphere);
+    model.name = name;
 
     auto vertexNormals = CalculateVertexNormalsPrueva(vertices.data(), indices.data(), vertices.size(), indices.size(), 30.0f);
     auto tangentData = CalculateTangentsAndBitangents(vertices.data(), indices.data(), vertexNormals, vertices.size(), indices.size());
@@ -456,7 +464,9 @@ void Render::CreateSphere()
     model.Normalmesh = DrawFaceNormals(vertices.data(), indices.data(), indices.size(), model.normalLines);
     model.VertexNormalmesh = DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), vertexNormals, tangents, bitangents, model.vertexNormalLines);
 
+    model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+    numSphere += 1;
 }
 
 gemotryMesh Render::CreateGrid(int size, int divisions)
@@ -494,9 +504,9 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
     model.name = "Grid";
+    model.modelId = Application::GetInstance().scene.get()->models.size();
 
     Application::GetInstance().scene.get()->models.push_back(model);
-
     return mesh;
 }
 
