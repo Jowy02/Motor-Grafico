@@ -89,6 +89,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
                 model.Mmesh.texture = tex;
                 model.actualTexture = tex;
                 model.texturePath = path;
+                model.hasTransparency = tex->hasAlpha;
             }
         }
     }

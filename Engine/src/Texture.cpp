@@ -66,18 +66,18 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
             if (alpha > maxAlpha) maxAlpha = alpha;
         }
 
-        if (foundTransparent)
-            std::cout << "[Texture] Transparencia real detectada. Alfa min=" << (int)minAlpha << ", max=" << (int)maxAlpha << "\n";
-        else
-            std::cout << "[Texture]  Tiene canal alfa pero todos los píxeles son opacos (alfa=" << (int)maxAlpha << ")\n";
+        //if (foundTransparent)
+        //    std::cout << "[Texture] Transparencia real detectada. Alfa min=" << (int)minAlpha << ", max=" << (int)maxAlpha << "\n";
+        //else
+        //    std::cout << "[Texture]  Tiene canal alfa pero todos los píxeles son opacos (alfa=" << (int)maxAlpha << ")\n";
     }
-    else
-    {
-        std::cout << "[Texture] La imagen no tiene canal alfa.\n";
-    }
+    //else
+    //{
+    //    std::cout << "[Texture] La imagen no tiene canal alfa.\n";
+    //}
 
-    std::cout << "Loaded: " << imagePath
-        << " (" << width << "x" << height << ")\n";
+    //std::cout << "Loaded: " << imagePath
+    //    << " (" << width << "x" << height << ")\n";
 
 
     glGenTextures(1, &ID);
