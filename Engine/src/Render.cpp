@@ -233,47 +233,47 @@ void Render::CreatePyramid()
 
 void Render::CreateCube()
 {
-    //GLfloat vertices2[] =
-    //{ //     COORDINATES     /        COLORS      /   TexCoord  //
-    //   -0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 0
-    //    0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    1.0f, 0.0f, // 1
-    //    0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 2
-    //   -0.5f,  0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 1.0f, // 3
-    //   -0.5f, -0.5f,  0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 4
-    //    0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 0.0f, // 5
-    //    0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 6
-    //   -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      0.0f, 1.0f  // 7
-    //};
-
-    //// Indices for vertex order
-    //GLuint indices2[] =
-    //{
-    //    // Back face
-    //    0, 1, 2, 2, 3, 0,
-    //    // Front face
-    //    4, 5, 6, 6, 7, 4,
-    //    // Left face
-    //    0, 4, 7, 7, 3, 0,
-    //    // Right face
-    //    1, 5, 6, 6, 2, 1,
-    //    // Bottom face
-    //    0, 1, 5, 5, 4, 0,
-    //    // Top face
-    //    3, 2, 6, 6, 7, 3
-    //};
-
     GLfloat vertices2[] =
-    {
-        -0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 1.0f
+    { //     COORDINATES     /        COLORS      /   TexCoord  //
+       -0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 0
+        0.5f, -0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    1.0f, 0.0f, // 1
+        0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 2
+       -0.5f,  0.5f, -0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 1.0f, // 3
+       -0.5f, -0.5f,  0.5f,    0.80f, 0.40f, 0.0f,    0.0f, 0.0f, // 4
+        0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 0.0f, // 5
+        0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      1.0f, 1.0f, // 6
+       -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,      0.0f, 1.0f  // 7
     };
 
-    GLuint indices2[] = {
-        0, 1, 2,
-        2, 3, 0
+    // Indices for vertex order
+    GLuint indices2[] =
+    {
+        // Back face
+        0, 1, 2, 2, 3, 0,
+        // Front face
+        4, 5, 6, 6, 7, 4,
+        // Left face
+        0, 4, 7, 7, 3, 0,
+        // Right face
+        1, 5, 6, 6, 2, 1,
+        // Bottom face
+        0, 1, 5, 5, 4, 0,
+        // Top face
+        3, 2, 6, 6, 7, 3
     };
+
+    //GLfloat vertices2[] =
+    //{
+    //    -0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 0.0f,
+    //     0.5f, -0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  1.0f, 0.0f,
+    //     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+    //    -0.5f,  0.5f, 0.0f,   0.8f, 0.4f, 0.0f,  0.0f, 1.0f
+    //};
+
+    //GLuint indices2[] = {
+    //    0, 1, 2,
+    //    2, 3, 0
+    //};
 
 
     int vertexCount = sizeof(vertices2) / sizeof(float);
