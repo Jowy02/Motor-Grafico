@@ -206,8 +206,8 @@ void Menus::BuildDockSpace()
 
         // Assign windows to each docking area
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
-        ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("System Config", dock_right);
+        ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom);
         ImGui::DockBuilderDockWindow("FPS Monitor", dock_bottom);
         ImGui::DockBuilderDockWindow("System Info", dock_bottom);

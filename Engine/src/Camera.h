@@ -4,6 +4,7 @@
 #include "Window.h"
 #include "Render.h"
 #include "Application.h"
+#include "LineSegment.h"
 
 #include <glad/glad.h>
 #include "SDL3/SDL.h"
@@ -49,4 +50,6 @@ public:
 
     // Handles input (keyboard and mouse)
     void Inputs(SDL_Window* window);
+
+    LineSegment CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float nearPlane, float farPlane);
 };

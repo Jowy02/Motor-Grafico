@@ -79,9 +79,9 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
     //std::cout << "Loaded: " << imagePath
     //    << " (" << width << "x" << height << ")\n";
 
-    std::cout << "Loaded: " << imagePath
+ /*   std::cout << "Loaded: " << imagePath
         << " (" << ilGetInteger(IL_IMAGE_WIDTH) << "x"
-        << ilGetInteger(IL_IMAGE_HEIGHT) << ")\n";
+        << ilGetInteger(IL_IMAGE_HEIGHT) << ")\n";*/
     width = ilGetInteger(IL_IMAGE_WIDTH);
     height = ilGetInteger(IL_IMAGE_HEIGHT);
 

@@ -98,8 +98,11 @@ bool Input::PreUpdate()
 				break;
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				if (btn >= 1 && btn <= NUM_MOUSE_BUTTONS)
+				if (btn >= 1 && btn <= NUM_MOUSE_BUTTONS) {
 					mouseButtons[btn - 1] = KEY_DOWN;
+					SDL_GetMouseState(&mouseX, &mouseY); // guarda posición exacta del clic
+				}
+
 			break;
 			case SDL_EVENT_MOUSE_BUTTON_UP:
 			

@@ -20,6 +20,11 @@ struct ModelMesh {
     GLuint VAO = 0, VBO = 0, EBO = 0;
     unsigned int indexCount = 0;
     Texture* texture = nullptr;
+
+    // Copias CPU para raycast
+    std::vector<glm::vec3> positionsLocal;
+    std::vector<unsigned int> indices;
+    std::vector<glm::vec3> positionsWorld;
 };
 
 class Model
@@ -33,6 +38,7 @@ public:
     // --- Core functions ---
     Model(const std::string& path);
     void Draw();
+    void UpdateAABB();
     void UpdateTransform();
     void CleanUp();
 
@@ -52,6 +58,9 @@ public:
     glm::vec3 minAABB;
     glm::vec3 maxAABB;
     glm::vec3 size;
+
+    glm::vec3 localMinAABB;
+    glm::vec3 localMaxAABB;
 
     // --- Normals and tangents ---
     std::vector<float> normalLines;

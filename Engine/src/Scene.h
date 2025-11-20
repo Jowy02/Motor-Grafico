@@ -3,6 +3,7 @@
 #include "Module.h"
 #include "Model.h"
 #include "Texture.h"
+#include "LineSegment.h"
 
 #include <vector>
 #include <string>
@@ -27,6 +28,13 @@ public:
     // --- Scene management ---
     void LoadFBX(const std::string& path);
     void ApplyTextureToSelected(const std::string& path);
+   
+    //Raycast
+    bool RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
+    bool RayIntersectsAABB(const LineSegment& ray, const glm::vec3& min, const glm::vec3& max, float& t);
+    void Raycast(const LineSegment& ray);
+
+    void SelectObject(Model* obj);
 
     // --- Scene content ---
     std::vector<Model> models;

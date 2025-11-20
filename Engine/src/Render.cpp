@@ -139,6 +139,55 @@ bool Render::Start()
 	return true;
 }
 
+void Render::InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount)
+{
+     model.Mmesh.positionsLocal.clear();
+    model.Mmesh.indices.clear();
+
+    // Rellenar posiciones locales (8 floats por vértice: pos+color+uv)
+    for (int i = 0; i < vertexCount; i += 8) {
+        glm::vec3 pos(vertices[i], vertices[i + 1], vertices[i + 2]);
+        model.Mmesh.positionsLocal.push_back(pos);
+    }
+
+    // Rellenar índices
+    for (int i = 0; i < indexCount; ++i) {
+        model.Mmesh.indices.push_back(indices[i]);
+    }
+    model.Mmesh.indexCount = indexCount;
+
+    // Actualizar AABB local
+    model.localMinAABB = glm::vec3(FLT_MAX);
+    model.localMaxAABB = glm::vec3(-FLT_MAX);
+    for (auto& v : model.Mmesh.positionsLocal) {
+        model.localMinAABB = glm::min(model.localMinAABB, v);
+        model.localMaxAABB = glm::max(model.localMaxAABB, v);
+    }
+}
+
+void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices,  int stride)
+{
+    model.Mmesh.positionsLocal.clear();
+    model.Mmesh.indices.clear();
+
+    for (size_t i = 0; i < vertices.size(); i += stride) {
+        glm::vec3 pos(vertices[i], vertices[i + 1], vertices[i + 2]);
+        model.Mmesh.positionsLocal.push_back(pos);
+    }
+
+    for (auto idx : indices) {
+        model.Mmesh.indices.push_back(idx);
+    }
+    model.Mmesh.indexCount = static_cast<int>(indices.size());
+
+    model.localMinAABB = glm::vec3(FLT_MAX);
+    model.localMaxAABB = glm::vec3(-FLT_MAX);
+    for (auto& v : model.Mmesh.positionsLocal) {
+        model.localMinAABB = glm::min(model.localMinAABB, v);
+        model.localMaxAABB = glm::max(model.localMaxAABB, v);
+    }
+}
+
 bool Render::PreUpdate()
 {
 
@@ -197,6 +246,8 @@ void Render::CreatePyramid()
   
     Model model("NULL");
 
+    InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
+
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
     model.Mmesh.VAO = mesh.VAO;
@@ -229,6 +280,8 @@ void Render::CreatePyramid()
    model.modelId = Application::GetInstance().scene.get()->models.size();
 
    Application::GetInstance().scene.get()->models.push_back(model);
+
+   Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
     numPyramid += 1;
 }
@@ -283,6 +336,7 @@ void Render::CreateCube()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
     Model model("NULL");
+    InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
@@ -304,6 +358,7 @@ void Render::CreateCube()
 
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+    Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
     numCube += 1;
 }
@@ -339,6 +394,8 @@ void Render::CreateDiamond()
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
     Model model("NULL");
+    InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
+
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
     model.Mmesh.VAO = mesh.VAO;
@@ -361,6 +418,7 @@ void Render::CreateDiamond()
 
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+    Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
     numDiamond += 1;
 }
@@ -456,6 +514,8 @@ void Render::CreateSphere()
     std::string name = "Sphere" + std::to_string(numSphere);
     model.name = name;
 
+    InitRaycastDataSphere(model, vertices, indices);
+
     auto vertexNormals = CalculateVertexNormalsPrueva(vertices.data(), indices.data(), vertices.size(), indices.size(), 30.0f);
     auto tangentData = CalculateTangentsAndBitangents(vertices.data(), indices.data(), vertexNormals, vertices.size(), indices.size());
     std::vector<glm::vec3> tangents = tangentData.first;
@@ -466,6 +526,8 @@ void Render::CreateSphere()
 
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
+    Application::GetInstance().scene.get()->models.back().UpdateTransform();
+
     numSphere += 1;
 }
 
@@ -878,7 +940,7 @@ std::vector<glm::vec3> Render::CalculateVertexNormalsPrueva(const GLfloat* verti
 
     std::vector<glm::vec3> vertexNormals(numVertices, glm::vec3(0.0f));
 
-    // 1️⃣ Calcular las normales de cada cara
+    //Calcular las normales de cada cara
     std::vector<glm::vec3> faceNormals(indexCount / 3);
     for (int i = 0; i < indexCount; i += 3) {
         GLuint i0 = indices[i];
@@ -893,10 +955,10 @@ std::vector<glm::vec3> Render::CalculateVertexNormalsPrueva(const GLfloat* verti
         faceNormals[i / 3] = normal;
     }
 
-    // 2️⃣ Convertir smoothing angle a radianes
+    //Convertir smoothing angle a radianes
     float smoothingAngle = glm::radians(smoothingAngleDeg);
 
-    // 3️⃣ Calcular normales por vértice
+    //Calcular normales por vértice
     for (int v = 0; v < numVertices; ++v) {
         glm::vec3 currentVertex(vertices[v * stride + 0],
             vertices[v * stride + 1],
@@ -959,7 +1021,7 @@ std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> Render::CalculateTange
     std::vector<glm::vec3> tangents(numVertices, glm::vec3(0.0f));
     std::vector<glm::vec3> bitangents(numVertices, glm::vec3(0.0f));
 
-    // --- 1️⃣ Recorremos cada triángulo ---
+    // --- Recorremos cada triángulo ---
     for (int i = 0; i < indexCount; i += 3)
     {
         GLuint i0 = indices[i];
@@ -996,12 +1058,12 @@ std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> Render::CalculateTange
             f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z)
         );
 
-        // --- 2️⃣ Acumular en los vértices ---
+        // --- Acumular en los vértices ---
         tangents[i0] += tangent; tangents[i1] += tangent; tangents[i2] += tangent;
         bitangents[i0] += bitangent; bitangents[i1] += bitangent; bitangents[i2] += bitangent;
     }
 
-    // --- 3️⃣ Ortonormalizar con las normales ---
+    // --- Ortonormalizar con las normales ---
     for (size_t i = 0; i < vertexNormals.size(); ++i)
     {
         glm::vec3 n = vertexNormals[i];

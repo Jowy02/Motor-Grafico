@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Menus.h"
+#include "LineSegment.h"
 
 Camera::Camera() : Module(), width(0), height(0), Position(0.0f, 0.0f, 0.0f)
 {
@@ -26,6 +27,24 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
     glUniformMatrix4fv(glGetUniformLocation(shaderID, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 }
+
+LineSegment Camera::CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float nearPlane, float farPlane)
+{
+    float x = (2.0f * mouseX) / width - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / height;
+
+    glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(FOVdeg), float(width) / height, nearPlane, farPlane);
+    glm::vec4 rayEye = glm::inverse(proj) * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+    glm::mat4 view = glm::lookAt(Position, Position + Orientation, Up);
+    glm::vec4 rayWorld4 = glm::inverse(view) * rayEye;
+    glm::vec3 rayWorld = glm::normalize(glm::vec3(rayWorld4));
+
+    return LineSegment(Position, Position + rayWorld * farPlane);
+}
+
 
 void Camera::Inputs(SDL_Window* window)
 {
@@ -126,6 +145,15 @@ void Camera::Inputs(SDL_Window* window)
 
        firstClick = true;
     }
+
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN)
+    {
+        float mx, my;
+        SDL_GetMouseState(&mx, &my);
+        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1000.0f);
+        Application::GetInstance().scene->Raycast(ray);
+    }
+
 }
 
 bool Camera::CleanUp()

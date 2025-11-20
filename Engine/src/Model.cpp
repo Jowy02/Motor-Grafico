@@ -76,6 +76,32 @@ void Model::Draw()
     glDisable(GL_BLEND);
 }
 
+void Model::UpdateAABB()
+{
+    glm::vec3 worldMin(std::numeric_limits<float>::max());
+    glm::vec3 worldMax(std::numeric_limits<float>::lowest());
+
+    for (int i = 0; i < 8; ++i)
+    {
+        glm::vec3 corner(
+            (i & 1) ? localMaxAABB.x : localMinAABB.x,
+            (i & 2) ? localMaxAABB.y : localMinAABB.y,
+            (i & 4) ? localMaxAABB.z : localMinAABB.z
+        );
+
+        glm::vec4 transformed = transformMatrix * glm::vec4(corner, 1.0f);
+        glm::vec3 p = glm::vec3(transformed);
+
+        worldMin = glm::min(worldMin, p);
+        worldMax = glm::max(worldMax, p);
+    }
+
+    minAABB = worldMin;
+    maxAABB = worldMax;
+    center = (worldMin + worldMax) * 0.5f;
+    size = worldMax - worldMin;
+}
+
 // Update the transformation matrix and recalculate AABB, center, and size
 void Model::UpdateTransform()
 {
@@ -115,6 +141,14 @@ void Model::UpdateTransform()
     // Store the new center and size
     center = (newMin + newMax) * 0.5f;
     size = newMax - newMin;
+
+    Mmesh.positionsWorld.resize(Mmesh.positionsLocal.size());
+    for (size_t i = 0; i < Mmesh.positionsLocal.size(); ++i) {
+        glm::vec4 p = transformMatrix * glm::vec4(Mmesh.positionsLocal[i], 1.0f);
+        Mmesh.positionsWorld[i] = glm::vec3(p);
+    }
+
+    UpdateAABB();
 }
 
 // Load a model using Assimp
@@ -179,6 +213,9 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
     minAABB = glm::vec3(FLT_MAX);
     maxAABB = glm::vec3(-FLT_MAX);
 
+    Mmesh.positionsLocal.clear();
+    Mmesh.indices.clear();
+
     // Extract vertices: position, normal, and UV coordinates
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -190,6 +227,8 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
         minAABB = glm::min(minAABB, vertex);
         maxAABB = glm::max(maxAABB, vertex);
 
+        Mmesh.positionsLocal.push_back(vertex);
+      
         // Position
         vertices.push_back(mesh->mVertices[i].x);
         vertices.push_back(mesh->mVertices[i].y);
@@ -213,6 +252,9 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vertices.push_back(0.0f);
         }
     }
+
+    localMinAABB = minAABB;
+    localMaxAABB = maxAABB;
 
     // Extract tangents if available
     if (mesh->mTangents != nullptr) 
@@ -242,10 +284,12 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
             indices.push_back(face.mIndices[j]);
+            Mmesh.indices.push_back(face.mIndices[j]);
+        }
+           
     }
-
     // Draw vertex and face normals for debugging
     VertexNormalmesh = Application::GetInstance().render.get()->DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), tangents, bitangents, {}, vertexNormalLines);
     Normalmesh = Application::GetInstance().render.get()->DrawFaceNormals(vertices.data(), indices.data(), indices.size(), normalLines);

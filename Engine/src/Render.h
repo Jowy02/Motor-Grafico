@@ -14,6 +14,8 @@
 #include <vector>
 #include <cmath>
 
+class Model;
+
 // Simple mesh structure for GPU buffers
 struct gemotryMesh
 {
@@ -59,6 +61,10 @@ public:
 
     std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(  const GLfloat* vertices,  const GLuint* indices, const std::vector<glm::vec3>& vertexNormals ,int vertexCount, int indexCount);
  
+
+    void InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount);
+    void InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int stride = 8);
+
     void OrderModels();
     bool FaceNormals = false;    
     bool VertexNormals = false;  
