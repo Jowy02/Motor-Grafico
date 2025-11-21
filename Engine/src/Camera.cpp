@@ -156,6 +156,16 @@ void Camera::Inputs(SDL_Window* window)
 
 }
 
+glm::mat4 Camera::GetViewMatrix() const
+{
+    return glm::lookAt(Position, Position + Orientation, Up);
+}
+
+glm::mat4 Camera::GetProjectionMatrix(float FOVdeg, float nearPlane, float farPlane) const
+{
+    return glm::perspective(glm::radians(FOVdeg), float(width) / height, nearPlane, farPlane);
+}
+
 bool Camera::CleanUp()
 {
     return true;

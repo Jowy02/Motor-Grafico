@@ -111,10 +111,16 @@ void Scene::SelectObject(Model* obj)
 {
     auto* menus = Application::GetInstance().menus.get();
 
-    if (menus->selectedObj != obj)
+    if (menus->selectedObj != obj) {
         menus->selectedObj = obj;
-    else
+        selected = true;
+    }
+    else {
+        selected = false;
         menus->selectedObj = nullptr; // mismo comportamiento que en la jerarquía
+    }
+
+
 }
 
 bool Scene::RayIntersectsTriangle(const LineSegment& ray,
@@ -256,7 +262,34 @@ bool Scene::Update(float dt)
     //    images[i].Unbind();
     //}
 
+    if (selected && Application::GetInstance().input->click) {
+        auto* menus = Application::GetInstance().menus.get();
 
+            ImGuizmo::BeginFrame();
+            ImGuizmo::SetRect(0, 0, Application::GetInstance().window->width, Application::GetInstance().window->height);
+
+            glm::mat4 view = Application::GetInstance().camera->GetViewMatrix();
+            glm::mat4 proj = Application::GetInstance().camera->GetProjectionMatrix();
+            glm::mat4 model = menus->selectedObj->transformMatrix;
+
+            ImGuizmo::OPERATION op;
+            switch (Application::GetInstance().scene->currentGizmo)
+            {
+            case GizmoOperation::TRANSLATE: op = ImGuizmo::TRANSLATE; break;
+            case GizmoOperation::ROTATE:    op = ImGuizmo::ROTATE; break;
+            case GizmoOperation::SCALE:     op = ImGuizmo::SCALE; break;
+            }
+
+            ImGuizmo::Manipulate(glm::value_ptr(view),
+                glm::value_ptr(proj),
+                op,
+                ImGuizmo::LOCAL,
+                glm::value_ptr(model));
+
+            if (ImGuizmo::IsUsing())
+                menus->selectedObj->transformMatrix = model;
+        
+    }
 	return true;
 }
 

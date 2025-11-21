@@ -4,11 +4,20 @@
 #include "Model.h"
 #include "Texture.h"
 #include "LineSegment.h"
+#include "ImGuizmo.h"
 
 #include <vector>
 #include <string>
 
 struct SDL_Texture;
+
+enum class GizmoOperation {
+    TRANSLATE,
+    ROTATE,
+    SCALE
+};
+
+
 
 class Scene : public Module
 {
@@ -38,6 +47,7 @@ public:
 
     // --- Scene content ---
     std::vector<Model> models;
+    GizmoOperation currentGizmo = GizmoOperation::TRANSLATE;
 
 private:
     // --- Internal data ---
@@ -47,4 +57,7 @@ private:
     // --- Resources ---
     std::vector<std::string> imagesFiles;
     std::vector<Texture> images;
+
+
+    bool selected = false;
 };
