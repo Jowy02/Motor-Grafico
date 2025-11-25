@@ -52,4 +52,7 @@ public:
     void Inputs(SDL_Window* window);
 
     LineSegment CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float nearPlane, float farPlane);
+
+    glm::mat4 GetViewMatrix() const;
+    glm::mat4 GetProjectionMatrix(float FOVdeg = 45.0f, float nearPlane = 0.1f, float farPlane = 1000.0f) const;
 };

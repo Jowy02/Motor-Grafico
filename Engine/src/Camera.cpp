@@ -146,7 +146,7 @@ void Camera::Inputs(SDL_Window* window)
        firstClick = true;
     }
 
-    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN)
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN && Application::GetInstance().input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
@@ -154,6 +154,16 @@ void Camera::Inputs(SDL_Window* window)
         Application::GetInstance().scene->Raycast(ray);
     }
 
+}
+
+glm::mat4 Camera::GetViewMatrix() const
+{
+    return glm::lookAt(Position, Position + Orientation, Up);
+}
+
+glm::mat4 Camera::GetProjectionMatrix(float FOVdeg, float nearPlane, float farPlane) const
+{
+    return glm::perspective(glm::radians(FOVdeg), float(width) / height, nearPlane, farPlane);
 }
 
 bool Camera::CleanUp()

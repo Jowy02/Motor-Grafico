@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Menus.h"
+#include "ImGuizmo.h"
 
 #define MAX_KEYS 300
 
@@ -143,6 +144,24 @@ bool Input::PreUpdate()
             break;
 		}
 	}
+
+
+	if (keys[SDL_SCANCODE_W] == KEY_DOWN) {
+		click = true;
+		Application::GetInstance().scene->currentGizmo = GizmoOperation::TRANSLATE;
+	}
+	if (keys[SDL_SCANCODE_E] == KEY_DOWN) {
+		click = true;
+
+		Application::GetInstance().scene->currentGizmo = GizmoOperation::ROTATE;
+	}
+	if (keys[SDL_SCANCODE_R] == KEY_DOWN) {
+		click = true;
+
+		Application::GetInstance().scene->currentGizmo = GizmoOperation::SCALE;
+	}
+
+
 	return true;
 }
 

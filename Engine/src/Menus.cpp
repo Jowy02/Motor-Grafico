@@ -76,6 +76,7 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
+ 
     // Dock Space
     BuildDockSpace();
     MainMenu();
@@ -137,6 +138,10 @@ void Menus::MainMenu()
         // --- GEOMETRY CREATION MENU ---
         if (ImGui::BeginMenu("Create"))
         {
+            if (Application::GetInstance().input->click) {
+                Application::GetInstance().input->click = false;
+
+            }
             selectedObj = NULL;
             if (ImGui::MenuItem("Pyramid"))
                 Application::GetInstance().render.get()->CreatePyramid();
@@ -277,7 +282,9 @@ void Menus::DrawGameObjectNode(Model* obj)
 
     if (ImGui::IsItemClicked())
     {
-        if (selectedObj != obj)selectedObj = obj;
+        if (selectedObj != obj) {
+            selectedObj = obj;
+        }
         else selectedObj = NULL;
     }
     else if(selectedObj != NULL && Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE)== KEY_DOWN)
@@ -297,12 +304,16 @@ void Menus::DrawInspector()
         ImGui::Separator();
 
         ImGui::Text("TRANSFORM");
-        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) 
+        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
             selectedObj->UpdateTransform();
-        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) 
+        }
+  
+        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
             selectedObj->UpdateTransform();
-        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) 
+        }
+        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
             selectedObj->UpdateTransform();
+        }
         if (selectedObj->name != "Grid")
         {
             ImGui::Separator();
@@ -332,6 +343,10 @@ void Menus::DrawInspector()
 
             if (ImGui::Button("Delete Model"))
             {
+                if (Application::GetInstance().input->click) {
+                    Application::GetInstance().input->click = false;
+
+                }
                 auto& sceneModels = Application::GetInstance().scene->models;
                 sceneModels.erase(
                     std::remove_if(sceneModels.begin(), sceneModels.end(),

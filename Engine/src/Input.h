@@ -50,6 +50,8 @@ public:
     glm::vec2 GetMouseMotion();
 
     bool windowEvents[WE_COUNT];
+
+    bool click = false;
 private:
     // --- Window and input state ---
     KeyState* keyboard;
