@@ -628,6 +628,9 @@ void Render::ShowFaceNormals()
             glBindVertexArray(0);
         }
     }
+
+    glUseProgram(shaderProgram);
+
 }
 
 void Render::ShowVertexNormals()
@@ -650,6 +653,9 @@ void Render::ShowVertexNormals()
             glBindVertexArray(0);
         }
     }
+
+    glUseProgram(shaderProgram);
+
 }
 
 // --- MESH DRAWING ---
