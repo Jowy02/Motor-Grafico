@@ -227,6 +227,48 @@ bool Scene::PreUpdate()
     return true;
 }
 
+void Scene::ImGuizmo() {
+    if (selected && Application::GetInstance().input->click) {
+        auto* menus = Application::GetInstance().menus.get();
+
+        ImGuizmo::BeginFrame();
+        ImGuizmo::SetRect(0, 0, Application::GetInstance().window->width, Application::GetInstance().window->height);
+
+        glm::mat4 view = Application::GetInstance().camera->GetViewMatrix();
+        glm::mat4 proj = Application::GetInstance().camera->GetProjectionMatrix();
+        glm::mat4 model = menus->selectedObj->transformMatrix;
+
+        ImGuizmo::OPERATION op = ImGuizmo::TRANSLATE;
+        switch (Application::GetInstance().scene->currentGizmo) {
+        case GizmoOperation::TRANSLATE: op = ImGuizmo::TRANSLATE; break;
+        case GizmoOperation::ROTATE:    op = ImGuizmo::ROTATE;    break;
+        case GizmoOperation::SCALE:     op = ImGuizmo::SCALE;     break;
+        }
+
+        ImGuizmo::Manipulate(glm::value_ptr(view),
+            glm::value_ptr(proj),
+            op,
+            ImGuizmo::LOCAL,
+            glm::value_ptr(model));
+
+        if (ImGuizmo::IsUsing()) {
+            menus->selectedObj->transformMatrix = model;
+
+            float translation[3], rotationDeg[3], scaleArr[3];
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotationDeg, scaleArr);
+
+            menus->selectedObj->position = glm::vec3(translation[0], translation[1], translation[2]);
+
+            menus->selectedObj->rotation = glm::vec3(rotationDeg[0], rotationDeg[1], rotationDeg[2]);
+
+            menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
+
+            menus->selectedObj->UpdateTransform();
+        }
+    }
+}
+
+
 bool Scene::Update(float dt)
 {
     for(auto& Model : models) Model.Draw();
@@ -262,34 +304,7 @@ bool Scene::Update(float dt)
     //    images[i].Unbind();
     //}
 
-    if (selected && Application::GetInstance().input->click) {
-        auto* menus = Application::GetInstance().menus.get();
-
-            ImGuizmo::BeginFrame();
-            ImGuizmo::SetRect(0, 0, Application::GetInstance().window->width, Application::GetInstance().window->height);
-
-            glm::mat4 view = Application::GetInstance().camera->GetViewMatrix();
-            glm::mat4 proj = Application::GetInstance().camera->GetProjectionMatrix();
-            glm::mat4 model = menus->selectedObj->transformMatrix;
-
-            ImGuizmo::OPERATION op;
-            switch (Application::GetInstance().scene->currentGizmo)
-            {
-            case GizmoOperation::TRANSLATE: op = ImGuizmo::TRANSLATE; break;
-            case GizmoOperation::ROTATE:    op = ImGuizmo::ROTATE; break;
-            case GizmoOperation::SCALE:     op = ImGuizmo::SCALE; break;
-            }
-
-            ImGuizmo::Manipulate(glm::value_ptr(view),
-                glm::value_ptr(proj),
-                op,
-                ImGuizmo::LOCAL,
-                glm::value_ptr(model));
-
-            if (ImGuizmo::IsUsing())
-                menus->selectedObj->transformMatrix = model;
-        
-    }
+    ImGuizmo();
 	return true;
 }
 

@@ -49,6 +49,8 @@ public:
     std::vector<Model> models;
     GizmoOperation currentGizmo = GizmoOperation::TRANSLATE;
 
+    void ImGuizmo();
+
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

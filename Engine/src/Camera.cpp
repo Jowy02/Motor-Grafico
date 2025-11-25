@@ -146,7 +146,7 @@ void Camera::Inputs(SDL_Window* window)
        firstClick = true;
     }
 
-    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN)
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN && Application::GetInstance().input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
