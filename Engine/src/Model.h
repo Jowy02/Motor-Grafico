@@ -27,6 +27,7 @@ struct ModelMesh {
     std::vector<glm::vec3> positionsWorld;
 };
 
+
 class Model
 {
 public:
@@ -91,5 +92,7 @@ private:
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
 
+
+    
 
 };

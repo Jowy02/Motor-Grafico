@@ -75,6 +75,13 @@ public:
     unsigned int shaderProgram = 0;   
     unsigned int normalShaderProgram = 0;
 
+    unsigned int selectedProgram = 0; // program to render selected object as white
+    unsigned int sobelProgram = 0;    // postprocess sobel program (uses quad vertex shader)
+
+
+    void DrawAABBOutline(Model& model);
+
+
 private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers
     unsigned int vertexShader = 0;          // Vertex shader ID
