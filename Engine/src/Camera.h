@@ -55,4 +55,6 @@ public:
 
     glm::mat4 GetViewMatrix() const;
     glm::mat4 GetProjectionMatrix(float FOVdeg = 45.0f, float nearPlane = 0.1f, float farPlane = 1000.0f) const;
+    glm::mat4 GetVPMatrix(float FOVdeg, float nearPlane, float farPlane) const;
+
 };

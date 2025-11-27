@@ -163,7 +163,16 @@ glm::mat4 Camera::GetViewMatrix() const
 
 glm::mat4 Camera::GetProjectionMatrix(float FOVdeg, float nearPlane, float farPlane) const
 {
-    return glm::perspective(glm::radians(FOVdeg), float(width) / height, nearPlane, farPlane);
+    float aspect = (height != 0) ? float(width) / float(height) : 1.0f;
+
+    return glm::perspective(glm::radians(FOVdeg), aspect, nearPlane, farPlane);
+}
+
+glm::mat4 Camera::GetVPMatrix(float FOVdeg, float nearPlane, float farPlane) const
+{
+    glm::mat4 proj = GetProjectionMatrix(FOVdeg, nearPlane, farPlane);
+    glm::mat4 view = GetViewMatrix();
+    return proj * view;
 }
 
 bool Camera::CleanUp()

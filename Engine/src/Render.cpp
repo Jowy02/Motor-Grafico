@@ -189,7 +189,7 @@ void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& verti
     }
 }
 
-void Render::DrawAABBOutline(Model& model)
+void Render::DrawAABBOutline(Model& model, glm::vec3 color)
 {
     // Si no hay datos de AABB, salir
     glm::vec3 minL = model.localMinAABB;
@@ -248,8 +248,9 @@ void Render::DrawAABBOutline(Model& model)
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
     if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 
-    glVertexAttrib4f(1, 0.40f, 0.80f, 1.0f, 1.0f);
+    glVertexAttrib4f(1, color.r, color.g, color.b, 1.0f);
 
+    
     glLineWidth(3.0f);
 
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -990,55 +991,12 @@ void  Render::OrderModels()
             Model& model = models[pair.second];
             model.Draw();
 
-           /* glEnable(GL_BLEND);
-            model.Draw();
-            glDisable(GL_BLEND);*/
         }
     }
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
 
-
-    //// OUTLINE (wireframe) - fiable y simple
-    //Model* selected = Application::GetInstance().menus.get()->selectedObj;
-    //if (selected != nullptr && !selected->isHidden && selected->Mmesh.VAO != 0 && selected->Mmesh.indexCount > 0)
-    //{
-    //    // Usar shader simple de color (outlineShaderProgram). Asegúrate de que lo compilaste.
-    //    glUseProgram(outlineShaderProgram);
-
-    //    // Subir view/proj al programa de outline (tu función Matrix debe aceptar el programa)
-    //    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, outlineShaderProgram);
-
-    //    GLint modelLoc = glGetUniformLocation(outlineShaderProgram, "model_matrix");
-    //    GLint colorLoc = glGetUniformLocation(outlineShaderProgram, "color");
-
-    //    // Matriz ligeramente escalada para que las líneas queden por fuera
-    //    glm::mat4 outlineMat = glm::scale(selected->GetModelMatrix(), glm::vec3(1.03f));
-
-    //    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(outlineMat));
-    //    if (colorLoc != -1) glUniform4f(colorLoc, 0.40f, 0.80f, 1.0f, 1.0f); // azul claro
-
-    //    // Dibujar sólo líneas: polygon mode LINE, con algo de offset para evitar z-fighting
-    //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //    glLineWidth(3.0f);
-
-    //    // Opcional: desplazar ligeramente las líneas hacia la cámara para que estén siempre visibles
-    //    glEnable(GL_POLYGON_OFFSET_LINE);
-    //    glPolygonOffset(-1.0f, -1.0f);
-
-    //    glBindVertexArray(selected->Mmesh.VAO);
-    //    glDrawElements(GL_TRIANGLES, selected->Mmesh.indexCount, GL_UNSIGNED_INT, 0);
-    //    glBindVertexArray(0);
-
-    //    // Restaurar estados
-    //    glDisable(GL_POLYGON_OFFSET_LINE);
-    //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //    glLineWidth(1.0f);
-
-    //    // Volver al shader principal
-    //    glUseProgram(shaderProgram);
-    //}
 }
 
 
@@ -1046,12 +1004,13 @@ void  Render::OrderModels()
 bool Render::PostUpdate()
 {
    
+
     OrderModels();
-    // después de dibujar modelos:
-    Model* selected = Application::GetInstance().menus.get()->selectedObj;
-    if (selected && !selected->isHidden) {
-        DrawAABBOutline(*selected);
-    }
+    //// después de dibujar modelos:
+    //Model* selected = Application::GetInstance().menus.get()->selectedObj;
+    //if (selected && !selected->isHidden) {
+    //    //DrawAABBOutline(*selected);
+    //}
 
     // Swap the window buffers (double buffering)
     SDL_GL_SwapWindow(temp);

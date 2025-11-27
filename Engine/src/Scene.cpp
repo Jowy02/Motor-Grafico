@@ -17,7 +17,7 @@
 #include "Menus.h"
 
 #include "LineSegment.h"
-
+#include <cmath> 
 Scene::Scene() : Module()
 {
 }
@@ -271,7 +271,24 @@ void Scene::ImGuizmo() {
 
 bool Scene::Update(float dt)
 {
-    for(auto& Model : models) Model.Draw();
+    frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(45.0f, 0.1f, 10.0f));
+    
+    Model* selected = Application::GetInstance().menus.get()->selectedObj;
+    if (selected && !selected->isHidden) {
+
+        for (auto& model : Application::GetInstance().scene->models)
+        {
+            // Comprobar visibilidad en el frustum
+            bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(model.minAABB, model.maxAABB);
+            glm::vec3 color = visible ? glm::vec3(0.0f, 0.8f, 1.0f) : glm::vec3(1.0f, 0.0f, 0.0f);
+            Application::GetInstance().render->DrawAABBOutline(model, color);
+
+            if (visible)
+                model.Draw();
+        }
+
+    }
+
     //GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
 

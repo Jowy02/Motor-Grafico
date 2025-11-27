@@ -79,7 +79,7 @@ public:
     unsigned int sobelProgram = 0;    // postprocess sobel program (uses quad vertex shader)
 
 
-    void DrawAABBOutline(Model& model);
+    void DrawAABBOutline(Model& model, glm::vec3 color= glm::vec3(0.0f, 0.8f, 1.0f));
 
 
 private:
@@ -96,5 +96,6 @@ private:
 
     SDL_Window* temp = nullptr; // Temporary window pointer
     std::vector<std::pair<float, int>> modelOrder;
+
 
 };

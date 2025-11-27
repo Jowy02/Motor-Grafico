@@ -5,7 +5,7 @@
 #include "Texture.h"
 #include "LineSegment.h"
 #include "ImGuizmo.h"
-
+#include "Frustum.h"
 #include <vector>
 #include <string>
 
@@ -50,6 +50,7 @@ public:
     GizmoOperation currentGizmo = GizmoOperation::TRANSLATE;
 
     void ImGuizmo();
+    Frustum frustum;
 
 private:
     // --- Internal data ---
@@ -62,4 +63,5 @@ private:
 
 
     bool selected = false;
+
 };
