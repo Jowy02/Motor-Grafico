@@ -945,8 +945,6 @@ void  Render::OrderModels()
             modelOrder.push_back({ distance, i });
         }
 
-        //float distance = glm::length(cameraPos - model.position);
-        //modelOrder.push_back({ distance, i });
     }
 
     // ordenar de mayor a menor distancia
@@ -961,16 +959,19 @@ void  Render::OrderModels()
         }
     }
 
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);        // sin blending
     glEnable(GL_DEPTH_TEST);    // usar z-buffer
     glDepthMask(GL_TRUE);
 
     for (auto& m : models)
     {
-       
+        if (m.name != "Grid")
+        {
+            bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(m.minAABB, m.maxAABB);
+            if (!visible)
+                continue;
+        }
+
         if (!m.hasTransparency)
             m.Draw();
     }
@@ -989,6 +990,13 @@ void  Render::OrderModels()
         {
 
             Model& model = models[pair.second];
+            if (model.name!="Grid")
+            {
+                bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(model.minAABB, model.maxAABB);
+                if (!visible)
+                    continue;
+            }
+
             model.Draw();
 
         }
@@ -997,21 +1005,26 @@ void  Render::OrderModels()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
 
+
 }
 
+void Render::FrustumModels() {
+    Model* selected = Application::GetInstance().menus.get()->selectedObj;
+    if (selected && !selected->isHidden) {
+
+        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
+            selected->minAABB, selected->maxAABB);
+
+        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
+        Application::GetInstance().render->DrawAABBOutline(*selected, color);
+
+    }
+}
 
 // --- DEATH CYCLE ---
 bool Render::PostUpdate()
 {
-   
-
-    OrderModels();
-    //// después de dibujar modelos:
-    //Model* selected = Application::GetInstance().menus.get()->selectedObj;
-    //if (selected && !selected->isHidden) {
-    //    //DrawAABBOutline(*selected);
-    //}
-
+       
     // Swap the window buffers (double buffering)
     SDL_GL_SwapWindow(temp);
 

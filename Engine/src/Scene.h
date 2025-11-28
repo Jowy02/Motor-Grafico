@@ -51,6 +51,7 @@ public:
 
     void ImGuizmo();
     Frustum frustum;
+    bool selected = false;
 
 private:
     // --- Internal data ---
@@ -62,6 +63,5 @@ private:
     std::vector<Texture> images;
 
 
-    bool selected = false;
 
 };

@@ -65,7 +65,9 @@ public:
     void InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount);
     void InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int stride = 8);
 
+
     void OrderModels();
+    void FrustumModels();
     bool FaceNormals = false;    
     bool VertexNormals = false;  
 
@@ -80,7 +82,6 @@ public:
 
 
     void DrawAABBOutline(Model& model, glm::vec3 color= glm::vec3(0.0f, 0.8f, 1.0f));
-
 
 private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers
