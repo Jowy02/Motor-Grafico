@@ -47,7 +47,7 @@ public:
     ModelMesh Mmesh;
     gemotryMesh Normalmesh;
     gemotryMesh VertexNormalmesh;
-
+    
     // --- Transformations ---
     glm::mat4 transformMatrix;
     glm::vec3 position;

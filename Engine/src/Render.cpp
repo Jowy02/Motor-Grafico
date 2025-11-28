@@ -71,6 +71,23 @@ const char* normalFragmentShaderSource = "#version 330 core\n"
 "   FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n" // Verde
 "}\0";
 
+const char* outlinerVertexShaderSource = "#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"uniform mat4 model_matrix;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = projection * view * model_matrix * vec4(aPos, 1.0);\n"
+"}\0";
+
+const char* outlinerFragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"uniform vec3 lineColor;\n"
+"void main()\n"
+"{\n"
+"    FragColor = vec4(lineColor, 1.0);\n"
+"}\0";
 
 // --- CONSTRUCTOR ---
 Render::Render() : Module()
@@ -124,6 +141,23 @@ bool Render::Awake()
 
     glDeleteShader(normalVertexShader);
     glDeleteShader(normalFragmentShader);
+
+
+    GLuint outlinerVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(outlinerVertexShader, 1, &outlinerVertexShaderSource, NULL);
+    glCompileShader(outlinerVertexShader);
+
+    GLuint outlinerFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(outlinerFragmentShader, 1, &outlinerFragmentShaderSource, NULL);
+    glCompileShader(outlinerFragmentShader);
+
+    outlinerShaderProgram = glCreateProgram();
+    glAttachShader(outlinerShaderProgram, outlinerVertexShader);
+    glAttachShader(outlinerShaderProgram, outlinerFragmentShader);
+    glLinkProgram(outlinerShaderProgram);
+
+    glDeleteShader(outlinerVertexShader);
+    glDeleteShader(outlinerFragmentShader);
 
     temp = Application::GetInstance().window.get()->window;
 
@@ -242,14 +276,15 @@ void Render::DrawAABBOutline(Model& model, glm::vec3 color)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
-    glUseProgram(shaderProgram);
-    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+    glUseProgram(outlinerShaderProgram);
+    Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, outlinerShaderProgram);
 
-    GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
+    GLint modelLoc = glGetUniformLocation(outlinerShaderProgram, "model_matrix");
     if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 
-    glVertexAttrib4f(1, color.r, color.g, color.b, 1.0f);
-
+    GLint colorLoc = glGetUniformLocation(outlinerShaderProgram, "lineColor");
+    if (colorLoc != -1)
+        glUniform3f(colorLoc, color.r, color.g, color.b);
     
     glLineWidth(3.0f);
 
@@ -651,6 +686,12 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.name = "Grid";
     model.modelId = Application::GetInstance().scene.get()->models.size();
 
+    float thickness = 0.00001f; // Altura de la AABB
+    model.localMinAABB = glm::vec3(-half, -thickness, -half);
+    model.localMaxAABB = glm::vec3(half, thickness, half);
+    model.UpdateTransform();
+
+
     Application::GetInstance().scene.get()->models.push_back(model);
     return mesh;
 }
@@ -965,13 +1006,11 @@ void  Render::OrderModels()
 
     for (auto& m : models)
     {
-        if (m.name != "Grid")
-        {
-            bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(m.minAABB, m.maxAABB);
-            if (!visible)
-                continue;
-        }
-
+   
+        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(m.minAABB, m.maxAABB);
+        if (!visible)
+            continue;
+        
         if (!m.hasTransparency)
             m.Draw();
     }
@@ -1019,6 +1058,7 @@ void Render::FrustumModels() {
         Application::GetInstance().render->DrawAABBOutline(*selected, color);
 
     }
+
 }
 
 // --- DEATH CYCLE ---
