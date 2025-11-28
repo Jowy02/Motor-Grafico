@@ -87,7 +87,6 @@ private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers
     unsigned int vertexShader = 0;          // Vertex shader ID
     unsigned int fragmentShader = 0;        // Fragment shader ID
-    unsigned int outlinerShaderProgram = 0;
 
     int numPyramid = 0;
     int numCube = 0;
