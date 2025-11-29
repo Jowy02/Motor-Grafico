@@ -13,6 +13,7 @@ public:
     bool hasAlpha = false;
     int width = 0;
     int height = 0;
+    std::string textPath;
 
     // --- Constructor ---
     Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);

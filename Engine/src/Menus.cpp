@@ -82,7 +82,10 @@ bool Menus::Update(float dt)
     MainMenu();
 
     CalculateFPS(dt);
-
+    if (init) {
+        LoadTextures();
+        LoadFbx();
+    }
     if (showConsole) DrawConsole();
     if (showFPS) FPS_graph();
     if (showHierarchy) Hierarchy_Menu();
@@ -90,6 +93,7 @@ bool Menus::Update(float dt)
     if (showAbout) DrawAboutWindow();
     if(showInspector)DrawInspector();
     if(showSystemConfig)DrawSystemConfig();
+    DrawResourceManager();
     return true;
 }
 
@@ -361,6 +365,119 @@ void Menus::DrawInspector()
     {
         ImGui::Text("No object selected");
     }
+    ImGui::End();
+}
+
+void Menus::LoadTextures()
+{
+    WIN32_FIND_DATAA data;
+    HANDLE h = FindFirstFileA("C:\\Users\\joelv\\Documents\\GitHub\\Motor-Grafico\\Engine\\Images\\*", &data);
+    std::string fileName;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
+    //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+            // Filtrar por tipo de archivo
+            fileName = data.cFileName;
+            if (fileName.substr(fileName.size() - 4) == ".png") {
+                fileName = "../Images/" + fileName;
+                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                textures.push_back(tex);
+            }
+        } while (FindNextFileA(h, &data));
+
+        FindClose(h);
+    }
+    init = false;
+}
+void Menus::LoadFbx()
+{
+    WIN32_FIND_DATAA data;
+    HANDLE h = FindFirstFileA("C:\\Users\\joelv\\Documents\\GitHub\\Motor-Grafico\\Engine\\FBX\\*", &data);
+    std::string fileName;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
+            //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+                    // Filtrar por tipo de archivo
+            fileName = data.cFileName;
+            if (fileName.substr(fileName.size() - 4) == ".fbx") {
+                fbxFiles.push_back("../FBX/" + fileName);
+            }
+        } while (FindNextFileA(h, &data));
+
+        FindClose(h);
+    }
+    init = false;
+}
+
+void Menus::DrawResourceManager() 
+{
+    ImGui::Begin("Resource Manager");
+    ImGui::Separator();
+    ImGui::Text("Texture");
+    for (int i = 0; i < textures.size(); i++) {
+
+        ImGui::BeginGroup();                        // <--- Grupo (no se separa en líneas)
+        ImGui::Text("%s", textures[i]->textPath.c_str());
+        ImGui::Image(textures[i]->ID, ImVec2(150, 150));
+        ImGui::EndGroup();  
+        
+        // <--- Fin del bloque
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+           
+            dragTexture = i;
+            draged = true;
+            
+            ImGui::Text("Arrastrando %s", textures[dragTexture]->textPath.c_str());
+            ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture], textures[dragTexture]->textPath.size() + 1);
+               
+            ImGui::EndDragDropSource();
+
+        }
+
+        if (!ImGui::GetDragDropPayload() && draged)
+        {
+           Application::GetInstance().scene->ApplyTextureToSelected(textures[dragTexture]->textPath.c_str());
+           draged = false;
+        }
+        if (i + 1 < textures.size())
+            ImGui::SameLine();                      // <--- Esto ya funciona
+    }
+    ImGui::Separator();
+    ImGui::Text("Fbx");
+    for (int i = 0; i < fbxFiles.size(); i++) {
+
+        ImGui::BeginGroup();                        // <--- Grupo (no se separa en líneas)
+        ImGui::Text("%s", fbxFiles[i].c_str());
+        ImGui::EndGroup();
+
+        // <--- Fin del bloque
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+            dragFbx = i;
+            dragedFbx = true;
+
+            ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
+            ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
+
+            ImGui::EndDragDropSource();
+
+        }
+        if (!ImGui::GetDragDropPayload() && dragedFbx)
+        {
+            Application::GetInstance().menus.get()->selectedObj = NULL;
+            Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
+            dragedFbx = false;
+        }
+        if (i + 1 < textures.size())
+            ImGui::SameLine();                      // <--- Esto ya funciona
+    }
+
     ImGui::End();
 }
 

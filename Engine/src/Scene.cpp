@@ -43,7 +43,7 @@ bool Scene::Start()
     models[0].actualTexture = tex;
     models[0].modelId = 0;
 
-//    std::string parentDir = std::string("../Images/");
+//   std::string parentDir = std::string("../Images/");
 //imagesFiles.push_back(std::string("textura.png"));
 //
 //for (size_t i = 0; i < imagesFiles.size(); ++i)
@@ -224,7 +224,7 @@ bool Scene::PreUpdate()
 }
 
 void Scene::ImGuizmo() {
-    if (selected && Application::GetInstance().input->click) {
+    if (selected && Application::GetInstance().input->click && Application::GetInstance().menus->selectedObj !=NULL) {
         auto* menus = Application::GetInstance().menus.get();
 
         ImGuizmo::BeginFrame();

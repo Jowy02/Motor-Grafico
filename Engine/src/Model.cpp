@@ -21,7 +21,6 @@ Model::Model(const std::string& path)
         UpdateTransform();
     }
 
-    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 // Draw all meshes of the model
@@ -189,6 +188,7 @@ void Model::loadModel(const std::string& path)
     scale = { 1,1,1 };
 
     UpdateTransform();
+    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 // Process all meshes in a node
