@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cstring> 
 #include "Menus.h"
+#include "Scene.h"
+#include "OctreeNode.h"
 
 Model::Model(const std::string& path)
 {
@@ -102,7 +104,6 @@ void Model::UpdateAABB()
     size = worldMax - worldMin;
 }
 
-// Update the transformation matrix and recalculate AABB, center, and size
 void Model::UpdateTransform()
 {
     transformMatrix = glm::mat4(1.0f);
@@ -112,42 +113,41 @@ void Model::UpdateTransform()
     transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.x), glm::vec3(1, 0, 0));
     transformMatrix = glm::scale(transformMatrix, scale);
 
-    // Original 8 vertices of the AABB
-    glm::vec3 corners[8] = 
+    // Usa los bounds LOCALES para calcular la caja en mundo
+    glm::vec3 corners[8] =
     {
-        {minAABB.x, minAABB.y, minAABB.z},
-        {minAABB.x, minAABB.y, maxAABB.z},
-        {minAABB.x, maxAABB.y, minAABB.z},
-        {minAABB.x, maxAABB.y, maxAABB.z},
-        {maxAABB.x, minAABB.y, minAABB.z},
-        {maxAABB.x, minAABB.y, maxAABB.z},
-        {maxAABB.x, maxAABB.y, minAABB.z},
-        {maxAABB.x, maxAABB.y, maxAABB.z},
+        {localMinAABB.x, localMinAABB.y, localMinAABB.z},
+        {localMinAABB.x, localMinAABB.y, localMaxAABB.z},
+        {localMinAABB.x, localMaxAABB.y, localMinAABB.z},
+        {localMinAABB.x, localMaxAABB.y, localMaxAABB.z},
+        {localMaxAABB.x, localMinAABB.y, localMinAABB.z},
+        {localMaxAABB.x, localMinAABB.y, localMaxAABB.z},
+        {localMaxAABB.x, localMaxAABB.y, localMinAABB.z},
+        {localMaxAABB.x, localMaxAABB.y, localMaxAABB.z},
     };
 
     glm::vec3 newMin(FLT_MAX);
     glm::vec3 newMax(-FLT_MAX);
 
-    // Apply the transformation matrix to each vertex
     for (int i = 0; i < 8; ++i)
     {
         glm::vec4 transformed = transformMatrix * glm::vec4(corners[i], 1.0f);
         glm::vec3 p = glm::vec3(transformed);
-
         newMin = glm::min(newMin, p);
         newMax = glm::max(newMax, p);
     }
 
-    // Store the new center and size
     center = (newMin + newMax) * 0.5f;
     size = newMax - newMin;
 
+    // Actualiza posiciones mundiales
     Mmesh.positionsWorld.resize(Mmesh.positionsLocal.size());
     for (size_t i = 0; i < Mmesh.positionsLocal.size(); ++i) {
         glm::vec4 p = transformMatrix * glm::vec4(Mmesh.positionsLocal[i], 1.0f);
         Mmesh.positionsWorld[i] = glm::vec3(p);
     }
 
+    // Actualiza AABB mundo usando los bounds locales (función ya existente)
     UpdateAABB();
 }
 
@@ -189,6 +189,10 @@ void Model::loadModel(const std::string& path)
     scale = { 1,1,1 };
 
     UpdateTransform();
+    if (Application::GetInstance().scene->octreeRoot) {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
 }
 
 // Process all meshes in a node

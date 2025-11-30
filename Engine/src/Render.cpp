@@ -165,6 +165,7 @@ void Render::InitRaycastData(Model& model, const GLfloat* vertices, int vertexCo
         model.localMinAABB = glm::min(model.localMinAABB, v);
         model.localMaxAABB = glm::max(model.localMaxAABB, v);
     }
+
 }
 
 void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices,  int stride)
@@ -365,6 +366,10 @@ void Render::CreatePyramid()
 
    Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
+   if (Application::GetInstance().scene->octreeRoot) {
+       OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+       root->Insert(&Application::GetInstance().scene->models.back());
+   }
     numPyramid += 1;
 }
 
@@ -442,6 +447,11 @@ void Render::CreateCube()
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
+    if (Application::GetInstance().scene->octreeRoot) {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
+
     numCube += 1;
 }
 
@@ -501,6 +511,11 @@ void Render::CreateDiamond()
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
+
+    if (Application::GetInstance().scene->octreeRoot) {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
 
     numDiamond += 1;
 }
@@ -610,6 +625,11 @@ void Render::CreateSphere()
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
+    if (Application::GetInstance().scene->octreeRoot) {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
+
     numSphere += 1;
 }
 
@@ -657,6 +677,10 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
 
 
     Application::GetInstance().scene.get()->models.push_back(model);
+    if (Application::GetInstance().scene->octreeRoot) {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
     return mesh;
 }
 
@@ -1011,19 +1035,37 @@ void  Render::OrderModels()
 
 }
 
+//void Render::FrustumModels() {
+//    Model* selected = Application::GetInstance().menus.get()->selectedObj;
+//    if (selected && !selected->isHidden) {
+//
+//        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
+//            selected->minAABB, selected->maxAABB);
+//
+//        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
+//        Application::GetInstance().render->DrawAABBOutline(*selected, color);
+//
+//    }
+//
+//
+//}
 void Render::FrustumModels() {
     Model* selected = Application::GetInstance().menus.get()->selectedObj;
-    if (selected && !selected->isHidden) {
+    std::vector<Model*> visibleModels;
 
-        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
-            selected->minAABB, selected->maxAABB);
-
-        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
-        Application::GetInstance().render->DrawAABBOutline(*selected, color);
-
+    if (Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->octreeRoot->CollectObjectsInFrustum(
+            Application::GetInstance().scene->frustum, visibleModels);
     }
 
+    if (selected && !selected->isHidden) {
+        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
+            selected->minAABB, selected->maxAABB);
+        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
+        Application::GetInstance().render->DrawAABBOutline(*selected, color);
+    }
 }
+
 
 // --- DEATH CYCLE ---
 bool Render::PostUpdate()
