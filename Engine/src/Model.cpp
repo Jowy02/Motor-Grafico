@@ -1,4 +1,4 @@
-#include "Model.h"
+ï»¿#include "Model.h"
 #include "Application.h"
 #include "Camera.h"
 #include "Texture.h"
@@ -18,12 +18,14 @@ Model::Model(const std::string& path)
         rotation = { 0,0,0 };
         scale = { 1,1,1 };
 
+        worldPosition = { 0,0,0 };
+        worldRotation = { 0,0,0 };
+        worldScale = { 1,1,1 };
+
         minAABB = { -1,-1,-1 };
         maxAABB = { 1,1,1 };
         UpdateTransform();
     }
-
-    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 // Draw all meshes of the model
@@ -43,8 +45,6 @@ void Model::Draw()
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
     }
-
-
 
     // Send the transformation matrix to the shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
@@ -106,12 +106,34 @@ void Model::UpdateAABB()
 
 void Model::UpdateTransform()
 {
-    transformMatrix = glm::mat4(1.0f);
-    transformMatrix = glm::translate(transformMatrix, position);
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-    transformMatrix = glm::scale(transformMatrix, scale);
+    for (int x = 0; x < childrenID.size(); x++) 
+        Application::GetInstance().scene.get()->models[childrenID[x]].UpdateTransform();
+
+    localMatrix = glm::mat4(1.0f);
+    localMatrix = glm::translate(localMatrix, position);
+    localMatrix = glm::rotate(localMatrix, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+    localMatrix = glm::rotate(localMatrix, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+    localMatrix = glm::rotate(localMatrix, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+    localMatrix = glm::scale(localMatrix, scale);
+
+    if (isChild)
+    {
+        transformMatrix = Application::GetInstance().scene->models[ParentID].transformMatrix * localMatrix;
+        parentTransform = false;
+    }
+    else
+    {
+        transformMatrix = localMatrix;
+    }
+
+    float translation[3], rotationDeg[3], scaleArr[3];
+    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transformMatrix), translation, rotationDeg, scaleArr);
+
+    worldPosition = glm::vec3(translation[0], translation[1], translation[2]);
+
+    worldRotation = glm::vec3(rotationDeg[0], rotationDeg[1], rotationDeg[2]);
+
+    worldScale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
     // Usa los bounds LOCALES para calcular la caja en mundo
     glm::vec3 corners[8] =
@@ -147,7 +169,7 @@ void Model::UpdateTransform()
         Mmesh.positionsWorld[i] = glm::vec3(p);
     }
 
-    // Actualiza AABB mundo usando los bounds locales (función ya existente)
+    // Actualiza AABB mundo usando los bounds locales (funciï¿½n ya existente)
     UpdateAABB();
 }
 
@@ -193,6 +215,7 @@ void Model::loadModel(const std::string& path)
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
+    blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 }
 
 // Process all meshes in a node
@@ -363,6 +386,7 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
         }
     }
+
 }
 
 // Switch the model's texture (BlackWhite or NormalMap)
@@ -382,15 +406,56 @@ void Model::switchTexture(bool checker, std::string type)
 
 // Get the model matrix
 glm::mat4 Model::GetModelMatrix() const {
-    glm::mat4 trans = glm::translate(glm::mat4(1.0f), position);
-    glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1, 0, 0));
-    glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0, 1, 0));
-    glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0, 0, 1));
-    glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), scale);
-    return trans * rotZ * rotY * rotX * scaleMat;
+    return transformMatrix;
 }
+void Model::SetChild(Model* child) 
+{
+    if (child->ParentID == modelId)
+        return;
+    for (int x = 0; x < child->childrenID.size(); x++)
+    {
+        if (child->childrenID[x] == modelId) return;
+    }
 
+    if (child->isChild) {
+        Application::GetInstance().scene->models[child->ParentID].eraseChild(child->modelId);
+    }
+
+    childrenID.push_back(child->modelId);
+    child->isChild = true;
+    child->ParentID = modelId;
+
+    child->UpdateTransform();
+}
+void  Model::eraseChild(int childId)
+{
+    childrenID.erase(std::remove(childrenID.begin(), childrenID.end(), childId),childrenID.end());
+}
 // Cleanup all OpenGL buffers and textures
+void  Model::CleanUpChilds()
+{
+    auto childCopy = childrenID; // copia segura
+    for (int childId : childCopy)
+    {
+        // Solo borrar si realmente sigue siendo hijo tuyo
+        if (Application::GetInstance().scene->models[childId].ParentID == modelId)
+        {
+            Application::GetInstance().scene->models[childId].CleanUpChilds();
+
+            // borrar del vector childrenID
+            eraseChild(childId);
+
+            // borrar del sceneModels
+            auto& sceneModels = Application::GetInstance().scene->models;
+            sceneModels.erase(
+                std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const Model& m) { return m.modelId == childId; }),
+                sceneModels.end()
+            );
+        }
+    }
+
+}
 void Model::CleanUp()
 {
     if (Mmesh.VAO != 0)

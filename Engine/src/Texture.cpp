@@ -37,6 +37,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
  
 
     // 🔸 Detectar el formato real antes de convertir
+    textPath = imagePath;
     ILint imgFormat = ilGetInteger(IL_IMAGE_FORMAT);
     ILint imgType = ilGetInteger(IL_IMAGE_TYPE);
 
@@ -50,7 +51,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
     unsigned char* data = ilGetData();
 
     // --- 🔎 Detección precisa de transparencia ---
-    hasAlpha = (bpp == 4);
+    hasAlpha = (bpp == 5);
     bool foundTransparent = false;
 
     if (hasAlpha)

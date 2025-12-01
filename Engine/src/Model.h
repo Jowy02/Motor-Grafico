@@ -41,6 +41,7 @@ public:
     void Draw();
     void UpdateAABB();
     void UpdateTransform();
+    void CleanUpChilds();
     void CleanUp();
 
     // --- Meshes ---
@@ -50,9 +51,14 @@ public:
     
     // --- Transformations ---
     glm::mat4 transformMatrix;
+    glm::mat4 localMatrix;
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+
+    glm::vec3 worldPosition ;
+    glm::vec3 worldRotation ;
+    glm::vec3 worldScale;
 
     // --- Bounding box ---
     glm::vec3 center;
@@ -79,6 +85,14 @@ public:
     glm::mat4 GetModelMatrix() const;
     bool hasTransparency = false;
 
+    std::vector<int> childrenID;
+    void SetChild(Model* child);
+    void eraseChild(int childId);
+
+    bool isChild = false;
+    int ParentID = -1;
+    bool parentTransform = false;
+
 private:
     // --- Internal data ---
     std::string directory;
@@ -91,8 +105,5 @@ private:
     void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
-
-
-    
 
 };

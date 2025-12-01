@@ -36,6 +36,7 @@ public:
     void Hierarchy_Menu();
     void DrawGameObjectNode(Model* model);
     void DrawInspector();
+    void DrawResourceManager();
     Model* selectedObj = nullptr;
 
     // --- System Info ---
@@ -48,8 +49,12 @@ public:
     void MainMenu();
     void BuildDockSpace();
 
+    void LoadFbx();
+    void LoadTextures();
+
 private:
     std::vector<Model> models;           // Loaded models
+    std::vector<Texture*> textures;           // Loaded models
     std::vector<float> fpsHistory;       // FPS history for graphs
 
     uint32_t lastFrameTime = 0;
@@ -70,4 +75,14 @@ private:
     bool checkbox2 = false;
 
     bool initialization_exist = false;
+
+    bool init = true;
+    bool draged = false;
+    int dragTexture = 0;
+
+    int dragFbx = 0;
+    bool dragedFbx = false;
+
+    std::vector<std::string> fbxFiles;
+
 };
