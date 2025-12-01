@@ -113,7 +113,6 @@ void Scene::SelectObject(Model* obj)
 
     if (menus->selectedObj != obj) {
         menus->selectedObj = obj;
-        Application::GetInstance().menus.get()->tempComponents(obj);
         selected = true;
     }
     else {
@@ -267,15 +266,9 @@ void Scene::ImGuizmo() {
             menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
-
-            if(menus->selectedObj->position != menus->TempPosition || menus->selectedObj->rotation != menus->TempRotation || menus->selectedObj->scale != menus->TempScale)
-                menus->selectedObj->UpdateChildTransform(menus->TempPosition, menus->TempRotation, menus->TempScale);
-
-            Application::GetInstance().menus.get()->tempComponents(menus->selectedObj);
         }
     }
 }
-
 
 bool Scene::Update(float dt)
 {

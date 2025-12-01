@@ -289,7 +289,6 @@ void Menus::DrawGameObjectNode(Model* obj)
     {
         if (selectedObj != obj) { 
             selectedObj = obj;
-            tempComponents(selectedObj);
         }
         else selectedObj = NULL;
     }
@@ -339,20 +338,15 @@ void Menus::DrawInspector()
         ImGui::Text("Selected: %s  id: %d", selectedObj->name.c_str(), selectedObj->modelId);
         ImGui::Separator();
 
-        ImGui::Text("TRANSFORM");
-        if (ImGui::DragFloat3("Position", &TempPosition.x, 0.1f)) {
-            selectedObj->position = TempPosition;
-            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
+        ImGui::Text("LOCAL TRANSFORM");
+        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
             selectedObj->UpdateTransform();
         }
-        if (ImGui::DragFloat3("Rotation", &TempRotation.x, 0.1f)) {
-            selectedObj->rotation = TempRotation;
-            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
+        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
             selectedObj->UpdateTransform();
+
         }
-        if (ImGui::DragFloat3("Scale", &TempScale.x, 0.1f)) {
-            selectedObj->scale = TempScale;
-            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
+        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
             selectedObj->UpdateTransform();
         }
         if (selectedObj->name != "Grid")
@@ -388,12 +382,12 @@ void Menus::DrawInspector()
                     Application::GetInstance().input->click = false;
 
                 }
+                if (selectedObj->isChild)Application::GetInstance().scene.get()->models[selectedObj->ParentID].eraseChild(selectedObj->modelId);
+                selectedObj->CleanUpChilds();
                 auto& sceneModels = Application::GetInstance().scene->models;
-                sceneModels.erase(
-                    std::remove_if(sceneModels.begin(), sceneModels.end(),
-                        [&](const Model& m) { return &m == selectedObj; }),
-                    sceneModels.end()
-                );
+                sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
+
                 selectedObj = nullptr;
             }
         }
@@ -404,13 +398,6 @@ void Menus::DrawInspector()
     }
     ImGui::End();
 }
-void Menus::tempComponents(Model * model)
-{
-    TempPosition = model->worldPosition;
-    TempRotation= model->worldRotation;
-    TempScale = model->worldScale;
-}
-
 void Menus::LoadTextures()
 {
     WIN32_FIND_DATAA data;

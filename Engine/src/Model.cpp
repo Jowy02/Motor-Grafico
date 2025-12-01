@@ -107,6 +107,9 @@ void Model::UpdateAABB()
 // Update the transformation matrix and recalculate AABB, center, and size
 void Model::UpdateTransform()
 {
+    for (int x = 0; x < childrenID.size(); x++) 
+        Application::GetInstance().scene.get()->models[childrenID[x]].UpdateTransform();
+
     localMatrix = glm::mat4(1.0f);
     localMatrix = glm::translate(localMatrix, position);
     localMatrix = glm::rotate(localMatrix, glm::radians(rotation.z), glm::vec3(0, 0, 1));
@@ -170,16 +173,6 @@ void Model::UpdateTransform()
     }
 
     UpdateAABB();
-}
-void Model::UpdateChildTransform(glm::vec3 worldPosition, glm::vec3 worldRotation, glm::vec3 WorldScale)
-{
-
-    for (int x = 0; x < childrenID.size(); x++) {
-        Application::GetInstance().scene.get()->models[childrenID[x]].parentTransform = true;
-        Application::GetInstance().scene.get()->models[childrenID[x]].UpdateTransform();
-        Application::GetInstance().scene.get()->models[childrenID[x]].UpdateChildTransform(worldPosition, worldRotation, WorldScale);
-
-    }
 }
 
 // Load a model using Assimp
@@ -411,17 +404,16 @@ void Model::switchTexture(bool checker, std::string type)
 
 // Get the model matrix
 glm::mat4 Model::GetModelMatrix() const {
-    glm::mat4 trans = glm::translate(glm::mat4(1.0f), position);
-    glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1, 0, 0));
-    glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0, 1, 0));
-    glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0, 0, 1));
-    glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), scale);
-    return trans * rotZ * rotY * rotX * scaleMat;
+    return transformMatrix;
 }
 void Model::SetChild(Model* child) 
 {
     if (child->ParentID == modelId)
         return;
+    for (int x = 0; x < child->childrenID.size(); x++)
+    {
+        if (child->childrenID[x] == modelId) return;
+    }
 
     if (child->isChild) {
         Application::GetInstance().scene->models[child->ParentID].eraseChild(child->modelId);
@@ -438,6 +430,30 @@ void  Model::eraseChild(int childId)
     childrenID.erase(std::remove(childrenID.begin(), childrenID.end(), childId),childrenID.end());
 }
 // Cleanup all OpenGL buffers and textures
+void  Model::CleanUpChilds()
+{
+    auto childCopy = childrenID; // copia segura
+    for (int childId : childCopy)
+    {
+        // Solo borrar si realmente sigue siendo hijo tuyo
+        if (Application::GetInstance().scene->models[childId].ParentID == modelId)
+        {
+            Application::GetInstance().scene->models[childId].CleanUpChilds();
+
+            // borrar del vector childrenID
+            eraseChild(childId);
+
+            // borrar del sceneModels
+            auto& sceneModels = Application::GetInstance().scene->models;
+            sceneModels.erase(
+                std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const Model& m) { return m.modelId == childId; }),
+                sceneModels.end()
+            );
+        }
+    }
+
+}
 void Model::CleanUp()
 {
     if (Mmesh.VAO != 0)

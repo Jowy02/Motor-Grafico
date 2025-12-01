@@ -41,7 +41,7 @@ public:
     void Draw();
     void UpdateAABB();
     void UpdateTransform();
-    void UpdateChildTransform(glm::vec3 worldPosition, glm::vec3 worldRotation, glm::vec3 WorldScale);
+    void CleanUpChilds();
     void CleanUp();
 
     // --- Meshes ---
