@@ -113,6 +113,7 @@ void Scene::SelectObject(Model* obj)
 
     if (menus->selectedObj != obj) {
         menus->selectedObj = obj;
+        Application::GetInstance().menus.get()->tempComponents(obj);
         selected = true;
     }
     else {
@@ -206,7 +207,7 @@ void Scene::Raycast(const LineSegment& ray)
                     selected = &model;
                 }
             }
-        }
+        }           
     }
     if (selected)
     {
@@ -260,6 +261,11 @@ void Scene::ImGuizmo() {
             menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
+
+            if(menus->selectedObj->position != menus->TempPosition || menus->selectedObj->rotation != menus->TempRotation || menus->selectedObj->scale != menus->TempScale)
+                menus->selectedObj->UpdateChildTransform(menus->TempPosition, menus->TempRotation, menus->TempScale);
+
+            Application::GetInstance().menus.get()->tempComponents(menus->selectedObj);
         }
     }
 }
@@ -267,7 +273,7 @@ void Scene::ImGuizmo() {
 
 bool Scene::Update(float dt)
 {
-    frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(45.0f, 0.1f, 10.0f));
+    frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(100.0f, 0.1f, 100.0f));
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();

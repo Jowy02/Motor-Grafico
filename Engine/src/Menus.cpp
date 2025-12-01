@@ -271,31 +271,63 @@ void Menus::Hierarchy_Menu()
 {
     ImGui::Begin("Hierarchy", &showHierarchy);
 
-    for (auto& Model : Application::GetInstance().scene.get()->models) DrawGameObjectNode(&Model);
-
+    for (auto& Model : Application::GetInstance().scene.get()->models) {
+        if(!Model.isChild)DrawGameObjectNode(&Model);
+    }
     ImGui::End();
 }
 
 void Menus::DrawGameObjectNode(Model* obj)
 {
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
 
-    if (obj == selectedObj)
-        flags |= ImGuiTreeNodeFlags_Selected;
+    // Tree node
     bool nodeOpen = ImGui::TreeNodeEx((void*)obj, flags, "%s", obj->name.c_str());
 
+    // Selección con click
     if (ImGui::IsItemClicked())
     {
-        if (selectedObj != obj) {
+        if (selectedObj != obj) { 
             selectedObj = obj;
+            tempComponents(selectedObj);
         }
         else selectedObj = NULL;
     }
-    else if(selectedObj != NULL && Application::GetInstance().input.get()->GetKey(SDL_SCANCODE_ESCAPE)== KEY_DOWN)
-        selectedObj = NULL;
 
+    if (ImGui::BeginDragDropSource())
+    {
+        // envías un puntero al objeto arrastrado
+        ImGui::SetDragDropPayload("OBJECT_NODE", &obj, sizeof(obj));
+        ImGui::Text("Mover %s", obj->name.c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("OBJECT_NODE"))
+        {
+            Model* draggedObj = *(Model**)payload->Data;
+            if (draggedObj != obj && draggedObj->ParentID != obj->modelId)
+            {
+                obj->SetChild(draggedObj);
+                selectedObj = NULL;
+            }
+            else {
+                selectedObj = NULL;
+            }
+            
+        }
+        ImGui::EndDragDropTarget();
+    }
+    
     if (nodeOpen)
+    {
+        // Dibujar hijos del objeto
+        for (auto& child : obj->childrenID)
+            DrawGameObjectNode(&Application::GetInstance().scene.get()->models[child]);
+
         ImGui::TreePop();
+    }
 }
 
 void Menus::DrawInspector()
@@ -308,14 +340,19 @@ void Menus::DrawInspector()
         ImGui::Separator();
 
         ImGui::Text("TRANSFORM");
-        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
+        if (ImGui::DragFloat3("Position", &TempPosition.x, 0.1f)) {
+            selectedObj->position = TempPosition;
+            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
             selectedObj->UpdateTransform();
         }
-  
-        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
+        if (ImGui::DragFloat3("Rotation", &TempRotation.x, 0.1f)) {
+            selectedObj->rotation = TempRotation;
+            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
             selectedObj->UpdateTransform();
         }
-        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
+        if (ImGui::DragFloat3("Scale", &TempScale.x, 0.1f)) {
+            selectedObj->scale = TempScale;
+            selectedObj->UpdateChildTransform(TempPosition, TempRotation, TempScale);
             selectedObj->UpdateTransform();
         }
         if (selectedObj->name != "Grid")
@@ -366,6 +403,12 @@ void Menus::DrawInspector()
         ImGui::Text("No object selected");
     }
     ImGui::End();
+}
+void Menus::tempComponents(Model * model)
+{
+    TempPosition = model->worldPosition;
+    TempRotation= model->worldRotation;
+    TempScale = model->worldScale;
 }
 
 void Menus::LoadTextures()

@@ -38,6 +38,7 @@ public:
     void DrawInspector();
     void DrawResourceManager();
     Model* selectedObj = nullptr;
+    void tempComponents(Model* model);
 
     // --- System Info ---
     float GetRAMUsageMB();
@@ -51,6 +52,11 @@ public:
 
     void LoadFbx();
     void LoadTextures();
+
+    glm::vec3 TempPosition;
+    glm::vec3 TempRotation;
+    glm::vec3 TempScale;
+
 private:
     std::vector<Model> models;           // Loaded models
     std::vector<Texture*> textures;           // Loaded models
@@ -83,4 +89,5 @@ private:
     bool dragedFbx = false;
 
     std::vector<std::string> fbxFiles;
+
 };
