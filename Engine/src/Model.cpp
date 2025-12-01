@@ -114,7 +114,7 @@ void Model::UpdateTransform()
     localMatrix = glm::rotate(localMatrix, glm::radians(rotation.x), glm::vec3(1, 0, 0));
     localMatrix = glm::scale(localMatrix, scale);
 
-    if (parentTransform)
+    if (isChild)
     {
         transformMatrix = Application::GetInstance().scene->models[ParentID].transformMatrix * localMatrix;
         parentTransform = false;
@@ -391,6 +391,7 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
         }
     }
+
 }
 
 // Switch the model's texture (BlackWhite or NormalMap)
@@ -420,9 +421,8 @@ glm::mat4 Model::GetModelMatrix() const {
 void Model::SetChild(Model* child) 
 {
     if (child->ParentID == modelId)
-        return; // ya es hijo
+        return;
 
-    // ➤ 1. Si ya tenía padre anterior, elimínalo
     if (child->isChild) {
         Application::GetInstance().scene->models[child->ParentID].eraseChild(child->modelId);
     }
