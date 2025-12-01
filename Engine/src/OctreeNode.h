@@ -1,0 +1,39 @@
+#pragma once
+#include <vector>
+#include <memory>
+#include <glm/glm.hpp>
+#include "Model.h"
+#include "Frustum.h"
+#include "Render.h"
+#include "LineSegment.h"
+
+class Scene; // forward declaration
+//inline bool IntersectsAABB(const Model* a, const Model* b) {
+//     return (a->minAABB.x <= b->maxAABB.x && a->maxAABB.x >= b->minAABB.x) && 
+//         (a->minAABB.y <= b->maxAABB.y && a->maxAABB.y >= b->minAABB.y) && 
+//         (a->minAABB.z <= b->maxAABB.z && a->maxAABB.z >= b->minAABB.z); 
+//}
+struct OctreeNode {
+    glm::vec3 min;
+    glm::vec3 max;
+    std::vector<int> objects;
+    std::unique_ptr<OctreeNode> children[8];
+    Scene* scene;
+
+    int maxObjects;
+    int maxDepth;
+    int depth;
+
+    OctreeNode(const glm::vec3& min, const glm::vec3& max,
+        int depth = 0, int maxObjects = 8, int maxDepth = 6, Scene* scene = nullptr);
+
+    void Clear();
+    bool FitsInNode(Model* m) const;
+    void Insert(Model* m);
+    void Subdivide();
+
+    void CollectObjectsInFrustum(const Frustum& frustum, std::vector<Model*>& result) const;
+    void CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<Model*>& result) const;
+    void DebugDraw(Render* render) const;
+
+};

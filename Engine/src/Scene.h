@@ -6,6 +6,7 @@
 #include "LineSegment.h"
 #include "ImGuizmo.h"
 #include "Frustum.h"
+#include "OctreeNode.h"
 #include <vector>
 #include <string>
 
@@ -53,6 +54,8 @@ public:
     Frustum frustum;
     bool selected = false;
 
+    void BuildOctree();
+    std::unique_ptr<OctreeNode> octreeRoot;
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

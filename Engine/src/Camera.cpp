@@ -14,6 +14,8 @@ Camera::~Camera() {}
 bool Camera::Awake()
 {
     Position = { 0, 2, 10 }; // Default camera position
+    SDL_GetWindowSize(Application::GetInstance().window->window, &width, &height);
+
     return true;
 }
 
@@ -34,7 +36,9 @@ LineSegment Camera::CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float
     float y = 1.0f - (2.0f * mouseY) / height;
 
     glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
-    glm::mat4 proj = glm::perspective(glm::radians(FOVdeg), float(width) / height, nearPlane, farPlane);
+
+    float aspect = (height != 0) ? float(width) / float(height) : 1.0f;
+    glm::mat4 proj = glm::perspective(glm::radians(FOVdeg), aspect, nearPlane, farPlane);
     glm::vec4 rayEye = glm::inverse(proj) * rayClip;
     rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
@@ -150,7 +154,7 @@ void Camera::Inputs(SDL_Window* window)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
-        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1000.0f);
+        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1e6f);
         Application::GetInstance().scene->Raycast(ray);
     }
 

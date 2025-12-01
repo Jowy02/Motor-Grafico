@@ -53,7 +53,7 @@ bool Scene::Start()
 //    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
 //    images.push_back(tex);
 //}
-
+    BuildOctree();
 	return true;
 }
 
@@ -62,7 +62,28 @@ void Scene::LoadFBX(const std::string& path)
     Model model(path.c_str());
     model.modelId = models.size();
     models.push_back(model);
+
+    if (octreeRoot) {
+        OctreeNode* root = octreeRoot.get();
+        root->Insert(&models.back());
+    }
 }
+
+void Scene::BuildOctree() {
+    glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
+    for (auto& m : models) {
+        m.UpdateTransform();
+        std::cout << "[AABB world] " << m.name
+            << " min(" << m.minAABB.x << "," << m.minAABB.y << "," << m.minAABB.z << ")"
+            << " max(" << m.maxAABB.x << "," << m.maxAABB.y << "," << m.maxAABB.z << ")\n";
+        globalMin = glm::min(globalMin, m.minAABB);
+        globalMax = glm::max(globalMax, m.maxAABB);
+    }
+    octreeRoot = std::make_unique<OctreeNode>(globalMin, globalMax, 0, 10, 5, this);
+    for (auto& m : models) octreeRoot->Insert(&m);
+}
+
+
 
 void Scene::ApplyTextureToSelected(const std::string& path) 
 {
@@ -115,6 +136,7 @@ void Scene::SelectObject(Model* obj)
         menus->selectedObj = obj;
         selected = true;
     }
+
     else {
         selected = false;
         menus->selectedObj = nullptr; // mismo comportamiento que en la jerarquía
@@ -175,39 +197,37 @@ bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, c
     t = (tNear >= 0.0f) ? tNear : tFar;
     return true;
 }
+ 
+
 void Scene::Raycast(const LineSegment& ray)
 {
+    std::vector<Model*> hitModels;
+    if (octreeRoot) {
+        octreeRoot->CollectObjectsHitByRay(ray, this, hitModels);
+
+        std::cout << "Cantidad modelos entregados por octree: "
+            << hitModels.size() << std::endl;
+
+    }
     float closestT = FLT_MAX;
     Model* selected = nullptr;
 
-    for (auto& model : models)
-    {
-        // 1) Filtro rápido por AABB en mundo
-        float tBox;
-        if (!RayIntersectsAABB(ray, model.minAABB, model.maxAABB, tBox))
-            continue;
+    for (auto* model : hitModels) {
+        for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
+            glm::vec3 v0 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 0]];
+            glm::vec3 v1 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 1]];
+            glm::vec3 v2 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 2]];
 
-        // 2) Prueba precisa contra triángulos
-        const auto& pos = model.Mmesh.positionsWorld;
-        const auto& idx = model.Mmesh.indices;
-
-        for (size_t i = 0; i + 2 < idx.size(); i += 3)
-        {
-            const glm::vec3& v0 = pos[idx[i]];
-            const glm::vec3& v1 = pos[idx[i + 1]];
-            const glm::vec3& v2 = pos[idx[i + 2]];
-
-            float tTri;
-            if (RayIntersectsTriangle(ray, v0, v1, v2, tTri))
-            {
-                if (tTri < closestT)
-                {
-                    closestT = tTri;
-                    selected = &model;
+            float t;
+            if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
+                if (t < closestT) {
+                    closestT = t;
+                    selected = model;
                 }
             }
         }           
     }
+
     if (selected)
     {
         SelectObject(selected); // ahora usa la misma lógica que el menú
@@ -266,6 +286,7 @@ void Scene::ImGuizmo() {
             menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
+            BuildOctree();
         }
     }
 }
@@ -276,7 +297,6 @@ bool Scene::Update(float dt)
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();
-
 
     //GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
