@@ -83,7 +83,6 @@ void OctreeNode::Subdivide() {
             {
                 c->Insert(obj);
                 moved = true;
-                break;
             }
         }
         if (!moved) keepHere.push_back(objId);
@@ -99,9 +98,11 @@ void OctreeNode::CollectObjectsInFrustum(const Frustum& frustum, std::vector<Mod
 
     for (int objId : objects) {
         Model* obj = &scene->models[objId]; // necesitas pasar scene
-        if (frustum.IsBoxVisible(obj->minAABB, obj->maxAABB))
+        if (frustum.IsBoxVisible(obj->minAABB, obj->maxAABB) && std::find(result.begin(), result.end(), obj) == result.end())
             result.push_back(obj);
     }
+
+    
 
 
     for (int i = 0; i < 8; i++)

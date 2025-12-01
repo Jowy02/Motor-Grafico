@@ -209,18 +209,21 @@ void Scene::Raycast(const LineSegment& ray)
             << hitModels.size() << std::endl;
 
     }
-
     float closestT = FLT_MAX;
     Model* selected = nullptr;
-    for (auto* model : hitModels)
-    {
-        float tBox;
-        if (RayIntersectsAABB(ray, model->minAABB, model->maxAABB, tBox))
-        {
-            if (tBox < closestT)
-            {
-                closestT = tBox;
-                selected = model;
+
+    for (auto* model : hitModels) {
+        for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
+            glm::vec3 v0 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 0]];
+            glm::vec3 v1 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 1]];
+            glm::vec3 v2 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 2]];
+
+            float t;
+            if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
+                if (t < closestT) {
+                    closestT = t;
+                    selected = model;
+                }
             }
         }
     }

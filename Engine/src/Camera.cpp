@@ -154,7 +154,7 @@ void Camera::Inputs(SDL_Window* window)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
-        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1000.0f);
+        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1e6f);
         Application::GetInstance().scene->Raycast(ray);
     }
 
