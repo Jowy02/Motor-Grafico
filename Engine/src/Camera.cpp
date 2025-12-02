@@ -14,7 +14,7 @@ Camera::~Camera() {}
 bool Camera::Awake()
 {
     Position = { 0, 2, 10 }; // Default camera position
-    SDL_GetWindowSize(Application::GetInstance().window->window, &width, &height);
+   // SDL_GetWindowSize(Application::GetInstance().window->window, &width, &height);
 
     return true;
 }

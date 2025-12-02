@@ -62,7 +62,7 @@ void Scene::LoadFBX(const std::string& path)
     Model model(path.c_str());
     model.modelId = models.size();
     models.push_back(model);
-
+    BuildOctree();
     if (octreeRoot) {
         OctreeNode* root = octreeRoot.get();
         root->Insert(&models.back());

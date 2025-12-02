@@ -382,6 +382,7 @@ void Menus::DrawInspector()
                     Application::GetInstance().input->click = false;
 
                 }
+                Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
                 if (selectedObj->isChild)Application::GetInstance().scene.get()->models[selectedObj->ParentID].eraseChild(selectedObj->modelId);
                 selectedObj->CleanUpChilds();
                 auto& sceneModels = Application::GetInstance().scene->models;
