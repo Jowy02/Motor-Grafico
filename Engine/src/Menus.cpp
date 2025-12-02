@@ -34,7 +34,7 @@ bool Menus::Awake()
 bool Menus::Start()
 {
     Application::GetInstance().menus->LogToConsole("Initializing ImGui...");
-    config.path = "../Library/Assets";
+    config.path = "../Library";
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -468,9 +468,9 @@ void Menus::LoadTxt()
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
             if (isLoad)Application::GetInstance().scene.get()->LoadScene(filePath);
             else if (isSave){
+                std::ofstream("filePath");
                 Application::GetInstance().scene.get()->SaveScene(filePath);
             }
-
             isSave = false;
             isLoad = false;
             ImGuiFileDialog::Instance()->Close();

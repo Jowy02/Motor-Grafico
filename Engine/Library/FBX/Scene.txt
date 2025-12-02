@@ -1,37 +1,10 @@
 GameObjects:
 {
 UID: 1
-Name: Cube0
+Name: Diamond1
 ParentUID: -1
-Translation: -2.03278, 0, -0.157319
-Scale: 2.91, 2.91, 2.91
+Translation: 0, 1.58322, 0
+Scale: 1.52, 5.35751, 1.52
 Rotation: 0, -0, 0
-Texture: ../Images/grass.png
-}
-{
-UID: 2
-Name: Diamond0
-ParentUID: -1
-Translation: 5.20173, -1.06824, -2.00282
-Scale: 0.496799, 0.4968, 0.4968
-Rotation: 53.7844, -0, 0
-Texture: ../Images/BlancoNegro.png
-}
-{
-UID: 3
-Name: Sphere0
-ParentUID: 2
-Translation: -0.530871, -7.08842, -2.54947
-Scale: 0.999982, 1, 1
-Rotation: 8.53773e-06, -0, 0
-Texture: ../Images/Lenna_(test_image).png
-}
-{
-UID: 4
-Name: BakerHouse
-ParentUID: -1
-Translation: 2.2796, -2.41773, -0.250385
-Scale: 1.55, 1.55, 1.55
-Rotation: -76.6789, -0, 0
-Texture: ../Images/Baker_house.png
+Texture: 
 }
