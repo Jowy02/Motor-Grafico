@@ -331,9 +331,9 @@ bool Scene::Update(float dt)
 
 	return true;
 }
-void Scene::SaveScene() 
+void Scene::SaveScene(std::string filePath)
 {
-    std::ofstream file("../FBX/Scene.txt");
+    std::ofstream file(filePath);
     if (!file.is_open()) return;
 
     file << "GameObjects:\n";
@@ -355,9 +355,10 @@ void Scene::SaveScene()
     }
     file.close();
 }
-void Scene::LoadScene()
+void Scene::LoadScene(std::string filePath)
 {
-    std::ifstream file("../FBX/Scene.txt");
+    //"../Library/FBX/Scene.txt"
+    std::ifstream file(filePath);
     if (!file.is_open()) return;
     std::string ModelName;
     std::string line;
@@ -422,7 +423,7 @@ void Scene::LoadScene()
                         }
                         else
                         {
-                            ModelName = "../FBX/" + value + ".fbx";
+                            ModelName = "../Library/FBX/" + value + ".fbx";
                             Application::GetInstance().scene->LoadFBX(ModelName);
                         }
                         UID = models.size() - 1;

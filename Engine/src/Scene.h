@@ -7,6 +7,7 @@
 #include "ImGuizmo.h"
 #include "Frustum.h"
 #include "OctreeNode.h"
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -45,8 +46,8 @@ public:
     void Raycast(const LineSegment& ray);
     void SelectObject(Model* obj);
 
-    void SaveScene();
-    void LoadScene();
+    void SaveScene(std::string filePath);
+    void LoadScene(std::string filePath);
 
     // --- Scene content ---
     std::vector<Model> models;

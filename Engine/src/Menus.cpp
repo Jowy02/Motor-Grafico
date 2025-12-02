@@ -14,6 +14,9 @@
 #include <windows.h>
 #include "imgui_internal.h"
 
+#include "ImGuiFileDialog.h"
+IGFD::FileDialogConfig config;
+
 Menus::Menus() : Module()
 {
 }
@@ -31,6 +34,7 @@ bool Menus::Awake()
 bool Menus::Start()
 {
     Application::GetInstance().menus->LogToConsole("Initializing ImGui...");
+    config.path = "../Library/Assets";
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -93,6 +97,8 @@ bool Menus::Update(float dt)
     if (showAbout) DrawAboutWindow();
     if(showInspector)DrawInspector();
     if(showSystemConfig)DrawSystemConfig();
+    if (isLoad || isSave)LoadTxt();
+
     DrawResourceManager();
     return true;
 }
@@ -161,10 +167,9 @@ void Menus::MainMenu()
         if (ImGui::BeginMenu("Scene"))
         {
             selectedObj = NULL;
-            if (ImGui::MenuItem("Save"))
-                Application::GetInstance().scene.get()->SaveScene();
-            if (ImGui::MenuItem("Load"))
-                Application::GetInstance().scene.get()->LoadScene();
+            if(ImGui::MenuItem("Save", nullptr, &isSave)) ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".json,.txt,.eduscene", config);
+            if (ImGui::MenuItem("Load", nullptr, &isLoad))ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".json,.txt,.eduscene", config);
+
 
             ImGui::EndMenu();
         }
@@ -411,7 +416,7 @@ void Menus::DrawInspector()
 void Menus::LoadTextures()
 {
     WIN32_FIND_DATAA data;
-    HANDLE h = FindFirstFileA("C:\\Users\\joelv\\Documents\\GitHub\\Motor-Grafico\\Engine\\Images\\*", &data);
+    HANDLE h = FindFirstFileA("..\\Library\\Images\\*", &data);
     std::string fileName;
 
     if (h != INVALID_HANDLE_VALUE) {
@@ -436,18 +441,18 @@ void Menus::LoadTextures()
 void Menus::LoadFbx()
 {
     WIN32_FIND_DATAA data;
-    HANDLE h = FindFirstFileA("C:\\Users\\joelv\\Documents\\GitHub\\Motor-Grafico\\Engine\\FBX\\*", &data);
+    HANDLE h = FindFirstFileA("..\\Library\\FBX\\*", &data);
     std::string fileName;
     if (h != INVALID_HANDLE_VALUE) {
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
                 continue;
-            //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-
-                    // Filtrar por tipo de archivo
             fileName = data.cFileName;
             if (fileName.substr(fileName.size() - 4) == ".fbx") {
-                fbxFiles.push_back("../FBX/" + fileName);
+                fbxFiles.push_back("../Library/FBX/" + fileName);
+            }
+            if (fileName.substr(fileName.size() - 4) == ".txt") {
+                txtFiles.push_back("../Library/FBX/" + fileName);
             }
         } while (FindNextFileA(h, &data));
 
@@ -455,15 +460,36 @@ void Menus::LoadFbx()
     }
     init = false;
 }
+void Menus::LoadTxt()
+{
 
+    if (ImGuiFileDialog::Instance()->Display("ChooseScene")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            if (isLoad)Application::GetInstance().scene.get()->LoadScene(filePath);
+            else if (isSave){
+                Application::GetInstance().scene.get()->SaveScene(filePath);
+            }
+
+            isSave = false;
+            isLoad = false;
+            ImGuiFileDialog::Instance()->Close();
+        }
+        isSave = false;
+        isLoad= false;
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+}
 void Menus::DrawResourceManager() 
 {
     ImGui::Begin("Resource Manager");
     ImGui::Separator();
     ImGui::Text("Texture");
+
     for (int i = 0; i < textures.size(); i++) {
 
-        ImGui::BeginGroup();                        // <--- Grupo (no se separa en líneas)
+        ImGui::BeginGroup();                       
         ImGui::Text("%s", textures[i]->textPath.c_str());
         ImGui::Image(textures[i]->ID, ImVec2(150, 150));
         ImGui::EndGroup();  

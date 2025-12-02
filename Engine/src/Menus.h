@@ -50,6 +50,8 @@ public:
     void BuildDockSpace();
 
     void LoadFbx();
+    void LoadTxt();
+
     void LoadTextures();
 
 private:
@@ -70,6 +72,8 @@ private:
     bool showInspector = true;
     bool showSystemConfig = true;
 
+    bool isSave = false;
+    bool isLoad = false;
     // Example checkbox states
     bool checkbox = false;
     bool checkbox2 = false;
@@ -84,5 +88,6 @@ private:
     bool dragedFbx = false;
 
     std::vector<std::string> fbxFiles;
+    std::vector<std::string> txtFiles;
 
 };
