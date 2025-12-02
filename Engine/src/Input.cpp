@@ -160,6 +160,15 @@ bool Input::PreUpdate()
 
 		Application::GetInstance().scene->currentGizmo = GizmoOperation::SCALE;
 	}
+	// CTRL + S
+	if (keyboard[SDL_SCANCODE_S] == KEY_DOWN && (SDL_GetModState() & SDL_KMOD_CTRL))
+	{
+		Application::GetInstance().scene->SaveSceneToLibrary("Library");
+	}
+	if (keyboard[SDL_SCANCODE_Z] == KEY_DOWN && (SDL_GetModState() & SDL_KMOD_CTRL))
+	{
+		Application::GetInstance().scene->LoadSceneFromLibrary("Library");
+	}
 
 
 	return true;

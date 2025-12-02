@@ -34,9 +34,11 @@ public:
     // --- General info ---
     std::string name;
     std::string texturePath;
+    std::string fbxPath;
     int modelId;
 
     // --- Core functions ---
+    void loadModel(const std::string& path);
     Model(const std::string& path);
     void Draw();
     void UpdateAABB();
@@ -102,7 +104,6 @@ private:
     Texture* noTexture = nullptr;
 
     // --- Model loading (Assimp) ---
-    void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
 

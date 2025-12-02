@@ -9,6 +9,7 @@
 #include "OctreeNode.h"
 #include <vector>
 #include <string>
+#include "SceneSerializer.h"
 
 struct SDL_Texture;
 
@@ -56,6 +57,9 @@ public:
 
     void BuildOctree();
     std::unique_ptr<OctreeNode> octreeRoot;
+
+    bool SaveSceneToLibrary(const std::string& libraryDir);
+    bool LoadSceneFromLibrary(const std::string& libraryDir);
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

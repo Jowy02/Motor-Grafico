@@ -18,6 +18,9 @@
 
 #include "LineSegment.h"
 #include <cmath> 
+
+#include "SceneSerializer.h"
+
 Scene::Scene() : Module()
 {
 }
@@ -57,6 +60,14 @@ bool Scene::Start()
 	return true;
 }
 
+bool Scene::SaveSceneToLibrary(const std::string& libraryDir) {
+    return SceneSerializer::SaveScene(libraryDir);
+}
+
+bool Scene::LoadSceneFromLibrary(const std::string& libraryDir) {
+    return SceneSerializer::LoadScene(libraryDir);
+}
+
 void Scene::LoadFBX(const std::string& path) 
 {
     Model model(path.c_str());
@@ -68,6 +79,7 @@ void Scene::LoadFBX(const std::string& path)
         root->Insert(&models.back());
     }
 }
+
 
 void Scene::BuildOctree() {
     glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
