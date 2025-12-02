@@ -34,14 +34,14 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
+    //Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
 
-    Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    models[0].texturePath = "../Images/Baker_house.png";
+    //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    //models[0].texturePath = "../Images/Baker_house.png";
 
-    models[0].Mmesh.texture = tex;
-    models[0].actualTexture = tex;
-    models[0].modelId = 0;
+    //models[0].Mmesh.texture = tex;
+    //models[0].actualTexture = tex;
+    //models[0].modelId = 0;
 
 //   std::string parentDir = std::string("../Images/");
 //imagesFiles.push_back(std::string("textura.png"));
@@ -299,9 +299,7 @@ bool Scene::Update(float dt)
     Application::GetInstance().render->FrustumModels();
 
     //GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-
-
- 
+    // 
     ////Image 2D
     //for (int i = 0; i < images.size(); i++)
     //{
@@ -333,7 +331,158 @@ bool Scene::Update(float dt)
 
 	return true;
 }
+void Scene::SaveScene() 
+{
+    std::ofstream file("../FBX/Scene.txt");
+    if (!file.is_open()) return;
 
+    file << "GameObjects:\n";
+    for (const auto& model : models) {
+        if (model.name != "Grid")
+        {
+            file << "{" << "\n";
+
+            file << "UID: " << model.modelId << "\n";
+            file << "Name: " << model.name << "\n";
+            file << "ParentUID: " << model.ParentID << "\n";
+            file << "Translation: " << model.position.x << ", " << model.position.y << ", " << model.position.z << "\n";
+            file << "Scale: " << model.scale.x << ", " << model.scale.y << ", " << model.scale.z << "\n";
+            file << "Rotation: " << model.rotation.x << ", " << model.rotation.y << ", " << model.rotation.z << "\n";
+            file << "Texture: " << model.texturePath << "\n";
+
+            file << "}" << "\n";
+        }
+    }
+    file.close();
+}
+void Scene::LoadScene()
+{
+    std::ifstream file("../FBX/Scene.txt");
+    if (!file.is_open()) return;
+    std::string ModelName;
+    std::string line;
+    int UID = -1;
+
+    bool insideObject = false;
+
+    if (models.size() > 1) {
+        deleteScene = true;
+        for (int i = models.size() - 1; i >= 0; --i) {
+            auto& model = models[i];
+
+            if(model.name != "Grid")
+            { 
+                Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
+                if (model.isChild)Application::GetInstance().scene.get()->models[model.ParentID].eraseChild(model.modelId);
+                models[model.modelId].CleanUpChilds();
+                auto& sceneModels = Application::GetInstance().scene->models;
+                sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const Model& m) { return &m == &models[model.modelId]; }), sceneModels.end());
+
+                Application::GetInstance().menus.get()->selectedObj = nullptr;
+                if (models.size() <= 1) {
+                    deleteScene = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!deleteScene)
+    { 
+        while (std::getline(file, line)) {
+            if (line == "{") {
+                insideObject = true;
+            }
+            else if (line == "}") {
+                insideObject = false;
+            }
+            else if (insideObject) {
+                // parsear clave: valor
+                std::istringstream iss(line);
+                std::string key;
+                if (std::getline(iss, key, ':')) {
+                    std::string value;
+                    std::getline(iss, value);
+                    // limpiar espacios
+                    if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+                
+                    if (key == "Name") {
+                        if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
+                            Application::GetInstance().render.get()->CreateCube();
+                        }
+                        else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
+                            Application::GetInstance().render.get()->CreatePyramid();
+                        }
+                        else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
+                            Application::GetInstance().render.get()->CreateSphere();
+                        }
+                        else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
+                            Application::GetInstance().render.get()->CreateDiamond();
+                        }
+                        else
+                        {
+                            ModelName = "../FBX/" + value + ".fbx";
+                            Application::GetInstance().scene->LoadFBX(ModelName);
+                        }
+                        UID = models.size() - 1;
+                    }
+                    if (key == "UID");
+                    else if (key == "ParentUID")
+                    {
+                        models[UID].ParentID = std::stoi(value);
+                    }
+                    else if (key == "Translation") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].position.x;
+                        ss.ignore(1);
+                        ss >> models[UID].position.y;
+                        ss.ignore(1);
+                        ss >> models[UID].position.z;
+                        models[UID].UpdateTransform();
+
+                    }
+                    else if (key == "Scale") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].scale.x;
+                        ss.ignore(1);
+                        ss >> models[UID].scale.y;
+                        ss.ignore(1);
+                        ss >> models[UID].scale.z;
+                        models[UID].UpdateTransform();
+
+                    }
+                    else if (key == "Rotation") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].rotation.x;
+                        ss.ignore(1);
+                        ss >> models[UID].rotation.y;
+                        ss.ignore(1);
+                        ss >> models[UID].rotation.z;
+                        models[UID].UpdateTransform();
+
+                    }
+                    else if (key == "Texture") {
+
+                        Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                        models[UID].texturePath = value;
+                        models[UID].Mmesh.texture = tex;
+                        models[UID].actualTexture = tex;
+                    }
+                }
+            }
+        }
+
+        for (const auto& model : models) 
+        {
+            if (model.ParentID != -1) {
+                int parent = model.ParentID;
+                models[model.modelId].ParentID = 0;
+                models[parent].SetChild(&models[model.modelId]);
+            }
+        }
+    }
+}
 bool Scene::PostUpdate()
 {
 

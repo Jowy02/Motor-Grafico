@@ -9,6 +9,8 @@
 #include "OctreeNode.h"
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 struct SDL_Texture;
 
@@ -17,8 +19,6 @@ enum class GizmoOperation {
     ROTATE,
     SCALE
 };
-
-
 
 class Scene : public Module
 {
@@ -43,8 +43,10 @@ public:
     bool RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
     bool RayIntersectsAABB(const LineSegment& ray, const glm::vec3& min, const glm::vec3& max, float& t);
     void Raycast(const LineSegment& ray);
-
     void SelectObject(Model* obj);
+
+    void SaveScene();
+    void LoadScene();
 
     // --- Scene content ---
     std::vector<Model> models;
@@ -64,7 +66,5 @@ private:
     // --- Resources ---
     std::vector<std::string> imagesFiles;
     std::vector<Texture> images;
-
-
-
+    bool deleteScene = false;
 };

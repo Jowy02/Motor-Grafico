@@ -158,7 +158,16 @@ void Menus::MainMenu()
             
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Scene"))
+        {
+            selectedObj = NULL;
+            if (ImGui::MenuItem("Save"))
+                Application::GetInstance().scene.get()->SaveScene();
+            if (ImGui::MenuItem("Load"))
+                Application::GetInstance().scene.get()->LoadScene();
 
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }
@@ -404,6 +413,7 @@ void Menus::LoadTextures()
     WIN32_FIND_DATAA data;
     HANDLE h = FindFirstFileA("C:\\Users\\joelv\\Documents\\GitHub\\Motor-Grafico\\Engine\\Images\\*", &data);
     std::string fileName;
+
     if (h != INVALID_HANDLE_VALUE) {
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)

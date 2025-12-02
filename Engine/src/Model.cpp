@@ -453,8 +453,7 @@ void  Model::CleanUpChilds()
                 sceneModels.end()
             );
         }
-    }
-
+    }   
 }
 void Model::CleanUp()
 {
