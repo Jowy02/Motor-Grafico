@@ -462,10 +462,10 @@ void Menus::LoadFbx()
 }
 void Menus::LoadTxt()
 {
-
     if (ImGuiFileDialog::Instance()->Display("ChooseScene")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+
             if (isLoad)Application::GetInstance().scene.get()->LoadScene(filePath);
             else if (isSave){
                 std::ofstream("filePath");
@@ -479,7 +479,6 @@ void Menus::LoadTxt()
         isLoad= false;
         ImGuiFileDialog::Instance()->Close();
     }
-
 }
 void Menus::DrawResourceManager() 
 {

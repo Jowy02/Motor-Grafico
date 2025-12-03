@@ -27,7 +27,15 @@ Model::Model(const std::string& path)
         UpdateTransform();
     }
 }
-
+void Model::ApplTexture(Texture* tex, std::string path)
+{
+    for (auto& mesh : meshes) 
+        mesh.texture = tex;
+       
+    actualTexture = tex;
+    texturePath = path;
+    hasTransparency = tex->hasAlpha;
+}
 // Draw all meshes of the model
 void Model::Draw()
 {
@@ -49,33 +57,35 @@ void Model::Draw()
     // Send the transformation matrix to the shader
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transformMatrix));
+    for (auto& mesh : meshes) {
+        if (mesh.texture)
+        {
+            mesh.texture->texUnit(shaderProgram, "tex0", 0);
+            mesh.texture->Bind();
+            GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+            glUniform1i(useTexLoc, 1);
+        }
+        else
+        {
+            GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+            glUniform1i(useTexLoc, 0);
+        }
 
-    if (Mmesh.texture)
-    {
-        Mmesh.texture->texUnit(shaderProgram, "tex0", 0);
-        Mmesh.texture->Bind();
-        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-        glUniform1i(useTexLoc, 1);
+        // Draw all meshes
+        glBindVertexArray(mesh.VAO);
+
+        if (name != "Grid") glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+        else glDrawElements(GL_LINES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+
+        if (mesh.texture)
+            mesh.texture->Unbind();
+
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
     }
-    else
-    {
-        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-        glUniform1i(useTexLoc, 0);
-    }
 
-    // Draw all meshes
-    glBindVertexArray(Mmesh.VAO);
-
-    if (name != "Grid") glDrawElements(GL_TRIANGLES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
-    else glDrawElements(GL_LINES, Mmesh.indexCount, GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
-
-    if (Mmesh.texture)
-        Mmesh.texture->Unbind();
-
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
 }
 
 void Model::UpdateAABB()
@@ -163,12 +173,14 @@ void Model::UpdateTransform()
     size = newMax - newMin;
 
     // Actualiza posiciones mundiales
-    Mmesh.positionsWorld.resize(Mmesh.positionsLocal.size());
-    for (size_t i = 0; i < Mmesh.positionsLocal.size(); ++i) {
-        glm::vec4 p = transformMatrix * glm::vec4(Mmesh.positionsLocal[i], 1.0f);
-        Mmesh.positionsWorld[i] = glm::vec3(p);
-    }
-
+    for (auto& mesh : meshes)
+    {
+        mesh.positionsWorld.resize(mesh.positionsLocal.size());
+        for (size_t i = 0; i < mesh.positionsLocal.size(); ++i) {
+            glm::vec4 p = transformMatrix * glm::vec4(mesh.positionsLocal[i], 1.0f);
+            mesh.positionsWorld[i] = glm::vec3(p);
+        }
+    }   
     // Actualiza AABB mundo usando los bounds locales (funci�n ya existente)
     UpdateAABB();
 }
@@ -221,6 +233,7 @@ void Model::loadModel(const std::string& path)
 // Process all meshes in a node
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -237,6 +250,8 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
+    ModelMesh newMesh;
+
     minAABB = glm::vec3(FLT_MAX);
     maxAABB = glm::vec3(-FLT_MAX);
 
@@ -383,25 +398,27 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene)
             std::cout << "No diffuse texture found in the material." << std::endl;
             Mmesh.texture = nullptr;
             hasTransparency = false;
-
         }
     }
-
+    meshes.push_back(std::move(Mmesh));
 }
 
 // Switch the model's texture (BlackWhite or NormalMap)
 void Model::switchTexture(bool checker, std::string type)
 {
+    Texture* tempTex;
     if (type == "BlackWhite")
     {
-        if (checker) Mmesh.texture = blackWhite;
-        else Mmesh.texture = actualTexture;
+        if (checker) tempTex = blackWhite;
+        else tempTex = actualTexture;
     }
     if (type == "Hide")
     {
-        if (checker) Mmesh.texture = noTexture;
-        else Mmesh.texture = actualTexture;
+        if (checker) tempTex = noTexture;
+        else tempTex = actualTexture;
     }
+    for (auto& mesh : meshes)
+        mesh.texture = tempTex;
 }
 
 // Get the model matrix

@@ -83,29 +83,8 @@ void Scene::BuildOctree() {
     for (auto& m : models) octreeRoot->Insert(&m);
 }
 
-
-
 void Scene::ApplyTextureToSelected(const std::string& path) 
 {
-   
-    //if (Application::GetInstance().menus.get()->selectedObj != NULL)
-    //    //if (!Application::GetInstance().menus.get()->selectedObj == NULL)
-    //{
-    //    Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-
-    //    for (auto& Model : models) 
-    //    {
-    //        if (Model.name == Application::GetInstance().menus.get()->selectedObj->name) 
-    //        {
-    //            Model.Mmesh.texture = tex;
-    //            Model.actualTexture = tex;
-    //            Model.texturePath = path;
-    //        }
-    //    }
-    //}
-    //else 
-    //    Application::GetInstance().menus->LogToConsole("ERROR APPLYING TEXTURE, NO OBJECT SELECTED");
-
     auto selected = Application::GetInstance().menus.get()->selectedObj;
     if (selected)
     {
@@ -113,13 +92,8 @@ void Scene::ApplyTextureToSelected(const std::string& path)
 
         for (auto& model : models)
         {
-
-            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId) {
-                model.Mmesh.texture = tex;
-                model.actualTexture = tex;
-                model.texturePath = path;
-                model.hasTransparency = tex->hasAlpha;
-            }
+            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId) 
+                Application::GetInstance().menus.get()->selectedObj->ApplTexture(tex, path);
         }
     }
     else
@@ -197,7 +171,6 @@ bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, c
     t = (tNear >= 0.0f) ? tNear : tFar;
     return true;
 }
- 
 
 void Scene::Raycast(const LineSegment& ray)
 {
@@ -213,19 +186,21 @@ void Scene::Raycast(const LineSegment& ray)
     Model* selected = nullptr;
 
     for (auto* model : hitModels) {
-        for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
-            glm::vec3 v0 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 0]];
-            glm::vec3 v1 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 1]];
-            glm::vec3 v2 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 2]];
+        for (auto& mesh : model->meshes) {
+            for (size_t i = 0; i < mesh.indices.size(); i += 3) {
+                glm::vec3 v0 = mesh.positionsWorld[mesh.indices[i + 0]];
+                glm::vec3 v1 = mesh.positionsWorld[mesh.indices[i + 1]];
+                glm::vec3 v2 = mesh.positionsWorld[mesh.indices[i + 2]];
 
-            float t;
-            if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
-                if (t < closestT) {
-                    closestT = t;
-                    selected = model;
+                float t;
+                if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
+                    if (t < closestT) {
+                        closestT = t;
+                        selected = model;
+                    }
                 }
             }
-        }           
+        }
     }
 
     if (selected)
@@ -466,8 +441,7 @@ void Scene::LoadScene(std::string filePath)
                     else if (key == "Texture") {
 
                         Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                        models[UID].texturePath = value;
-                        models[UID].Mmesh.texture = tex;
+                        models[UID].ApplTexture(tex, value);
                         models[UID].actualTexture = tex;
                     }
                 }

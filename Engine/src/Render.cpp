@@ -143,29 +143,30 @@ bool Render::Start()
 
 void Render::InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount)
 {
-     model.Mmesh.positionsLocal.clear();
-    model.Mmesh.indices.clear();
+    for (auto& mesh : model.meshes) {
 
-    // Rellenar posiciones locales (8 floats por vértice: pos+color+uv)
-    for (int i = 0; i < vertexCount; i += 8) {
-        glm::vec3 pos(vertices[i], vertices[i + 1], vertices[i + 2]);
-        model.Mmesh.positionsLocal.push_back(pos);
+        mesh.positionsLocal.clear();
+        mesh.indices.clear();
+
+        // Rellenar posiciones locales (8 floats por vértice: pos+color+uv)
+        for (int i = 0; i < vertexCount; i += 8) {
+            glm::vec3 pos(vertices[i], vertices[i + 1], vertices[i + 2]);
+            mesh.positionsLocal.push_back(pos);
+        }
+
+        // Rellenar índices
+        for (int i = 0; i < indexCount; ++i) {
+            mesh.indices.push_back(indices[i]);
+        }
+        mesh.indexCount = indexCount;
+        // Actualizar AABB local
+        model.localMinAABB = glm::vec3(FLT_MAX);
+        model.localMaxAABB = glm::vec3(-FLT_MAX);
+        for (auto& v : mesh.positionsLocal) {
+            model.localMinAABB = glm::min(model.localMinAABB, v);
+            model.localMaxAABB = glm::max(model.localMaxAABB, v);
+        }
     }
-
-    // Rellenar índices
-    for (int i = 0; i < indexCount; ++i) {
-        model.Mmesh.indices.push_back(indices[i]);
-    }
-    model.Mmesh.indexCount = indexCount;
-
-    // Actualizar AABB local
-    model.localMinAABB = glm::vec3(FLT_MAX);
-    model.localMaxAABB = glm::vec3(-FLT_MAX);
-    for (auto& v : model.Mmesh.positionsLocal) {
-        model.localMinAABB = glm::min(model.localMinAABB, v);
-        model.localMaxAABB = glm::max(model.localMaxAABB, v);
-    }
-
 }
 
 void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices,  int stride)
@@ -338,6 +339,8 @@ void Render::CreatePyramid()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
+    model.meshes.push_back(model.Mmesh);
+
     std::string name = "Pyramid" + std::to_string(numPyramid);
 
     model.name = name;
@@ -432,6 +435,8 @@ void Render::CreateCube()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
+    model.meshes.push_back(model.Mmesh);
+    
     std::string name = "Cube" + std::to_string(numCube);
     model.name = name;
 
@@ -495,6 +500,8 @@ void Render::CreateDiamond()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
+    model.meshes.push_back(model.Mmesh);
+
     std::string name = "Diamond" + std::to_string(numDiamond);
 
     model.name = name;
@@ -608,6 +615,8 @@ void Render::CreateSphere()
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.indexCount = mesh.indexCount;
+    model.meshes.push_back(model.Mmesh);
+
     std::string name = "Sphere" + std::to_string(numSphere);
     model.name = name;
 
@@ -667,6 +676,8 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.indexCount = mesh.indexCount;
     model.Mmesh.texture = mesh.texture;
+    model.meshes.push_back(model.Mmesh);
+
     model.name = "Grid";
     model.modelId = Application::GetInstance().scene.get()->models.size();
 

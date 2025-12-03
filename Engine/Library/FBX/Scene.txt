@@ -1,10 +1,10 @@
 GameObjects:
 {
 UID: 1
-Name: Diamond1
+Name: BakerHouse
 ParentUID: -1
-Translation: 0, 1.58322, 0
-Scale: 1.52, 5.35751, 1.52
-Rotation: 0, -0, 0
-Texture: 
+Translation: -1.07837, 0, 0
+Scale: 1, 1, 1
+Rotation: -20.3615, 6.44767e-08, 18.985
+Texture: ../Images/Baker_house.png
 }

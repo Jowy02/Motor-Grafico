@@ -43,7 +43,7 @@ public:
     void UpdateTransform();
     void CleanUpChilds();
     void CleanUp();
-
+    void ApplTexture(Texture* tex, std::string path);
     // --- Meshes ---
     ModelMesh Mmesh;
     gemotryMesh Normalmesh;
@@ -93,6 +93,7 @@ public:
     int ParentID = -1;
     bool parentTransform = false;
 
+    std::vector<ModelMesh> meshes;
 private:
     // --- Internal data ---
     std::string directory;
