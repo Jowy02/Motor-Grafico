@@ -94,6 +94,7 @@ public:
 
     int componentID = -1;
     std::string modelPath;
+    bool haveComponents = false;
 
 private:
     // --- Internal data ---

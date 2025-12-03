@@ -213,7 +213,7 @@ void Model::loadModel(const std::string& path)
     name = name.substr(0, name.find_last_of('.'));
 
     processNode(scene->mRootNode, scene);
-    modelId = Application::GetInstance().scene.get()->models.size() + 1;
+    modelId = Application::GetInstance().scene.get()->models.size() + otherMesh.size();
     processOthers(scene);
     center = (minAABB + maxAABB) * 0.5f;
     size = maxAABB - minAABB;
@@ -249,9 +249,6 @@ void Model::processOthers(const aiScene* scene)
         Application::GetInstance().scene->models.push_back(std::move(newModel));
         Application::GetInstance().scene->models.back().UpdateTransform();
 
-        if (Application::GetInstance().scene->octreeRoot) {
-            Application::GetInstance().scene->octreeRoot->Insert(&Application::GetInstance().scene->models.back());
-        }
     }
 }
 // Process all meshes in a node
@@ -269,6 +266,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
         else
         {
             otherMesh.push_back(mesh);
+            haveComponents = true;
         }
         objNum++;
     }

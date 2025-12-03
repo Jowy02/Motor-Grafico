@@ -5,13 +5,13 @@ Path: ../Library/FBX/BakerHouse(Child).fbx
 Component: -1
 Name: Baker_house
 ParentUID: -1
-Translation: -1.1537, 0, 0
+Translation: -2.15446, 0, 0
 Scale: 1, 1, 1
 Rotation: 0, -0, 0
 Texture: ../Images/Baker_house.png
 ComponentID: 1
-Translation: 0, 0, 0
+Translation: 0, 0, 3.99471
 Scale: 1, 1, 1
-Rotation: 0, 0, 0
-Texture: ../Images/Lenna_(test_image).png
+Rotation: 0, -37.3361, 0
+Texture: ../Images/BlancoNegro.png
 }

@@ -259,7 +259,7 @@ void Scene::ImGuizmo() {
             menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
-            BuildOctree();
+            //BuildOctree();
         }
     }
 }
@@ -325,6 +325,21 @@ void Scene::SaveScene(std::string filePath)
             file << "Rotation: " << model.rotation.x << ", " << model.rotation.y << ", " << model.rotation.z << "\n";
             file << "Texture: " << model.texturePath << "\n";
 
+            if (model.haveComponents)
+            {
+                for (const auto& Othermodel : models) 
+                {
+                    if(Othermodel.componentID == model.modelId)
+                    {
+                        file << "ComponentID: " << Othermodel.modelId << "\n";
+                        file << "Translation: " << Othermodel.position.x << ", " << Othermodel.position.y << ", " << Othermodel.position.z << "\n";
+                        file << "Scale: " << Othermodel.scale.x << ", " << Othermodel.scale.y << ", " << Othermodel.scale.z << "\n";
+                        file << "Rotation: " << Othermodel.rotation.x << ", " << Othermodel.rotation.y << ", " << Othermodel.rotation.z << "\n";
+                        file << "Texture: " << Othermodel.texturePath << "\n";
+                    }
+                }
+
+            }
             file << "}" << "\n";
         }
     }
@@ -338,7 +353,8 @@ void Scene::LoadScene(std::string filePath)
     std::string ModelName;
     std::string line;
     int UID = -1;
-
+    int tempId = -1;
+    bool components = false;
     bool insideObject = false;
 
     if (models.size() > 1) {
@@ -382,82 +398,131 @@ void Scene::LoadScene(std::string filePath)
                     std::getline(iss, value);
                     // limpiar espacios
                     if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-                
-                    if (key == "Name") {
-                        if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
-                            Application::GetInstance().render.get()->CreateCube();
-                            UID = models.size() - 1;
-
-                        }
-                        else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
-                            Application::GetInstance().render.get()->CreatePyramid();
-                            UID = models.size() - 1;
-
-                        }
-                        else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
-                            Application::GetInstance().render.get()->CreateSphere();
-                            UID = models.size() - 1;
-
-                        }
-                        else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
-                            Application::GetInstance().render.get()->CreateDiamond();
-                            UID = models.size() - 1;
-
-                        }
-                        else
-                        {
-                            //ModelName = "../Library/FBX/" + value + ".fbx";
-                            //Application::GetInstance().scene->LoadFBX(ModelName);
-                        }
-                    }
-                    if (key == "Path") 
+                    if (!components)
                     {
-                        if (value != "")
-                        {
-                            Application::GetInstance().scene->LoadFBX(value);
-                            UID = models.size() - 1;
+                        if (key == "Name") {
+                            if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
+                                Application::GetInstance().render.get()->CreateCube();
+                                UID = models.size() - 1;
+
+                            }
+                            else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
+                                Application::GetInstance().render.get()->CreatePyramid();
+                                UID = models.size() - 1;
+
+                            }
+                            else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
+                                Application::GetInstance().render.get()->CreateSphere();
+                                UID = models.size() - 1;
+
+                            }
+                            else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
+                                Application::GetInstance().render.get()->CreateDiamond();
+                                UID = models.size() - 1;
+
+                            }
                         }
-                    }
-                    else if (key == "ParentUID")
-                    {
-                        models[UID].ParentID = std::stoi(value);
-                    }
-                    else if (key == "Translation") {
-                        std::stringstream ss(value);
-                        ss >> models[UID].position.x;
-                        ss.ignore(1);
-                        ss >> models[UID].position.y;
-                        ss.ignore(1);
-                        ss >> models[UID].position.z;
-                        models[UID].UpdateTransform();
+                        if (key == "Path")
+                        {
+                            if (value != "")
+                            {
+                                Application::GetInstance().scene->LoadFBX(value);
+                                UID = models.size() - 1;
+                            }
+                        }
+                        else if (key == "ParentUID")
+                        {
+                            models[UID].ParentID = std::stoi(value);
+                        }
 
-                    }
-                    else if (key == "Scale") {
-                        std::stringstream ss(value);
-                        ss >> models[UID].scale.x;
-                        ss.ignore(1);
-                        ss >> models[UID].scale.y;
-                        ss.ignore(1);
-                        ss >> models[UID].scale.z;
-                        models[UID].UpdateTransform();
+                        else if (key == "Translation") {
+                            std::stringstream ss(value);
+                            ss >> models[UID].position.x;
+                            ss.ignore(1);
+                            ss >> models[UID].position.y;
+                            ss.ignore(1);
+                            ss >> models[UID].position.z;
+                            models[UID].UpdateTransform();
 
-                    }
-                    else if (key == "Rotation") {
-                        std::stringstream ss(value);
-                        ss >> models[UID].rotation.x;
-                        ss.ignore(1);
-                        ss >> models[UID].rotation.y;
-                        ss.ignore(1);
-                        ss >> models[UID].rotation.z;
-                        models[UID].UpdateTransform();
+                        }
+                        else if (key == "Scale") {
+                            std::stringstream ss(value);
+                            ss >> models[UID].scale.x;
+                            ss.ignore(1);
+                            ss >> models[UID].scale.y;
+                            ss.ignore(1);
+                            ss >> models[UID].scale.z;
+                            models[UID].UpdateTransform();
 
-                    }
-                    else if (key == "Texture") {
+                        }
+                        else if (key == "Rotation") {
+                            std::stringstream ss(value);
+                            ss >> models[UID].rotation.x;
+                            ss.ignore(1);
+                            ss >> models[UID].rotation.y;
+                            ss.ignore(1);
+                            ss >> models[UID].rotation.z;
+                            models[UID].UpdateTransform();
 
-                        Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                        models[UID].ApplTexture(tex, value);
-                        models[UID].actualTexture = tex;
+                        }
+                        else if (key == "Texture") {
+
+                            Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                            models[UID].ApplTexture(tex, value);
+                            models[UID].actualTexture = tex;
+                        }
+                        else if (key == "ComponentID")
+                        {
+                            std::stringstream ss(value);
+                            ss >> tempId;
+
+                            if (tempId >= 0) components = true;
+                        }
+                        else components = false;
                     }
+                    else
+                    { 
+                        if (key == "Translation") {
+                            std::stringstream ss(value);
+                            ss >> models[tempId].position.x;
+                            ss.ignore(1);
+                            ss >> models[tempId].position.y;
+                            ss.ignore(1);
+                            ss >> models[tempId].position.z;
+                            models[tempId].UpdateTransform();
+
+                        }
+                        else if (key == "Scale") {
+                            std::stringstream ss(value);
+                            ss >> models[tempId].scale.x;
+                            ss.ignore(1);
+                            ss >> models[tempId].scale.y;
+                            ss.ignore(1);
+                            ss >> models[tempId].scale.z;
+                            models[tempId].UpdateTransform();
+
+                        }
+                        else if (key == "Rotation") {
+                            std::stringstream ss(value);
+                            ss >> models[tempId].rotation.x;
+                            ss.ignore(1);
+                            ss >> models[tempId].rotation.y;
+                            ss.ignore(1);
+                            ss >> models[tempId].rotation.z;
+                            models[tempId].UpdateTransform();
+
+                        }
+                        else if (key == "Texture") {
+
+                            Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                            models[tempId].ApplTexture(tex, value);
+                            models[tempId].actualTexture = tex;
+
+                            components = false;
+                        }
+                    
+                    }
+
                 }
             }
         }
