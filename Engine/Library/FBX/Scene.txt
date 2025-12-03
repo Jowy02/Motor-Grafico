@@ -1,10 +1,45 @@
 GameObjects:
 {
-UID: 1
-Name: BakerHouse
+UID: 2
+Path: ../Library/FBX/BakerHouse(Child).fbx
+Component: -1
+Name: Baker_house
 ParentUID: -1
-Translation: -1.07837, 0, 0
+Translation: -2.72634, 0.352448, 0
 Scale: 1, 1, 1
-Rotation: -20.3615, 6.44767e-08, 18.985
-Texture: ../Images/Baker_house.png
+Rotation: 0, -0, 0
+Texture: ../Images/BlancoNegro.png
+}
+{
+UID: 3
+Path: 
+Component: -1
+Name: Cube0
+ParentUID: -1
+Translation: -0.345755, -1.68623, 0
+Scale: 1, 1, 1
+Rotation: 0, -0, 0
+Texture: 
+}
+{
+UID: 4
+Path: 
+Component: -1
+Name: Diamond0
+ParentUID: -1
+Translation: 0, 0, 0
+Scale: 1, 1, 1
+Rotation: 0, 0, 0
+Texture: 
+}
+{
+UID: 5
+Path: 
+Component: -1
+Name: Sphere0
+ParentUID: 2
+Translation: 6.9697, 3.19298, 0
+Scale: 1, 1, 1
+Rotation: 0, -0, 0
+Texture: 
 }

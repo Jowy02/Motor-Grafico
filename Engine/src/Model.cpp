@@ -184,6 +184,8 @@ void Model::UpdateTransform()
 // Load a model using Assimp
 void Model::loadModel(const std::string& path)
 {
+    modelPath = path;
+
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_Triangulate |
@@ -211,6 +213,7 @@ void Model::loadModel(const std::string& path)
     name = name.substr(0, name.find_last_of('.'));
 
     processNode(scene->mRootNode, scene);
+    modelId = Application::GetInstance().scene.get()->models.size() + 1;
     processOthers(scene);
     center = (minAABB + maxAABB) * 0.5f;
     size = maxAABB - minAABB;
@@ -228,37 +231,28 @@ void Model::loadModel(const std::string& path)
 }
 void Model::processOthers(const aiScene* scene)
 {
-    objNum = 0;
     for (auto& mesh : otherMesh)
     {
-        
-        if (objNum < 100)
-        {
-            Model newModel("Imported");
+        Model newModel("Imported");
 
-            newModel.processMesh(mesh, scene);
+        newModel.processMesh(mesh, scene);
+        newModel.name = mesh->mName.C_Str();
+        newModel.modelId = Application::GetInstance().scene->models.size();
+        newModel.center = (minAABB + maxAABB) * 0.5f;
+        newModel.size = maxAABB - minAABB;
+        newModel.componentID = modelId;
 
-            newModel.name = mesh->mName.C_Str();
-            newModel.modelId = Application::GetInstance().scene->models.size();
-            newModel.center = (minAABB + maxAABB) * 0.5f;
-            newModel.size = maxAABB - minAABB;
+        newModel.position = { 0,0,0 };
+        newModel.rotation = { 0,0,0 };
+        newModel.scale = { 1,1,1 };
 
-            newModel.position = { 0,0,0 };
-            newModel.rotation = { 0,0,0 };
-            newModel.scale = { 1,1,1 };
+        Application::GetInstance().scene->models.push_back(std::move(newModel));
+        Application::GetInstance().scene->models.back().UpdateTransform();
 
-
-            Application::GetInstance().scene->models.push_back(std::move(newModel));
-            Application::GetInstance().scene->models.back().UpdateTransform();
-
-            if (Application::GetInstance().scene->octreeRoot) {
-                Application::GetInstance().scene->octreeRoot->Insert(&Application::GetInstance().scene->models.back());
-            }
+        if (Application::GetInstance().scene->octreeRoot) {
+            Application::GetInstance().scene->octreeRoot->Insert(&Application::GetInstance().scene->models.back());
         }
-
-        objNum++;
     }
-
 }
 // Process all meshes in a node
 void Model::processNode(aiNode* node, const aiScene* scene)

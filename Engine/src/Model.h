@@ -27,7 +27,6 @@ struct ModelMesh {
     std::vector<glm::vec3> positionsWorld;
 };
 
-
 class Model
 {
 public:
@@ -92,6 +91,10 @@ public:
     bool isChild = false;
     int ParentID = -1;
     bool parentTransform = false;
+
+    int componentID = -1;
+    std::string modelPath;
+
 private:
     // --- Internal data ---
     std::string directory;

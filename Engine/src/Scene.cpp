@@ -311,11 +311,13 @@ void Scene::SaveScene(std::string filePath)
 
     file << "GameObjects:\n";
     for (const auto& model : models) {
-        if (model.name != "Grid")
+        if (model.name != "Grid" && model.componentID < 0)
         {
             file << "{" << "\n";
 
             file << "UID: " << model.modelId << "\n";
+            file << "Path: " << model.modelPath << "\n";
+            file << "Component: " << model.componentID << "\n";
             file << "Name: " << model.name << "\n";
             file << "ParentUID: " << model.ParentID << "\n";
             file << "Translation: " << model.position.x << ", " << model.position.y << ", " << model.position.z << "\n";
@@ -384,24 +386,38 @@ void Scene::LoadScene(std::string filePath)
                     if (key == "Name") {
                         if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
                             Application::GetInstance().render.get()->CreateCube();
+                            UID = models.size() - 1;
+
                         }
                         else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
                             Application::GetInstance().render.get()->CreatePyramid();
+                            UID = models.size() - 1;
+
                         }
                         else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
                             Application::GetInstance().render.get()->CreateSphere();
+                            UID = models.size() - 1;
+
                         }
                         else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
                             Application::GetInstance().render.get()->CreateDiamond();
+                            UID = models.size() - 1;
+
                         }
                         else
                         {
-                            ModelName = "../Library/FBX/" + value + ".fbx";
-                            Application::GetInstance().scene->LoadFBX(ModelName);
+                            //ModelName = "../Library/FBX/" + value + ".fbx";
+                            //Application::GetInstance().scene->LoadFBX(ModelName);
                         }
-                        UID = models.size() - 1;
                     }
-                    if (key == "UID");
+                    if (key == "Path") 
+                    {
+                        if (value != "")
+                        {
+                            Application::GetInstance().scene->LoadFBX(value);
+                            UID = models.size() - 1;
+                        }
+                    }
                     else if (key == "ParentUID")
                     {
                         models[UID].ParentID = std::stoi(value);

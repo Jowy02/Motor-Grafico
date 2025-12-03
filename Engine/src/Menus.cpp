@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "Menus.h"
 #include "Input.h"
+
 #include <iostream> 
 
 #include "imgui.h"
@@ -12,9 +13,10 @@
 #include "imgui_impl_opengl3.h"
 
 #include <windows.h>
-#include "imgui_internal.h"
 
+#include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
+
 IGFD::FileDialogConfig config;
 
 Menus::Menus() : Module()
@@ -33,6 +35,7 @@ bool Menus::Awake()
 
 bool Menus::Start()
 {
+    
     Application::GetInstance().menus->LogToConsole("Initializing ImGui...");
     config.path = "../Library";
 
@@ -483,6 +486,7 @@ void Menus::LoadTxt()
 void Menus::DrawResourceManager() 
 {
     ImGui::Begin("Resource Manager");
+
     ImGui::Separator();
     ImGui::Text("Texture");
 
@@ -512,13 +516,13 @@ void Menus::DrawResourceManager()
            draged = false;
         }
         if (i + 1 < textures.size())
-            ImGui::SameLine();                      // <--- Esto ya funciona
+            ImGui::SameLine();                      
     }
     ImGui::Separator();
     ImGui::Text("Fbx");
     for (int i = 0; i < fbxFiles.size(); i++) {
 
-        ImGui::BeginGroup();                        // <--- Grupo (no se separa en líneas)
+        ImGui::BeginGroup();                        
         ImGui::Text("%s", fbxFiles[i].c_str());
         ImGui::EndGroup();
 
@@ -541,7 +545,7 @@ void Menus::DrawResourceManager()
             dragedFbx = false;
         }
         if (i + 1 < textures.size())
-            ImGui::SameLine();                      // <--- Esto ya funciona
+            ImGui::SameLine();                    
     }
 
     ImGui::End();
