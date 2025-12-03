@@ -186,18 +186,16 @@ void Scene::Raycast(const LineSegment& ray)
     Model* selected = nullptr;
 
     for (auto* model : hitModels) {
-        for (auto& mesh : model->meshes) {
-            for (size_t i = 0; i < mesh.indices.size(); i += 3) {
-                glm::vec3 v0 = mesh.positionsWorld[mesh.indices[i + 0]];
-                glm::vec3 v1 = mesh.positionsWorld[mesh.indices[i + 1]];
-                glm::vec3 v2 = mesh.positionsWorld[mesh.indices[i + 2]];
+        for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
+            glm::vec3 v0 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 0]];
+            glm::vec3 v1 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 1]];
+            glm::vec3 v2 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 2]];
 
-                float t;
-                if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
-                    if (t < closestT) {
-                        closestT = t;
-                        selected = model;
-                    }
+            float t;
+            if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
+                if (t < closestT) {
+                    closestT = t;
+                    selected = model;
                 }
             }
         }

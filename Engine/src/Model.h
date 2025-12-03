@@ -92,8 +92,6 @@ public:
     bool isChild = false;
     int ParentID = -1;
     bool parentTransform = false;
-
-    std::vector<ModelMesh> meshes;
 private:
     // --- Internal data ---
     std::string directory;
@@ -107,4 +105,9 @@ private:
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
 
+    void processOthers(const aiScene* scene);
+
+    std::vector<aiMesh*> otherMesh;
+    std::vector<ModelMesh> otherModel;
+    int objNum = 0;
 };
