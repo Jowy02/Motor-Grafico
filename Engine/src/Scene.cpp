@@ -379,18 +379,20 @@ void Scene::LoadScene(std::string filePath)
 
             if(model.name != "Grid")
             { 
-                Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
+                Application::GetInstance().menus.get()->selectedObj = nullptr;
+
                 if (model.isChild)Application::GetInstance().scene.get()->models[model.ParentID].eraseChild(model.modelId);
-                models[model.modelId].CleanUpChilds();
+                model.CleanUpChilds();
                 auto& sceneModels = Application::GetInstance().scene->models;
                 sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const Model& m) { return &m == &models[model.modelId]; }), sceneModels.end());
+                    [&](const Model& m) { return &m == &models[model.modelId-1]; }), sceneModels.end());
 
-                Application::GetInstance().menus.get()->selectedObj = nullptr;
                 if (models.size() <= 1) {
                     deleteScene = false;
                     break;
                 }
+                Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
+
             }
         }
     }

@@ -172,8 +172,8 @@ void Menus::MainMenu()
         if (ImGui::BeginMenu("Scene"))
         {
             selectedObj = NULL;
-            if(ImGui::MenuItem("Save", nullptr, &isSave)) ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".json,.txt,.eduscene", config);
-            if (ImGui::MenuItem("Load", nullptr, &isLoad))ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".json,.txt,.eduscene", config);
+            if(ImGui::MenuItem("Save", nullptr, &isSave)) ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".txt,.json", config);
+            if (ImGui::MenuItem("Load", nullptr, &isLoad))ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".txt,.json", config);
 
 
             ImGui::EndMenu();
@@ -314,7 +314,7 @@ void Menus::DrawGameObjectNode(Model* obj)
 
     if (ImGui::BeginDragDropSource())
     {
-        // envías un puntero al objeto arrastrado
+        //Ppuntero al objeto arrastrado
         ImGui::SetDragDropPayload("OBJECT_NODE", &obj, sizeof(obj));
         ImGui::Text("Mover %s", obj->name.c_str());
         ImGui::EndDragDropSource();
@@ -428,7 +428,6 @@ void Menus::LoadTextures()
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
                 continue;
-    //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
             // Filtrar por tipo de archivo
             fileName = data.cFileName;
@@ -499,7 +498,6 @@ void Menus::DrawResourceManager()
         ImGui::Image(textures[i]->ID, ImVec2(150, 150));
         ImGui::EndGroup();  
         
-        // <--- Fin del bloque
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
            
             dragTexture = i;
@@ -528,7 +526,6 @@ void Menus::DrawResourceManager()
         ImGui::Text("%s", fbxFiles[i].c_str());
         ImGui::EndGroup();
 
-        // <--- Fin del bloque
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 
             dragFbx = i;
