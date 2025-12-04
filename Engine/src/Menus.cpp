@@ -399,15 +399,19 @@ void Menus::DrawInspector()
             {
                 if (Application::GetInstance().input->click) {
                     Application::GetInstance().input->click = false;
-
                 }
                 Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
                 if (selectedObj->isChild)Application::GetInstance().scene.get()->models[selectedObj->ParentID].eraseChild(selectedObj->modelId);
                 selectedObj->CleanUpChilds();
+                int id = selectedObj->modelId;
                 auto& sceneModels = Application::GetInstance().scene->models;
                 sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
                     [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
 
+                for (id; id < Application::GetInstance().scene.get()->models.size();id++)
+                {
+                    Application::GetInstance().scene.get()->models[id].modelId -= 1;
+                }
                 selectedObj = nullptr;
             }
         }
@@ -423,6 +427,7 @@ void Menus::LoadTextures()
     WIN32_FIND_DATAA data;
     HANDLE h = FindFirstFileA("..\\Library\\Images\\*", &data);
     std::string fileName;
+    bool exist = false;
 
     if (h != INVALID_HANDLE_VALUE) {
         do {
@@ -433,8 +438,14 @@ void Menus::LoadTextures()
             fileName = data.cFileName;
             if (fileName.substr(fileName.size() - 4) == ".png") {
                 fileName = "../Images/" + fileName;
-                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                textures.push_back(tex);
+                for (auto& text : textures)
+                {
+                    if (text->textPath == fileName) exist = true;
+                }
+                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); 
+                if(!exist)textures.push_back(tex);
+                exist = false;
+
             }
         } while (FindNextFileA(h, &data));
 
@@ -447,13 +458,24 @@ void Menus::LoadFbx()
     WIN32_FIND_DATAA data;
     HANDLE h = FindFirstFileA("..\\Library\\FBX\\*", &data);
     std::string fileName;
+    bool exist = false;
     if (h != INVALID_HANDLE_VALUE) {
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
                 continue;
             fileName = data.cFileName;
-            if (fileName.substr(fileName.size() - 4) == ".fbx") {
-                fbxFiles.push_back("../Library/FBX/" + fileName);
+
+            if (fileName.substr(fileName.size() - 4) == ".fbx" ) {
+                for (auto& files : fbxFiles)
+                {
+                    std::string TempfileName = "../Library/FBX/" + fileName;
+                    if (files == TempfileName) {
+                        exist = true;
+                    }
+                }
+                if(!exist)fbxFiles.push_back("../Library/FBX/" + fileName);
+                exist = false;
+
             }
             if (fileName.substr(fileName.size() - 4) == ".txt") {
                 txtFiles.push_back("../Library/FBX/" + fileName);
@@ -507,7 +529,6 @@ void Menus::DrawResourceManager()
             ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture], textures[dragTexture]->textPath.size() + 1);
                
             ImGui::EndDragDropSource();
-
         }
 
         if (!ImGui::GetDragDropPayload() && draged)

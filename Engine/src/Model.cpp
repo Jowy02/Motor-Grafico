@@ -6,7 +6,7 @@
 #include <cstring> 
 #include "Menus.h"
 #include "Scene.h"
-#include "OctreeNode.h"
+#include "OctreeNode.h" 
 
 Model::Model(const std::string& path)
 {
