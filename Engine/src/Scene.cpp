@@ -66,6 +66,7 @@ void Scene::LoadFBX(const std::string& path)
         std::filesystem::create_directories("../Library/FBX");
         std::filesystem::copy_file(path, dest,
             std::filesystem::copy_options::update_existing);
+        Application::GetInstance().menus.get()->init = true;
     }
     Model model(dest);
     //Model model(path.c_str());
@@ -129,6 +130,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
             std::filesystem::create_directories("../Library/Images");
             std::filesystem::copy_file(path, dest,
                 std::filesystem::copy_options::update_existing);
+            Application::GetInstance().menus.get()->init = true;
         }
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
@@ -408,11 +410,11 @@ void Scene::LoadScene(std::string filePath)
             { 
                 Application::GetInstance().menus.get()->selectedObj = nullptr;
 
-                if (model.isChild)Application::GetInstance().scene.get()->models[model.ParentID].eraseChild(model.modelId);
+                if (model.isChild) models[model.ParentID].eraseChild(model.modelId);
                 model.CleanUpChilds();
-                auto& sceneModels = Application::GetInstance().scene->models;
+                auto& sceneModels = models;
                 sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const Model& m) { return &m == &models[model.modelId-1]; }), sceneModels.end());
+                    [&](const Model& m) { return &m == &models[model.modelId]; }), sceneModels.end());
 
                 if (models.size() <= 1) {
                     deleteScene = false;

@@ -53,6 +53,7 @@ public:
     void LoadTxt();
 
     void LoadTextures();
+    bool init = true;
 
 private:
     std::vector<Model> models;           // Loaded models
@@ -80,7 +81,6 @@ private:
 
     bool initialization_exist = false;
 
-    bool init = true;
     bool draged = false;
     int dragTexture = 0;
 
