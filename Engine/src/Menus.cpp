@@ -16,6 +16,7 @@
 
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
+#include <filesystem>
 
 IGFD::FileDialogConfig config;
 
@@ -35,7 +36,8 @@ bool Menus::Awake()
 
 bool Menus::Start()
 {
-    
+    std::filesystem::create_directories("../Library/Images"); 
+    std::filesystem::create_directories("../Library/FBX");
     Application::GetInstance().menus->LogToConsole("Initializing ImGui...");
     config.path = "../Library";
 

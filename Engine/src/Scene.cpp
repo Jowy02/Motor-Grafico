@@ -18,6 +18,8 @@
 
 #include "LineSegment.h"
 #include <cmath> 
+#include <filesystem>
+
 Scene::Scene() : Module()
 {
 }
@@ -59,7 +61,14 @@ bool Scene::Start()
 
 void Scene::LoadFBX(const std::string& path) 
 {
-    Model model(path.c_str());
+    std::string dest = "../Library/FBX/" + std::filesystem::path(path).filename().string();
+    if (!std::filesystem::exists(dest)) {
+        std::filesystem::create_directories("../Library/FBX");
+        std::filesystem::copy_file(path, dest,
+            std::filesystem::copy_options::update_existing);
+    }
+    Model model(dest);
+    //Model model(path.c_str());
     model.modelId = models.size();
     models.push_back(model);
     BuildOctree();
@@ -88,6 +97,12 @@ void Scene::ApplyTextureToSelected(const std::string& path)
     auto selected = Application::GetInstance().menus.get()->selectedObj;
     if (selected)
     {
+        std::string dest = "../Library/Images/" + std::filesystem::path(path).filename().string();
+        if (!std::filesystem::exists(dest)) {
+            std::filesystem::create_directories("../Library/Images");
+            std::filesystem::copy_file(path, dest,
+                std::filesystem::copy_options::update_existing);
+        }
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
         for (auto& model : models)
