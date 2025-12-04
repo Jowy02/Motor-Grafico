@@ -360,6 +360,7 @@ void Menus::DrawInspector()
         ImGui::Text("LOCAL TRANSFORM");
         if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
             selectedObj->UpdateTransform();
+
         }
         if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
             selectedObj->UpdateTransform();
@@ -409,6 +410,8 @@ void Menus::DrawInspector()
                     [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
 
                 selectedObj = nullptr;
+                Application::GetInstance().scene->BuildOctree();
+
             }
         }
     }

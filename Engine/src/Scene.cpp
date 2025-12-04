@@ -72,25 +72,52 @@ void Scene::LoadFBX(const std::string& path)
     model.modelId = models.size();
     models.push_back(model);
     BuildOctree();
-    if (octreeRoot) {
+ /*   if (octreeRoot) {
         OctreeNode* root = octreeRoot.get();
         root->Insert(&models.back());
-    }
+    }*/
+
 }
 
+//void Scene::BuildOctree() {
+//    glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
+//    for (auto& m : models) {
+//        m.UpdateTransform();
+//        std::cout << "[AABB world] " << m.name
+//            << " min(" << m.minAABB.x << "," << m.minAABB.y << "," << m.minAABB.z << ")"
+//            << " max(" << m.maxAABB.x << "," << m.maxAABB.y << "," << m.maxAABB.z << ")\n";
+//        globalMin = glm::min(globalMin, m.minAABB);
+//        globalMax = glm::max(globalMax, m.maxAABB);
+//    }
+//    octreeRoot = std::make_unique<OctreeNode>(globalMin, globalMax, 0, 10, 5, this);
+//    for (auto& m : models) octreeRoot->Insert(&m);
+//}
+
 void Scene::BuildOctree() {
+    if (models.empty()) {
+        octreeRoot.reset();
+        return;
+    }
+
     glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
     for (auto& m : models) {
         m.UpdateTransform();
-        std::cout << "[AABB world] " << m.name
-            << " min(" << m.minAABB.x << "," << m.minAABB.y << "," << m.minAABB.z << ")"
-            << " max(" << m.maxAABB.x << "," << m.maxAABB.y << "," << m.maxAABB.z << ")\n";
         globalMin = glm::min(globalMin, m.minAABB);
         globalMax = glm::max(globalMax, m.maxAABB);
     }
+
+    // Añadir un pequeño padding para evitar cajas degeneradas
+    const float pad = 0.001f;
+    globalMin -= glm::vec3(pad);
+    globalMax += glm::vec3(pad);
+
     octreeRoot = std::make_unique<OctreeNode>(globalMin, globalMax, 0, 10, 5, this);
-    for (auto& m : models) octreeRoot->Insert(&m);
+
+    for (auto& m : models) {
+        octreeRoot->Insert(&m);
+    }
 }
+
 
 void Scene::ApplyTextureToSelected(const std::string& path) 
 {
@@ -274,7 +301,7 @@ void Scene::ImGuizmo() {
             menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
-            //BuildOctree();
+            BuildOctree();
         }
     }
 }

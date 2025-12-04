@@ -209,7 +209,7 @@ void Render::DrawAABBOutline(Model& model, glm::vec3 color)
         {minL.x, maxL.y, maxL.z}
     };
 
-    // Transformar esquinas a la matriz del modelo
+    //// Transformar esquinas a la matriz del modelo
     glm::mat4 modelMat = model.GetModelMatrix();
     std::vector<glm::vec3> cornersWorld(8);
     for (int i = 0; i < 8; ++i) {
@@ -217,7 +217,7 @@ void Render::DrawAABBOutline(Model& model, glm::vec3 color)
         cornersWorld[i] = glm::vec3(w);
     }
 
-    // Aristas del cubo
+    //// Aristas del cubo
     const int edgeIndexPairs[12][2] = {
         {0,1},{1,2},{2,3},{3,0}, // bottom face
         {4,5},{5,6},{6,7},{7,4}, // top face
@@ -244,6 +244,7 @@ void Render::DrawAABBOutline(Model& model, glm::vec3 color)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     
     glUseProgram(shaderProgram);
+
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
@@ -366,10 +367,14 @@ void Render::CreatePyramid()
 
    Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
-   if (Application::GetInstance().scene->octreeRoot) {
+   if (!Application::GetInstance().scene->octreeRoot) {
+       Application::GetInstance().scene->BuildOctree();
+   }
+   else {
        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
        root->Insert(&Application::GetInstance().scene->models.back());
    }
+
     numPyramid += 1;
 }
 
@@ -448,7 +453,10 @@ void Render::CreateCube()
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
-    if (Application::GetInstance().scene->octreeRoot) {
+    if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
@@ -514,7 +522,10 @@ void Render::CreateDiamond()
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
 
-    if (Application::GetInstance().scene->octreeRoot) {
+    if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
@@ -627,8 +638,10 @@ void Render::CreateSphere()
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
-
-    if (Application::GetInstance().scene->octreeRoot) {
+    if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
@@ -681,7 +694,10 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
 
 
     Application::GetInstance().scene.get()->models.push_back(model);
-    if (Application::GetInstance().scene->octreeRoot) {
+    if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
@@ -1048,6 +1064,11 @@ void  Render::OrderModels()
 //
 //        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
 //        Application::GetInstance().render->DrawAABBOutline(*selected, color);
+//
+//        std::cout << "Color: ("
+//            << color.x << ", "
+//            << color.y << ", "
+//            << color.z << ")" << std::endl;
 //
 //    }
 //

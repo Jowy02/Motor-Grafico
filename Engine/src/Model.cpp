@@ -37,9 +37,11 @@ void Model::ApplTexture(Texture* tex, std::string path)
 // Draw all meshes of the model
 void Model::Draw()
 {
+
     if (isHidden) return;
-   
+
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
+
 
     if (hasTransparency) {
         glEnable(GL_BLEND);
@@ -56,18 +58,52 @@ void Model::Draw()
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(transformMatrix));
     
-    if (Mmesh.texture)
+    /*if (Mmesh.texture)
     {
         Mmesh.texture->texUnit(shaderProgram, "tex0", 0);
         Mmesh.texture->Bind();
         GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+
         glUniform1i(useTexLoc, 1);
     }
     else
     {
         GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
         glUniform1i(useTexLoc, 0);
+    }*/
+ 
+    glm::vec4 overrideColorVec(0.0f, 0.0f, 0.0f, 0.0f); // default: no override
+
+
+    Model* selected = Application::GetInstance().menus.get()->selectedObj;
+
+    if (selected && selected == this)
+    {
+        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(minAABB, maxAABB);
+        overrideColorVec = visible ? glm::vec4(0.0f, 0.8f, 1.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+        // Forzar que no use textura cuando está seleccionado
+        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+        glUniform1i(useTexLoc, 0);
     }
+    else
+    {
+        if (Mmesh.texture)
+        {
+            Mmesh.texture->texUnit(shaderProgram, "tex0", 0);
+            Mmesh.texture->Bind();
+            GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+            glUniform1i(useTexLoc, 1);
+        }
+        else
+        {
+            GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+            glUniform1i(useTexLoc, 0);
+        }
+    }
+
+
+    //Application::GetInstance().render->FrustumModels();
 
     // Draw all meshes
     glBindVertexArray(Mmesh.VAO);
@@ -82,7 +118,7 @@ void Model::Draw()
 
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
-    
+
 
 }
 
@@ -218,16 +254,25 @@ void Model::loadModel(const std::string& path)
     center = (minAABB + maxAABB) * 0.5f;
     size = maxAABB - minAABB;
 
+    localMinAABB = minAABB;
+    localMaxAABB = maxAABB;
+
     position = { 0,0,0 };
     rotation = { 0,0,0 };
     scale = { 1,1,1 };
 
-    UpdateTransform();
-    if (Application::GetInstance().scene->octreeRoot) {
+ /*   if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
         OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
         root->Insert(&Application::GetInstance().scene->models.back());
     }
     blackWhite = new Texture("../Images/BlancoNegro.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+    UpdateTransform();
+    UpdateAABB();*/
+
 }
 void Model::processOthers(const aiScene* scene)
 {
@@ -240,6 +285,10 @@ void Model::processOthers(const aiScene* scene)
         newModel.modelId = Application::GetInstance().scene->models.size();
         newModel.center = (minAABB + maxAABB) * 0.5f;
         newModel.size = maxAABB - minAABB;
+
+        newModel.localMinAABB = newModel.minAABB;
+        newModel.localMaxAABB = newModel.maxAABB;
+
         newModel.componentID = modelId;
 
         newModel.position = { 0,0,0 };
