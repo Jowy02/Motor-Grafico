@@ -12,11 +12,13 @@
 
 #include "Texture.h"
 #include "Render.h"
+#include "Module.h"
+#include "Application.h"
 
 // Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
 
-struct ModelMesh {
+struct MMesh{
     GLuint VAO = 0, VBO = 0, EBO = 0;
     unsigned int indexCount = 0;
     Texture* texture = nullptr;
@@ -27,30 +29,26 @@ struct ModelMesh {
     std::vector<glm::vec3> positionsWorld;
 };
 
-class Model
+class Mesh : public Module
 {
 public:
+    // --- Core functions ---
+    Mesh();
+    virtual ~Mesh();
+
+    bool CleanUp() override;
+
     // --- General info ---
     std::string name;
     std::string texturePath;
     int modelId;
 
-    // --- Core functions ---
-    Model(const std::string& path);
-    void Draw();
-    void UpdateAABB();
-    void UpdateTransform();
-    void CleanUpChilds();
-    void CleanUp();
-    void ApplTexture(Texture* tex, std::string path);
     // --- Meshes ---
-    ModelMesh Mmesh;
+    MMesh Mmesh;
     gemotryMesh Normalmesh;
     gemotryMesh VertexNormalmesh;
     
     // --- Transformations ---
-    glm::mat4 transformMatrix;
-    glm::mat4 localMatrix;
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
@@ -78,40 +76,27 @@ public:
 
     // --- Textures and visibility ---
     Texture* actualTexture = nullptr;
-    void switchTexture(bool checker, std::string type);
-    bool isHidden = false;
-
-    glm::mat4 GetModelMatrix() const;
     bool hasTransparency = false;
-
-    std::vector<int> childrenID;
-    void SetChild(Model* child);
-    void eraseChild(int childId);
-
-    bool isChild = false;
-    int ParentID = -1;
-    bool parentTransform = false;
 
     int componentID = -1;
     std::string modelPath;
     bool haveComponents = false;
 
+    void loadModel(const std::string& path, GameObject* Obj);
 private:
     // --- Internal data ---
     std::string directory;
-
+    //GameObject* Obj = nullptr;
+    
     // --- Extra textures ---
     Texture* blackWhite = nullptr;
     Texture* noTexture = nullptr;
 
     // --- Model loading (Assimp) ---
-    void loadModel(const std::string& path);
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
 
     void processOthers(const aiScene* scene);
-
     std::vector<aiMesh*> otherMesh;
-    std::vector<ModelMesh> otherModel;
     int objNum = 0;
 };

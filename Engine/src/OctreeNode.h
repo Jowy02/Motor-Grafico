@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <glm/glm.hpp>
-#include "Model.h"
+#include "GameObject.h"
 #include "Frustum.h"
 #include "Render.h"
 #include "LineSegment.h"
@@ -28,12 +28,12 @@ struct OctreeNode {
         int depth = 0, int maxObjects = 8, int maxDepth = 6, Scene* scene = nullptr);
 
     void Clear();
-    bool FitsInNode(Model* m) const;
-    void Insert(Model* m);
+    bool FitsInNode(GameObject* m) const;
+    void Insert(GameObject* m);
     void Subdivide();
 
-    void CollectObjectsInFrustum(const Frustum& frustum, std::vector<Model*>& result) const;
-    void CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<Model*>& result) const;
+    void CollectObjectsInFrustum(const Frustum& frustum, std::vector<GameObject*>& result) const;
+    void CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<GameObject*>& result) const;
     void DebugDraw(Render* render) const;
 
 };

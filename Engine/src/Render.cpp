@@ -3,7 +3,7 @@
 #include "Render.h"
 #include "Texture.h"
 #include "Scene.h"
-#include "Model.h"
+#include "GameObject.h"
 #include <iostream>
 #include "Menus.h"
 
@@ -141,7 +141,7 @@ bool Render::Start()
 	return true;
 }
 
-void Render::InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount)
+void Render::InitRaycastData(GameObject& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount)
 {
     model.Mmesh.positionsLocal.clear();
     model.Mmesh.indices.clear();
@@ -167,7 +167,7 @@ void Render::InitRaycastData(Model& model, const GLfloat* vertices, int vertexCo
     
 }
 
-void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices,  int stride)
+void Render::InitRaycastDataSphere(GameObject& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices,  int stride)
 {
     model.Mmesh.positionsLocal.clear();
     model.Mmesh.indices.clear();
@@ -190,7 +190,7 @@ void Render::InitRaycastDataSphere(Model& model, const std::vector<float>& verti
     }
 }
 
-void Render::DrawAABBOutline(Model& model, glm::vec3 color)
+void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 {
     // Si no hay datos de AABB, salir
     glm::vec3 minL = model.localMinAABB;
@@ -327,7 +327,7 @@ void Render::CreatePyramid()
     int vertexCount = sizeof(vertices2) / sizeof(float);
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
   
-    Model model("NULL");
+    GameObject model("NULL");
 
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
@@ -427,7 +427,7 @@ void Render::CreateCube()
     int vertexCount = sizeof(vertices2) / sizeof(float);
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
-    Model model("NULL");
+    GameObject model("NULL");
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
@@ -494,7 +494,7 @@ void Render::CreateDiamond()
     int vertexCount = sizeof(vertices2) / sizeof(float);
     int indexCount = sizeof(indices2) / sizeof(unsigned int);
 
-    Model model("NULL");
+    GameObject model("NULL");
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
     static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
@@ -616,7 +616,7 @@ void Render::CreateSphere()
     mesh = SetBuffers(mesh, vertices, indices);
 
     // Create a model and assign mesh data
-    Model model("NULL");
+    GameObject model("NULL");
     model.Mmesh.EBO = mesh.EBO;
     model.Mmesh.VBO = mesh.VBO;
     model.Mmesh.VAO = mesh.VAO;
@@ -677,7 +677,7 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     mesh = SetBuffers(mesh, vertices, indices);
     mesh.indexCount = indices.size();
 
-    Model model("NULL");
+    GameObject model("NULL");
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;
     model.Mmesh.VBO = mesh.VBO;
@@ -749,7 +749,7 @@ void Render::ShowFaceNormals()
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
         Application::GetInstance().camera.get()->Matrix(45.0f, 0.2f, 100.0f, normalShaderProgram);
 
-        Model* selected = Application::GetInstance().menus.get()->selectedObj;
+        GameObject* selected = Application::GetInstance().menus.get()->selectedObj;
         if (selected && selected->Normalmesh.VAO != 0)
         {
             glm::mat4 modelMat = selected->GetModelMatrix();
@@ -774,7 +774,7 @@ void Render::ShowVertexNormals()
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
         Application::GetInstance().camera.get()->Matrix(45.0f, 0.2f, 100.0f, normalShaderProgram);
 
-        Model* selected = Application::GetInstance().menus.get()->selectedObj;
+        GameObject* selected = Application::GetInstance().menus.get()->selectedObj;
         if (selected && selected->Normalmesh.VAO != 0)
         {
             glm::mat4 modelMat = selected->GetModelMatrix();
@@ -977,7 +977,7 @@ gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vert
 void  Render::OrderModels()
 {
  
-    Model model("NULL");
+    GameObject model("NULL");
     auto& scene = *Application::GetInstance().scene;  // Referencia a la escena actual
     auto& models = scene.models;
 
@@ -987,7 +987,7 @@ void  Render::OrderModels()
 
     for (int i = 0; i < model.Mmesh.indexCount; ++i)
     {
-        Model& model = Application::GetInstance().scene->models[i];
+        GameObject& model = Application::GetInstance().scene->models[i];
         if (model.hasTransparency)
         {
             float distance = glm::length(cameraPos - model.position);
@@ -1032,11 +1032,11 @@ void  Render::OrderModels()
     {
         float dist = pair.first;
         int index = pair.second;
-        Model& model = models[index];
+        GameObject& model = models[index];
         if (model.hasTransparency)
         {
 
-            Model& model = models[pair.second];
+            GameObject& model = models[pair.second];
             if (model.name!="Grid")
             {
                 bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(model.minAABB, model.maxAABB);
@@ -1075,8 +1075,8 @@ void  Render::OrderModels()
 //
 //}
 void Render::FrustumModels() {
-    Model* selected = Application::GetInstance().menus.get()->selectedObj;
-    std::vector<Model*> visibleModels;
+    GameObject* selected = Application::GetInstance().menus.get()->selectedObj;
+    std::vector<GameObject*> visibleModels;
 
     if (Application::GetInstance().scene->octreeRoot) {
         Application::GetInstance().scene->octreeRoot->CollectObjectsInFrustum(

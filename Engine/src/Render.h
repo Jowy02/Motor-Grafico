@@ -14,7 +14,7 @@
 #include <vector>
 #include <cmath>
 
-class Model;
+class GameObject;
 
 // Simple mesh structure for GPU buffers
 struct gemotryMesh
@@ -62,8 +62,8 @@ public:
     std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(  const GLfloat* vertices,  const GLuint* indices, const std::vector<glm::vec3>& vertexNormals ,int vertexCount, int indexCount);
  
 
-    void InitRaycastData(Model& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount);
-    void InitRaycastDataSphere(Model& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int stride = 8);
+    void InitRaycastData(GameObject& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount);
+    void InitRaycastDataSphere(GameObject& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int stride = 8);
 
 
     void OrderModels();
@@ -81,7 +81,7 @@ public:
     unsigned int sobelProgram = 0;    // postprocess sobel program (uses quad vertex shader)
 
 
-    void DrawAABBOutline(Model& model, glm::vec3 color= glm::vec3(0.0f, 0.8f, 1.0f));
+    void DrawAABBOutline(GameObject& model, glm::vec3 color= glm::vec3(0.0f, 0.8f, 1.0f));
 
 private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers

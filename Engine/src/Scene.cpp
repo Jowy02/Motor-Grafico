@@ -6,7 +6,7 @@
 
 #include "Window.h"
 #include "Scene.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Input.h"
 #include <iostream> 
 
@@ -68,7 +68,7 @@ void Scene::LoadFBX(const std::string& path)
             std::filesystem::copy_options::update_existing);
         Application::GetInstance().menus.get()->init = true;
     }
-    Model model(dest);
+    GameObject model(dest);
     //Model model(path.c_str());
     model.modelId = models.size();
     models.push_back(model);
@@ -146,7 +146,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
     }
 
 }
-void Scene::SelectObject(Model* obj)
+void Scene::SelectObject(GameObject* obj)
 {
     auto* menus = Application::GetInstance().menus.get();
 
@@ -218,7 +218,7 @@ bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, c
 
 void Scene::Raycast(const LineSegment& ray)
 {
-    std::vector<Model*> hitModels;
+    std::vector<GameObject*> hitModels;
     if (octreeRoot) {
         octreeRoot->CollectObjectsHitByRay(ray, this, hitModels);
 
@@ -227,7 +227,7 @@ void Scene::Raycast(const LineSegment& ray)
 
     }
     float closestT = FLT_MAX;
-    Model* selected = nullptr;
+    GameObject* selected = nullptr;
 
     for (auto* model : hitModels) {
         for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
@@ -414,14 +414,13 @@ void Scene::LoadScene(std::string filePath)
                 model.CleanUpChilds();
                 auto& sceneModels = models;
                 sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const Model& m) { return &m == &models[model.modelId]; }), sceneModels.end());
+                    [&](const GameObject& m) { return &m == &models[model.modelId]; }), sceneModels.end());
 
                 if (models.size() <= 1) {
                     deleteScene = false;
                     break;
                 }
                 Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
-
             }
         }
     }

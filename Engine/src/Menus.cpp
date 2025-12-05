@@ -2,7 +2,7 @@
 #include "Render.h"
 #include "Window.h"
 #include "Scene.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Menus.h"
 #include "Input.h"
 
@@ -296,7 +296,7 @@ void Menus::Hierarchy_Menu()
     ImGui::End();
 }
 
-void Menus::DrawGameObjectNode(Model* obj)
+void Menus::DrawGameObjectNode(GameObject* obj)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
 
@@ -324,7 +324,7 @@ void Menus::DrawGameObjectNode(Model* obj)
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("OBJECT_NODE"))
         {
-            Model* draggedObj = *(Model**)payload->Data;
+            GameObject* draggedObj = *(GameObject**)payload->Data;
             if (draggedObj != obj && draggedObj->ParentID != obj->modelId)
             {
                 obj->SetChild(draggedObj);
@@ -407,7 +407,7 @@ void Menus::DrawInspector()
                 int id = selectedObj->modelId;
                 auto& sceneModels = Application::GetInstance().scene->models;
                 sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const Model& m) { return &m == selectedObj; }), sceneModels.end());
+                    [&](const GameObject& m) { return &m == selectedObj; }), sceneModels.end());
 
                 for (id; id < Application::GetInstance().scene.get()->models.size();id++)
                 {

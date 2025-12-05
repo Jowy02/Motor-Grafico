@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Texture.h"
 #include "LineSegment.h"
 #include "ImGuizmo.h"
@@ -44,13 +44,13 @@ public:
     bool RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
     bool RayIntersectsAABB(const LineSegment& ray, const glm::vec3& min, const glm::vec3& max, float& t);
     void Raycast(const LineSegment& ray);
-    void SelectObject(Model* obj);
+    void SelectObject(GameObject* obj);
 
     void SaveScene(std::string filePath);
     void LoadScene(std::string filePath);
 
     // --- Scene content ---
-    std::vector<Model> models;
+    std::vector<GameObject> models;
     GizmoOperation currentGizmo = GizmoOperation::TRANSLATE;
 
     void ImGuizmo();

@@ -15,20 +15,20 @@ void OctreeNode::Clear() {
     }
 }
 
-bool OctreeNode::FitsInNode(Model* m) const {
+bool OctreeNode::FitsInNode(GameObject* m) const {
     return !(m->maxAABB.x < min.x || m->minAABB.x > max.x ||
         m->maxAABB.y < min.y || m->minAABB.y > max.y ||
         m->maxAABB.z < min.z || m->minAABB.z > max.z);
 }
 
 
-static bool IntersectsBox(const glm::vec3& nodeMin, const glm::vec3& nodeMax, const Model* m) {
+static bool IntersectsBox(const glm::vec3& nodeMin, const glm::vec3& nodeMax, const GameObject* m) {
     return !(m->maxAABB.x < nodeMin.x || m->minAABB.x > nodeMax.x ||
         m->maxAABB.y < nodeMin.y || m->minAABB.y > nodeMax.y ||
         m->maxAABB.z < nodeMin.z || m->minAABB.z > nodeMax.z);
 }
 
-void OctreeNode::Insert(Model* m) {
+void OctreeNode::Insert(GameObject* m) {
     // si el objeto no intersecta este nodo, ignorar
     if (!IntersectsBox(min, max, m)) return;
 
@@ -73,7 +73,7 @@ void OctreeNode::Subdivide() {
 
     std::vector<int> keepHere;
     for (int objId : objects) {
-        Model* obj = &scene->models[objId];
+        GameObject* obj = &scene->models[objId];
         bool moved = false;
         for (int i = 0; i < 8; ++i) {
             auto& c = children[i];
@@ -93,11 +93,11 @@ void OctreeNode::Subdivide() {
 
 
 
-void OctreeNode::CollectObjectsInFrustum(const Frustum& frustum, std::vector<Model*>& result) const {
+void OctreeNode::CollectObjectsInFrustum(const Frustum& frustum, std::vector<GameObject*>& result) const {
     if (!frustum.IsBoxVisible(min, max)) return;
 
     for (int objId : objects) {
-        Model* obj = &scene->models[objId]; // necesitas pasar scene
+        GameObject* obj = &scene->models[objId]; // necesitas pasar scene
         if (frustum.IsBoxVisible(obj->minAABB, obj->maxAABB) && std::find(result.begin(), result.end(), obj) == result.end())
             result.push_back(obj);
     }
@@ -109,7 +109,7 @@ void OctreeNode::CollectObjectsInFrustum(const Frustum& frustum, std::vector<Mod
         if (children[i]) children[i]->CollectObjectsInFrustum(frustum, result);
 }
 
-void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<Model*>& result) const {
+void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<GameObject*>& result) const {
     float t;
     if (!scene->RayIntersectsAABB(ray, min, max, t)) return;
 
@@ -117,7 +117,7 @@ void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, st
 
     for (int id : objects) {
         if (id < 0 || id >= (int)scene->models.size()) continue; // seguridad
-        Model* obj = &scene->models[id];
+        GameObject* obj = &scene->models[id];
         float tobj;
         if (scene->RayIntersectsAABB(ray, obj->minAABB, obj->maxAABB, tobj)) {
             std::cout << "  hit obj " << obj->name << " t=" << tobj << "\n";
@@ -132,7 +132,7 @@ void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, st
 
 void OctreeNode::DebugDraw(Render* render) const {
     for (int objId : objects) {
-        Model* obj = &scene->models[objId];
+        GameObject* obj = &scene->models[objId];
         render->DrawAABBOutline(*obj);
     }
 

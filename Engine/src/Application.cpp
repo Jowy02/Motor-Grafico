@@ -4,6 +4,7 @@
 #include "Render.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Mesh.h"
 #include "Menus.h"
 
 // Constructor
@@ -15,10 +16,13 @@ Application::Application()
     scene = std::make_shared<Scene>();
     camera = std::make_shared<Camera>();
     menus = std::make_shared<Menus>();
+    mesh = std::make_shared<Mesh>();
+
     // Ordered for awake / Start / Update // Reverse order of CleanUp
     AddModule(std::static_pointer_cast<Module>(window));
     AddModule(std::static_pointer_cast<Module>(input));
     AddModule(std::static_pointer_cast<Module>(menus));
+    AddModule(std::static_pointer_cast<Module>(mesh));
     AddModule(std::static_pointer_cast<Module>(scene));
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));

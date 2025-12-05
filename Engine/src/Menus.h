@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Module.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Texture.h"
 #include <vector>
 #include <string>
@@ -34,10 +34,10 @@ public:
 
     // --- Scene / Hierarchy ---
     void Hierarchy_Menu();
-    void DrawGameObjectNode(Model* model);
+    void DrawGameObjectNode(GameObject* model);
     void DrawInspector();
     void DrawResourceManager();
-    Model* selectedObj = nullptr;
+    GameObject* selectedObj = nullptr;
 
     // --- System Info ---
     float GetRAMUsageMB();
@@ -56,7 +56,7 @@ public:
     bool init = true;
 
 private:
-    std::vector<Model> models;           // Loaded models
+    std::vector<GameObject> models;           // Loaded models
     std::vector<Texture*> textures;           // Loaded models
     std::vector<float> fpsHistory;       // FPS history for graphs
 
