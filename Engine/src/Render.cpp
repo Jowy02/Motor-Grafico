@@ -197,7 +197,6 @@ void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
     glm::vec3 maxL = model.localMaxAABB;
     if (minL == glm::vec3(FLT_MAX) && maxL == glm::vec3(-FLT_MAX)) return;
 
-    // 8 esquinas en espacio local
     glm::vec3 cornersLocal[8] = {
         {minL.x, minL.y, minL.z},
         {maxL.x, minL.y, minL.z},
@@ -209,27 +208,17 @@ void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
         {minL.x, maxL.y, maxL.z}
     };
 
-    //// Transformar esquinas a la matriz del modelo
-    glm::mat4 modelMat = model.GetModelMatrix();
-    std::vector<glm::vec3> cornersWorld(8);
-    for (int i = 0; i < 8; ++i) {
-        glm::vec4 w = modelMat * glm::vec4(cornersLocal[i], 1.0f);
-        cornersWorld[i] = glm::vec3(w);
-    }
-
-    //// Aristas del cubo
     const int edgeIndexPairs[12][2] = {
-        {0,1},{1,2},{2,3},{3,0}, // bottom face
-        {4,5},{5,6},{6,7},{7,4}, // top face
-        {0,4},{1,5},{2,6},{3,7}  // vertical edges
+        {0,1},{1,2},{2,3},{3,0},
+        {4,5},{5,6},{6,7},{7,4},
+        {0,4},{1,5},{2,6},{3,7}
     };
 
-    // Crear array de posiciones (vertices)
     std::vector<glm::vec3> lineVerts;
     lineVerts.reserve(24);
     for (int e = 0; e < 12; ++e) {
-        lineVerts.push_back(cornersWorld[edgeIndexPairs[e][0]]);
-        lineVerts.push_back(cornersWorld[edgeIndexPairs[e][1]]);
+        lineVerts.push_back(cornersLocal[edgeIndexPairs[e][0]]);
+        lineVerts.push_back(cornersLocal[edgeIndexPairs[e][1]]);
     }
 
     GLuint tmpVAO = 0, tmpVBO = 0;
@@ -242,35 +231,51 @@ void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-    
+
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+
     glUseProgram(shaderProgram);
 
     Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
 
+    glm::mat4 modelMat = model.GetModelMatrix();
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
-    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat)); //Matriz de la figura
 
-    glVertexAttrib4f(1, color.r, color.g, color.b, 1);
+    GLint overrideColorLoc = glGetUniformLocation(shaderProgram, "overrideColor");
+    if (overrideColorLoc != -1)
+    {
+        glm::vec4 overrideColor(color.r, color.g, color.b, 1.0f);
+        glUniform4fv(overrideColorLoc, 1, glm::value_ptr(overrideColor));
+    }
+
+    GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+    if (useTexLoc != -1) glUniform1i(useTexLoc, 0);
+
     glLineWidth(3.0f);
-
-    glEnable(GL_POLYGON_OFFSET_FILL);
+    glEnable(GL_POLYGON_OFFSET_LINE);
     glPolygonOffset(-1.0f, -1.0f);
 
     glBindVertexArray(tmpVAO);
     glDrawArrays(GL_LINES, 0, (GLsizei)lineVerts.size());
     glBindVertexArray(0);
 
-    glPolygonOffset(0.0f, 0.0f);
-    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_POLYGON_OFFSET_LINE);
     glLineWidth(1.0f);
 
-    glVertexAttrib4f(1, 0.0f, 0.0f, 0.0f, 0.0f);
+    if (overrideColorLoc != -1)
+    {
+        glm::vec4 resetColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glUniform4fv(overrideColorLoc, 1, glm::value_ptr(resetColor));
+    }
 
     glDisableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &tmpVBO);
     glDeleteVertexArrays(1, &tmpVAO);
 }
+
 bool Render::PreUpdate()
 {
 
