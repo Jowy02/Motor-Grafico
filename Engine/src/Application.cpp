@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Menus.h"
-
+#include "SimulationController.h"
 // Constructor
 Application::Application() 
 {
@@ -17,6 +17,7 @@ Application::Application()
     camera = std::make_shared<Camera>();
     menus = std::make_shared<Menus>();
     mesh = std::make_shared<Mesh>();
+    simulationController = std::make_shared<SimulationController>();
 
     // Ordered for awake / Start / Update // Reverse order of CleanUp
     AddModule(std::static_pointer_cast<Module>(window));
@@ -26,6 +27,7 @@ Application::Application()
     AddModule(std::static_pointer_cast<Module>(scene));
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));
+    AddModule(std::static_pointer_cast<Module>(simulationController));
 }
 
 // Static method to get the instance of the Engine class, following the singletn pattern
@@ -139,6 +141,7 @@ bool Application::PreUpdate()
 // Call modules on each loop iteration
 bool Application::DoUpdate()
 {
+    float gameDeltaTime = simulationController->GetGameDeltaTime(dt);
     bool result = true;
     for (const auto& module : moduleList) 
     {

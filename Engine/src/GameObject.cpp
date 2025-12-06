@@ -75,37 +75,6 @@ void GameObject::Draw()
  
     glm::vec4 overrideColorVec(0.0f, 0.0f, 0.0f, 0.0f); // default: no override
 
-
-    //Model* selected = Application::GetInstance().menus.get()->selectedObj;
-
-    //if (selected && selected == this)
-    //{
-    //    bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(minAABB, maxAABB);
-    //    overrideColorVec = visible ? glm::vec4(0.0f, 0.8f, 1.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-    //    // Forzar que no use textura cuando está seleccionado
-    //    GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-    //    glUniform1i(useTexLoc, 0);
-    //}
-    //else
-    //{
-    //    if (Mmesh.texture)
-    //    {
-    //        Mmesh.texture->texUnit(shaderProgram, "tex0", 0);
-    //        Mmesh.texture->Bind();
-    //        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-    //        glUniform1i(useTexLoc, 1);
-    //    }
-    //    else
-    //    {
-    //        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
-    //        glUniform1i(useTexLoc, 0);
-    //    }
-    //}
-
-
-    //Application::GetInstance().render->FrustumModels();
-
     // Draw all meshes
     glBindVertexArray(Mmesh.VAO);
 
@@ -322,6 +291,26 @@ void  GameObject::CleanUpChilds()
         }
     }   
 }
+
+void GameObject::SaveInitialState() {
+    initial_position = position;
+    initial_rotation = rotation;
+    initial_scale = scale;
+    initial_isHidden = isHidden;
+    initial_texturePath = texturePath;
+    created_in_play = false;
+}
+
+void GameObject::LoadInitialState() {
+    position = initial_position;
+    rotation = initial_rotation;
+    scale = initial_scale;
+    isHidden = initial_isHidden;
+
+    UpdateTransform();
+
+}
+
 void GameObject::CleanUp()
 {
     if (Mmesh.VAO != 0)

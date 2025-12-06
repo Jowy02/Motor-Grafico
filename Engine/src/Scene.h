@@ -59,6 +59,7 @@ public:
 
     void BuildOctree();
     std::unique_ptr<OctreeNode> octreeRoot;
+
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

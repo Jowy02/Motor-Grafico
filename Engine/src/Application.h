@@ -19,7 +19,7 @@ class Render;
 class Scene;
 class Menus;
 class Mesh;
-
+class SimulationController;
 
 class Application
 {
@@ -75,7 +75,7 @@ public:
     std::shared_ptr<Camera> camera;
     std::shared_ptr<Menus> menus;
     std::shared_ptr<Mesh> mesh;
-
+    std::shared_ptr<SimulationController> simulationController;
     bool requestExit = false;
 
 private:

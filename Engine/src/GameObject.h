@@ -44,6 +44,12 @@ public:
     void CleanUp();
     void ApplTexture(Texture* tex, std::string path);
 
+    //Play, Stop, Puase
+    bool IsCreatedInPlay() const { return created_in_play; }
+    void SetCreatedInPlay(bool value) { created_in_play = value; }
+    void SaveInitialState();
+    void LoadInitialState();
+
     // --- Meshes ---
     ModelMesh Mmesh;
     gemotryMesh Normalmesh;
@@ -107,4 +113,12 @@ private:
 
     // --- Model loading (Assimp) ---
     void loadModel(const std::string& path);
+
+    //Play, Stop, Puase
+    glm::vec3 initial_position;
+    glm::vec3 initial_rotation;
+    glm::vec3 initial_scale;
+    bool initial_isHidden = false;
+    std::string initial_texturePath;
+    bool created_in_play = false;
 };
