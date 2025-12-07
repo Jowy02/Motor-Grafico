@@ -33,7 +33,16 @@ void GameObject::ApplTexture(Texture* tex, std::string path)
     Mmesh.texture = tex;
     actualTexture = tex;
     texturePath = path;
-    hasTransparency = tex->hasAlpha;
+    //hasTransparency = tex->hasAlpha;
+
+    if (tex != nullptr)
+    {
+        hasTransparency = tex->hasAlpha;
+    }
+    else
+    {
+        hasTransparency = false;
+    }
 }
 // Draw all meshes of the model
 void GameObject::Draw()
@@ -297,7 +306,7 @@ void GameObject::SaveInitialState() {
     initial_rotation = rotation;
     initial_scale = scale;
     initial_isHidden = isHidden;
-    //initial_texturePath = texturePath;
+    initial_texturePath = texturePath;
     created_in_play = false;
     initial_modelPath = modelPath;
     initial_ParentID = ParentID;
@@ -309,7 +318,7 @@ void GameObject::LoadInitialState() {
     scale = initial_scale;
     isHidden = initial_isHidden;
     modelPath = initial_modelPath;
-    
+    texturePath = initial_texturePath;
     UpdateTransform();
 
 }

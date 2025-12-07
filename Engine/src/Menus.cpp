@@ -218,38 +218,6 @@ void Menus::DrawSimulationToolbar()
     }
 
     if (stopDisabled) ImGui::EndDisabled();
-//    ImGui::Begin("##SimulationToolbar", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize);
-//
-//    SimulationController* simController = Application::GetInstance().simulationController.get();
-//    GameState currentState = simController->GetState();
-//
-//    if (currentState == GameState::STOPPED || currentState == GameState::PAUSED) {
-//        if (ImGui::Button("PLAY")) {
-//            simController->Play();
-//            Application::GetInstance().menus->LogToConsole("Simulation Started/Resumed");
-//        }
-//    }
-//    // Si está corriendo -> mostrar PAUSE
-//    else if (currentState == GameState::RUNNING) {
-//        if (ImGui::Button("PAUSE")) {
-//            simController->Pause();
-//            Application::GetInstance().menus->LogToConsole("Simulation Paused");
-//        }
-//    }
-//
-//    ImGui::SameLine();
-//
-//    bool stopDisabled = currentState == GameState::STOPPED;
-//    if (stopDisabled) ImGui::BeginDisabled();
-//
-//    if (ImGui::Button("STOP")) {
-//        simController->Stop();
-//        Application::GetInstance().menus->LogToConsole("Simulation Stopped and Reset");
-//    }
-//
-//    if (stopDisabled) ImGui::EndDisabled();
-//
-//    ImGui::End();
 }
 
 void Menus::BuildDockSpace() 
@@ -485,7 +453,10 @@ void Menus::DrawInspector()
                 }
                 selectedObj = nullptr;
                 Application::GetInstance().scene->BuildOctree();
+                if (Application::GetInstance().simulationController->GetState() == GameState::STOPPED) {
+                    Application::GetInstance().simulationController.get()->SaveInitialSceneState();
 
+                }
             }
         }
     }
@@ -526,6 +497,19 @@ void Menus::LoadTextures()
     }
     init = false;
 }
+
+Texture* Menus::GetLoadedTexture(const std::string& path)
+{
+    for (Texture* tex : textures)
+    {
+        if (tex->textPath == path)
+        {
+            return tex; 
+        }
+    }
+    return nullptr; // No encontrada.
+}
+
 void Menus::LoadFbx()
 {
     WIN32_FIND_DATAA data;

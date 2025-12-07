@@ -38,10 +38,11 @@ public:
     GameState GetState() const { return currentState; }
     float GetGameDeltaTime(float realDeltaTime) const;
 
+    void SaveInitialSceneState();
+
 private:
     GameState currentState;
 
-    void SaveInitialSceneState();
     void LoadInitialSceneState();
 
     std::vector<InitialGameObjectData> savedSceneBlueprints;

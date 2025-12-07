@@ -55,6 +55,8 @@ public:
     void LoadTextures();
     bool init = true;
 
+    Texture* GetLoadedTexture(const std::string& path);
+
     void DrawSimulationToolbar();
 private:
     std::vector<GameObject> models;           // Loaded models

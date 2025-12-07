@@ -651,6 +651,26 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
 
     GameObject& newObj = *newObjPtr;
 
+    //Texture
+    std::string initialTexturePath = blueprint.texturePath;
+
+    if (!initialTexturePath.empty()) {
+        Texture* tex = Application::GetInstance().menus->GetLoadedTexture(initialTexturePath);
+
+        if (!tex) {
+            Application::GetInstance().menus->LogToConsole("Advertencia: Recargando textura: " + initialTexturePath);
+            tex = new Texture(initialTexturePath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+        }
+
+        newObj.ApplTexture(tex, initialTexturePath);
+    }
+    else {
+        newObj.ApplTexture(nullptr, "");
+
+        //newObj.Mmesh.texture = nullptr;
+        //newObj.actualTexture = nullptr;
+    }
+
     newObj.name = blueprint.name;
     newObj.position = blueprint.pos;
     newObj.rotation = blueprint.rot;
