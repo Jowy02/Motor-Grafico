@@ -7,6 +7,7 @@
 #include "ImGuizmo.h"
 #include "Frustum.h"
 #include "OctreeNode.h"
+#include "SimulationController.h"
 
 #include <vector>
 #include <string>
@@ -60,6 +61,7 @@ public:
     void BuildOctree();
     std::unique_ptr<OctreeNode> octreeRoot;
 
+    void RecreateGameObject(const InitialGameObjectData& blueprint);
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

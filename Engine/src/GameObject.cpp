@@ -297,8 +297,10 @@ void GameObject::SaveInitialState() {
     initial_rotation = rotation;
     initial_scale = scale;
     initial_isHidden = isHidden;
-    initial_texturePath = texturePath;
+    //initial_texturePath = texturePath;
     created_in_play = false;
+    initial_modelPath = modelPath;
+    initial_ParentID = ParentID;
 }
 
 void GameObject::LoadInitialState() {
@@ -306,9 +308,45 @@ void GameObject::LoadInitialState() {
     rotation = initial_rotation;
     scale = initial_scale;
     isHidden = initial_isHidden;
-
+    modelPath = initial_modelPath;
+    
     UpdateTransform();
 
+}
+
+glm::vec3 GameObject::GetInitialPosition() const
+{
+    return initial_position;
+}
+
+glm::vec3 GameObject::GetInitialRotation() const
+{
+    return initial_rotation;
+}
+
+glm::vec3 GameObject::GetInitialScale() const
+{
+    return initial_scale;
+}
+
+std::string GameObject::GetInitialTexturePath() const
+{
+    return initial_texturePath;
+}
+
+bool GameObject::GetInitialIsHidden() const
+{
+    return initial_isHidden;
+}
+
+int GameObject::GetInitialParentID() const
+{
+    return initial_ParentID;
+}
+
+void GameObject::SetInitialParentID(int id)
+{
+    initial_ParentID = id;
 }
 
 void GameObject::CleanUp()

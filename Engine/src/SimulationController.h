@@ -1,7 +1,23 @@
 #pragma once
 
 #include "Module.h" 
+#include "Menus.h" 
 #include "glm/glm.hpp"
+#include <vector>
+#include <string>
+
+struct InitialGameObjectData
+{
+    std::string modelPath;
+    glm::vec3 pos;
+    glm::vec3 rot;
+    glm::vec3 scale;
+    std::string texturePath; // Agregamos la textura
+    bool isHidden;
+    int parentID; // Para restaurar la jerarquía
+    std::string name;
+    int modelId;
+};
 
 enum class GameState {
     STOPPED, 
@@ -27,4 +43,7 @@ private:
 
     void SaveInitialSceneState();
     void LoadInitialSceneState();
+
+    std::vector<InitialGameObjectData> savedSceneBlueprints;
+
 };

@@ -336,7 +336,7 @@ void Render::CreatePyramid()
 
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
-    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+    gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;
@@ -435,7 +435,7 @@ void Render::CreateCube()
     GameObject model("NULL");
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
-    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+    gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;
@@ -502,7 +502,7 @@ void Render::CreateDiamond()
     GameObject model("NULL");
     InitRaycastData(model, vertices2, vertexCount, indices2, indexCount);
 
-    static gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
+    gemotryMesh mesh = Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 60.0f);
 
     model.Mmesh.VAO = mesh.VAO;
     model.Mmesh.EBO = mesh.EBO;

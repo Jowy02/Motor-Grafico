@@ -602,3 +602,65 @@ bool Scene::CleanUp()
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
 	return true;
 }
+
+// Scene.cpp
+
+void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
+{
+    GameObject* newObjPtr = nullptr;
+
+    // 1. 🏗️ CREACIÓN DE LA GEOMETRÍA (Crea el objeto y sus buffers de OpenGL)
+
+    if (blueprint.modelPath.empty() || blueprint.modelPath == "")
+    {
+        // Es una primitiva (Cube, Pyramid, etc.)
+        // 🚩 LLAMADA CLAVE: Usamos las funciones del Render para crear la malla y añadir el objeto al vector 'models'.
+        if (blueprint.name.find("Cube") != std::string::npos) {
+            Application::GetInstance().render.get()->CreateCube();
+        }
+        else if (blueprint.name.find("Pyramid") != std::string::npos) {
+            Application::GetInstance().render.get()->CreatePyramid();
+        }
+        else if (blueprint.name.find("Sphere") != std::string::npos) {
+            Application::GetInstance().render.get()->CreateSphere();
+        }
+        else if (blueprint.name.find("Diamond") != std::string::npos) {
+            Application::GetInstance().render.get()->CreateDiamond();
+        }
+        else if (blueprint.name.find("Grid") != std::string::npos) {
+          // Application::GetInstance().render.get()->CreateGrid(100,20);
+           //blueprint.parentID = 0;
+        }
+
+        if (!models.empty()) {
+            newObjPtr = &models.back();
+        }
+    }
+    else 
+    {
+        GameObject newObj(blueprint.modelPath);
+        models.push_back(newObj); 
+        newObjPtr = &models.back();         
+
+    }
+
+    if (!newObjPtr) {
+        Application::GetInstance().menus->LogToConsole("ERROR: Failed to recreate GameObject: " + blueprint.name);
+        return;
+    }
+
+    GameObject& newObj = *newObjPtr;
+
+    newObj.name = blueprint.name;
+    newObj.position = blueprint.pos;
+    newObj.rotation = blueprint.rot;
+    newObj.scale = blueprint.scale;
+    newObj.isHidden = blueprint.isHidden;
+
+
+    newObj.modelId = models.size() - 1;
+    newObj.SetInitialParentID(blueprint.parentID);
+
+    newObj.UpdateTransform(); 
+
+}

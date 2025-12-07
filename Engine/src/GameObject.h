@@ -50,6 +50,14 @@ public:
     void SaveInitialState();
     void LoadInitialState();
 
+    glm::vec3 GetInitialPosition() const;
+    glm::vec3 GetInitialRotation() const;
+    glm::vec3 GetInitialScale() const;
+    std::string GetInitialTexturePath() const;
+    bool GetInitialIsHidden() const;
+    int GetInitialParentID() const;
+    void SetInitialParentID(int id);
+
     // --- Meshes ---
     ModelMesh Mmesh;
     gemotryMesh Normalmesh;
@@ -121,4 +129,7 @@ private:
     bool initial_isHidden = false;
     std::string initial_texturePath;
     bool created_in_play = false;
+
+    std::string initial_modelPath;
+    int initial_ParentID = -1;
 };
