@@ -522,7 +522,7 @@ void Menus::LoadFbx()
                 continue;
             fileName = data.cFileName;
 
-            if (fileName.substr(fileName.size() - 4) == ".fbx" ) {
+            if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
                 for (auto& files : fbxFiles)
                 {
                     std::string TempfileName = "../Library/FBX/" + fileName;

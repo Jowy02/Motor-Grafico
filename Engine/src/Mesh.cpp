@@ -306,14 +306,19 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
         aiString path;
         if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
         {
+          
             std::string filename = std::string(path.C_Str());
 
-            // Normalize backslashes
-            std::replace(filename.begin(), filename.end(), '\\', '/');
+            std::string materialName = filename.substr(filename.find_last_of("/\\") + 1);
+            materialName = materialName.substr(0, name.find_last_of('.'));
+            filename = "../Library/Images/" + materialName;
 
-            // If the texture path is not absolute, prepend the model directory
-            if (filename[0] != '/' && !(filename.length() > 1 && filename[1] == ':'))
-                filename = directory + "/" + filename;
+            //// Normalize backslashes
+            //std::replace(filename.begin(), filename.end(), '\\', '/');
+
+            //// If the texture path is not absolute, prepend the model directory
+            //if (filename[0] != '/' && !(filename.length() > 1 && filename[1] == ':'))
+            //    filename = directory + "/" + filename;
 
             std::cout << "Loading texture from material: " << filename << std::endl;
 
