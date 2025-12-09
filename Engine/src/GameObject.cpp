@@ -378,3 +378,28 @@ void GameObject::CleanUp()
     actualTexture = nullptr;
     blackWhite = nullptr;
 }
+
+void GameObject::RecreateBuffers() {
+    if (Mmesh.VAO != 0) glDeleteVertexArrays(1, &Mmesh.VAO);
+    if (Mmesh.VBO != 0) glDeleteBuffers(1, &Mmesh.VBO);
+    if (Mmesh.EBO != 0) glDeleteBuffers(1, &Mmesh.EBO);
+
+    glGenVertexArrays(1, &Mmesh.VAO);
+    glGenBuffers(1, &Mmesh.VBO);
+    glGenBuffers(1, &Mmesh.EBO);
+
+    glBindVertexArray(Mmesh.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, Mmesh.VBO);
+    glBufferData(GL_ARRAY_BUFFER, Mmesh.positionsLocal.size() * sizeof(glm::vec3),
+        Mmesh.positionsLocal.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mmesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mmesh.indices.size() * sizeof(unsigned int),
+        Mmesh.indices.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glBindVertexArray(0);
+}

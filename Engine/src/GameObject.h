@@ -111,6 +111,7 @@ public:
     std::string modelPath;
     bool haveComponents = false;
 
+    void GameObject::RecreateBuffers();
 private:
     // --- Internal data ---
     std::string directory;

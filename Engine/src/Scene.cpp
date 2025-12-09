@@ -31,7 +31,7 @@ Scene::~Scene()
 
 bool Scene::Awake()
 {
-	return true;
+    return true;
 }
 
 bool Scene::Start()
@@ -56,10 +56,10 @@ bool Scene::Start()
 //    images.push_back(tex);
 //}
     BuildOctree();
-	return true;
+    return true;
 }
 
-void Scene::LoadFBX(const std::string& path) 
+void Scene::LoadFBX(const std::string& path)
 {
     std::string dest = "../Library/FBX/" + std::filesystem::path(path).filename().string();
     int cntModels = models.size();
@@ -76,8 +76,8 @@ void Scene::LoadFBX(const std::string& path)
     models.push_back(model);
     BuildOctree();
 
-    for (cntModels; cntModels < models.size();cntModels++)
-    {   
+    for (cntModels; cntModels < models.size(); cntModels++)
+    {
         dest = "../Library/Meshes/" + models[cntModels].name + ".txt";
         Application::GetInstance().scene.get()->SaveMesh(dest, models[cntModels]);
     }
@@ -123,7 +123,7 @@ void Scene::BuildOctree() {
 }
 
 
-void Scene::ApplyTextureToSelected(const std::string& path) 
+void Scene::ApplyTextureToSelected(const std::string& path)
 {
     auto selected = Application::GetInstance().menus.get()->selectedObj;
     if (selected)
@@ -139,7 +139,7 @@ void Scene::ApplyTextureToSelected(const std::string& path)
 
         for (auto& model : models)
         {
-            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId) 
+            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId)
                 Application::GetInstance().menus.get()->selectedObj->ApplTexture(tex, path);
         }
     }
@@ -166,7 +166,7 @@ void Scene::SelectObject(GameObject* obj)
 
 }
 
-bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0,const glm::vec3& v1,const glm::vec3& v2, float& t)
+bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t)
 {
     const float EPSILON = 1e-8f;
     glm::vec3 dir = ray.Direction();
@@ -264,7 +264,7 @@ bool Scene::PreUpdate()
 }
 
 void Scene::ImGuizmo() {
-    if (selected && Application::GetInstance().input->click && Application::GetInstance().menus->selectedObj !=NULL) {
+    if (selected && Application::GetInstance().input->click && Application::GetInstance().menus->selectedObj != NULL) {
         auto* menus = Application::GetInstance().menus.get();
 
         ImGuizmo::BeginFrame();
@@ -349,7 +349,7 @@ bool Scene::Update(float dt)
     //}
     ImGuizmo();
 
-	return true;
+    return true;
 }
 void Scene::SaveMesh(std::string filePath, GameObject model)
 {
@@ -359,7 +359,7 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
     file << "Mesh:\n";
 
     file << "{" << "\n";
-    file << "VAO: " << model.Mmesh.VAO<< "\n";
+    file << "VAO: " << model.Mmesh.VAO << "\n";
     file << "VBO: " << model.Mmesh.VBO << "\n";
     file << "EBO: " << model.Mmesh.EBO << "\n";
     file << "IndexCount: " << model.Mmesh.indexCount << "\n";
@@ -424,6 +424,21 @@ void Scene::SaveScene(std::string filePath)
 }
 void Scene::LoadScene(std::string filePath)
 {
+
+    if (!models.empty()) {
+        GameObject grid = models.front(); // Guarda la Grid (asumiendo índice 0)
+        models.clear();                   // Borra todos los objetos
+        models.push_back(grid);           // Reinserta la Grid
+
+        // Limpia y resetea el Octree
+        if (octreeRoot) {
+            octreeRoot->Clear();
+            octreeRoot.reset();
+        }
+
+        Application::GetInstance().menus.get()->selectedObj = nullptr;
+    }
+
     //"../Library/FBX/Scene.txt"
     std::ifstream file(filePath);
     if (!file.is_open()) return;
@@ -439,8 +454,8 @@ void Scene::LoadScene(std::string filePath)
         for (int i = models.size() - 1; i >= 0; --i) {
             auto& model = models[i];
 
-            if(model.name != "Grid")
-            { 
+            if (model.name != "Grid")
+            {
                 Application::GetInstance().menus.get()->selectedObj = nullptr;
 
                 if (model.isChild) models[model.ParentID].eraseChild(model.modelId);
@@ -459,7 +474,7 @@ void Scene::LoadScene(std::string filePath)
     }
 
     if (!deleteScene)
-    { 
+    {
         while (std::getline(file, line)) {
             if (line == "{") {
                 insideObject = true;
@@ -476,90 +491,90 @@ void Scene::LoadScene(std::string filePath)
                     std::getline(iss, value);
                     // limpiar espacios
                     if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-                   
-                        if (key == "Name") {
-                            if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
-                                Application::GetInstance().render.get()->CreateCube();
-                                UID = models.size() - 1;
 
-                            }
-                            else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
-                                Application::GetInstance().render.get()->CreatePyramid();
-                                UID = models.size() - 1;
+                    if (key == "Name") {
+                        if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
+                            Application::GetInstance().render.get()->CreateCube();
+                            UID = models.size() - 1;
 
-                            }
-                            else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
-                                Application::GetInstance().render.get()->CreateSphere();
-                                UID = models.size() - 1;
-
-                            }
-                            else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
-                                Application::GetInstance().render.get()->CreateDiamond();
-                                UID = models.size() - 1;
-
-                            }
                         }
-                        if (key == "Path")
+                        else if (value.size() >= 7 && value.substr(0, 7) == "Pyramid") {
+                            Application::GetInstance().render.get()->CreatePyramid();
+                            UID = models.size() - 1;
+
+                        }
+                        else if (value.size() >= 6 && value.substr(0, 6) == "Sphere") {
+                            Application::GetInstance().render.get()->CreateSphere();
+                            UID = models.size() - 1;
+
+                        }
+                        else if (value.size() >= 7 && value.substr(0, 7) == "Diamond") {
+                            Application::GetInstance().render.get()->CreateDiamond();
+                            UID = models.size() - 1;
+
+                        }
+                    }
+                    if (key == "Path")
+                    {
+                        if (value != "")
                         {
-                            if (value != "")
-                            {
-                                //Application::GetInstance().scene->LoadFBX(value);
-                                LoadMesh(value);
-                                UID = models.size() - 1;
-                                models[UID].modelId = UID;
-                            }
+                            //Application::GetInstance().scene->LoadFBX(value);
+                            LoadMesh(value);
+                            UID = models.size() - 1;
+                            models[UID].modelId = UID;
                         }
-                        else if (key == "ParentUID")
-                        {
-                            models[UID].ParentID = std::stoi(value);
-                        }
-                        else if (key == "Name")
-                        {
-                            models[UID].name = value;
-                        }
-                        else if (key == "Translation") {
-                            std::stringstream ss(value);
-                            ss >> models[UID].position.x;
-                            ss.ignore(1);
-                            ss >> models[UID].position.y;
-                            ss.ignore(1);
-                            ss >> models[UID].position.z;
-                            models[UID].UpdateTransform();
+                    }
+                    else if (key == "ParentUID")
+                    {
+                        models[UID].ParentID = std::stoi(value);
+                    }
+                    else if (key == "Name")
+                    {
+                        models[UID].name = value;
+                    }
+                    else if (key == "Translation") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].position.x;
+                        ss.ignore(1);
+                        ss >> models[UID].position.y;
+                        ss.ignore(1);
+                        ss >> models[UID].position.z;
+                        models[UID].UpdateTransform();
 
-                        }
-                        else if (key == "Scale") {
-                            std::stringstream ss(value);
-                            ss >> models[UID].scale.x;
-                            ss.ignore(1);
-                            ss >> models[UID].scale.y;
-                            ss.ignore(1);
-                            ss >> models[UID].scale.z;
-                            models[UID].UpdateTransform();
+                    }
+                    else if (key == "Scale") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].scale.x;
+                        ss.ignore(1);
+                        ss >> models[UID].scale.y;
+                        ss.ignore(1);
+                        ss >> models[UID].scale.z;
+                        models[UID].UpdateTransform();
 
-                        }
-                        else if (key == "Rotation") {
-                            std::stringstream ss(value);
-                            ss >> models[UID].rotation.x;
-                            ss.ignore(1);
-                            ss >> models[UID].rotation.y;
-                            ss.ignore(1);
-                            ss >> models[UID].rotation.z;
-                            models[UID].UpdateTransform();
+                    }
+                    else if (key == "Rotation") {
+                        std::stringstream ss(value);
+                        ss >> models[UID].rotation.x;
+                        ss.ignore(1);
+                        ss >> models[UID].rotation.y;
+                        ss.ignore(1);
+                        ss >> models[UID].rotation.z;
+                        models[UID].UpdateTransform();
 
-                        }
-                        else if (key == "Texture") {
+                    }
+                    else if (key == "Texture") {
 
-                            Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                            models[UID].ApplTexture(tex, value);
-                            models[UID].actualTexture = tex;
-                            //BuildOctree();
+                        Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                        models[UID].ApplTexture(tex, value);
+                        models[UID].actualTexture = tex;
+                        //BuildOctree();
 
-                        }
+                    }
                 }
             }
         }
 
-        for (const auto& model : models) 
+        for (const auto& model : models)
         {
             if (model.ParentID != -1) {
                 int parent = model.ParentID;
@@ -567,7 +582,7 @@ void Scene::LoadScene(std::string filePath)
                 models[parent].SetChild(&models[model.modelId]);
             }
         }
-        //BuildOctree();
+        BuildOctree();
 
     }
 }
@@ -647,7 +662,7 @@ void Scene::LoadMesh(std::string filePath)
                     std::stringstream ss(value);
                     std::string token;
                     NewModel.Mmesh.positionsLocal.clear();
-                    while (std::getline(ss, token, '|')) {
+                  while (std::getline(ss, token, '|')) {
                         if (!token.empty()) {
                             std::stringstream vecStream(token);
                             float x, y, z;
@@ -674,6 +689,29 @@ void Scene::LoadMesh(std::string filePath)
     NewModel.rotation = { 0,0,0 };
     NewModel.scale = { 1,1,1 };
 
+    NewModel.modelId = (int)models.size();
+
+    models.push_back(NewModel);
+
+    GameObject* inserted = &models.back();
+
+    models.back().RecreateBuffers();
+
+    NewModel.UpdateTransform();
+    NewModel.UpdateAABB();
+
+    std::cout << "DBG: Loaded model '" << inserted->name
+        << "' id=" << inserted->modelId
+        << " VAO=" << inserted->Mmesh.VAO
+        << " VBO=" << inserted->Mmesh.VBO
+        << " EBO=" << inserted->Mmesh.EBO
+        << " indexCount=" << inserted->Mmesh.indexCount
+        << " positionsLocal.size=" << inserted->Mmesh.positionsLocal.size()
+        << " indices.size=" << inserted->Mmesh.indices.size()
+        << " texture=" << (inserted->Mmesh.texture ? "yes" : "no")
+        << std::endl;
+
+
     if (!Application::GetInstance().scene->octreeRoot) {
         Application::GetInstance().scene->BuildOctree();
     }
@@ -683,32 +721,36 @@ void Scene::LoadMesh(std::string filePath)
     }
 
 
-    NewModel.UpdateTransform();
-    NewModel.UpdateAABB();
 
-    models.push_back(NewModel);
+
+
+
+    //models.push_back(NewModel);
+
+   
 
     //BuildOctree();
 }
 
+
 bool Scene::PostUpdate()
 {
 
- 	return true;
+    return true;
 }
 
-bool Scene::CleanUp() 
+bool Scene::CleanUp()
 {
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
 
     models.clear();
     imagesFiles.clear();
-    for (auto& tex : images) 
+    for (auto& tex : images)
         tex.Delete();
     images.clear();
 
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
-	return true;
+    return true;
 }
 
 // Scene.cpp
@@ -736,19 +778,19 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
             Application::GetInstance().render.get()->CreateDiamond();
         }
         else if (blueprint.name.find("Grid") != std::string::npos) {
-          // Application::GetInstance().render.get()->CreateGrid(100,20);
-           //blueprint.parentID = 0;
+            // Application::GetInstance().render.get()->CreateGrid(100,20);
+             //blueprint.parentID = 0;
         }
 
         if (!models.empty()) {
             newObjPtr = &models.back();
         }
     }
-    else 
+    else
     {
         GameObject newObj(blueprint.modelPath);
-        models.push_back(newObj); 
-        newObjPtr = &models.back();         
+        models.push_back(newObj);
+        newObjPtr = &models.back();
 
     }
 
@@ -789,6 +831,6 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
     newObj.modelId = models.size() - 1;
     newObj.SetInitialParentID(blueprint.parentID);
 
-    newObj.UpdateTransform(); 
+    newObj.UpdateTransform();
 
 }

@@ -1268,4 +1268,3 @@ std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> Render::CalculateTange
 
     return { tangents, bitangents };
 }
-
