@@ -359,9 +359,6 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
     file << "Mesh:\n";
 
     file << "{" << "\n";
-    file << "VAO: " << model.Mmesh.VAO << "\n";
-    file << "VBO: " << model.Mmesh.VBO << "\n";
-    file << "EBO: " << model.Mmesh.EBO << "\n";
     file << "IndexCount: " << model.Mmesh.indexCount << "\n";
     file << "Texture: " << model.texturePath << "\n";
     file << "minAABB: " << model.minAABB.x << ", " << model.minAABB.y << ", " << model.minAABB.z << "\n";
@@ -369,6 +366,11 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
 
     file << "Indices:";
     for (auto& indice : model.Mmesh.indices)
+        file << indice << "|";
+    file << "\n";
+
+    file << "Vertices:";
+    for (auto& indice : model.Mmesh.vertices)
         file << indice << "|";
     file << "\n";
 
@@ -614,16 +616,7 @@ void Scene::LoadMesh(std::string filePath)
                 std::getline(iss, value);
                 if (!value.empty() && value[0] == ' ') value.erase(0, 1);
 
-                if (key == "VAO") {
-                    NewModel.Mmesh.VAO = std::stoi(value);
-                }
-                else if (key == "VBO") {
-                    NewModel.Mmesh.VBO = std::stoi(value);
-                }
-                else if (key == "EBO") {
-                    NewModel.Mmesh.EBO = std::stoi(value);
-                }
-                else if (key == "IndexCount") {
+                if (key == "IndexCount") {
                     NewModel.Mmesh.indexCount = std::stoi(value);
                 }
                 else if (key == "minAABB") {
@@ -656,6 +649,16 @@ void Scene::LoadMesh(std::string filePath)
                     while (std::getline(ss, token, '|')) {
                         if (!token.empty())
                             NewModel.Mmesh.indices.push_back(std::stoi(token));
+                    }
+                }
+                else if (key == "Vertices") {
+                    // leer línea completa con índices separados por '|'
+                    std::stringstream ss(value);
+                    std::string token;
+                    NewModel.Mmesh.vertices.clear();
+                    while (std::getline(ss, token, '|')) {
+                        if (!token.empty())
+                            NewModel.Mmesh.vertices.push_back(std::stof(token));
                     }
                 }
                 else if (key == "PositionsLocal") {
@@ -693,24 +696,10 @@ void Scene::LoadMesh(std::string filePath)
 
     models.push_back(NewModel);
 
-    GameObject* inserted = &models.back();
-
     models.back().RecreateBuffers();
 
     NewModel.UpdateTransform();
     NewModel.UpdateAABB();
-
-    std::cout << "DBG: Loaded model '" << inserted->name
-        << "' id=" << inserted->modelId
-        << " VAO=" << inserted->Mmesh.VAO
-        << " VBO=" << inserted->Mmesh.VBO
-        << " EBO=" << inserted->Mmesh.EBO
-        << " indexCount=" << inserted->Mmesh.indexCount
-        << " positionsLocal.size=" << inserted->Mmesh.positionsLocal.size()
-        << " indices.size=" << inserted->Mmesh.indices.size()
-        << " texture=" << (inserted->Mmesh.texture ? "yes" : "no")
-        << std::endl;
-
 
     if (!Application::GetInstance().scene->octreeRoot) {
         Application::GetInstance().scene->BuildOctree();
@@ -720,14 +709,7 @@ void Scene::LoadMesh(std::string filePath)
         root->Insert(&Application::GetInstance().scene->models.back());
     }
 
-
-
-
-
-
     //models.push_back(NewModel);
-
-   
 
     //BuildOctree();
 }
@@ -752,8 +734,6 @@ bool Scene::CleanUp()
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
     return true;
 }
-
-// Scene.cpp
 
 void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
 {

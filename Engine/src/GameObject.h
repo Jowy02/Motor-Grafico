@@ -24,6 +24,7 @@ struct ModelMesh {
     // Copias CPU para raycast
     std::vector<glm::vec3> positionsLocal;
     std::vector<unsigned int> indices;
+    std::vector<float> vertices;
     std::vector<glm::vec3> positionsWorld;
 };
 

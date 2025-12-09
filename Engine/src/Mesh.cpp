@@ -55,6 +55,8 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
 
     Obj->Mmesh.indexCount = Mmesh.indexCount;
     Obj->Mmesh.indices = Mmesh.indices;
+    Obj->Mmesh.vertices = Mmesh.vertices;
+
     Obj->Mmesh.positionsLocal = Mmesh.positionsLocal;
     Obj->Mmesh.positionsWorld = Mmesh.positionsWorld;
     Obj->Mmesh.texture = Mmesh.texture; 
@@ -101,6 +103,8 @@ void Mesh::processOthers(const aiScene* scene)
 
         newModel.Mmesh.indexCount = Mmesh.indexCount;
         newModel.Mmesh.indices = Mmesh.indices;
+        newModel.Mmesh.vertices = Mmesh.vertices;
+
         newModel.Mmesh.positionsLocal = Mmesh.positionsLocal;
         newModel.Mmesh.positionsWorld = Mmesh.positionsWorld;
         newModel.Mmesh.texture = Mmesh.texture;
@@ -217,6 +221,7 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 
+    Mmesh.vertices = vertices;
 
     localMinAABB = minAABB;
     localMaxAABB = maxAABB;

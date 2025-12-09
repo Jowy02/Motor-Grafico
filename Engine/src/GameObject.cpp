@@ -47,7 +47,6 @@ void GameObject::ApplTexture(Texture* tex, std::string path)
 // Draw all meshes of the model
 void GameObject::Draw()
 {
-
     if (isHidden) return;
 
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
@@ -380,10 +379,7 @@ void GameObject::CleanUp()
 }
 
 void GameObject::RecreateBuffers() {
-    if (Mmesh.VAO != 0) glDeleteVertexArrays(1, &Mmesh.VAO);
-    if (Mmesh.VBO != 0) glDeleteBuffers(1, &Mmesh.VBO);
-    if (Mmesh.EBO != 0) glDeleteBuffers(1, &Mmesh.EBO);
-
+    // Create OpenGL buffers
     glGenVertexArrays(1, &Mmesh.VAO);
     glGenBuffers(1, &Mmesh.VBO);
     glGenBuffers(1, &Mmesh.EBO);
@@ -391,15 +387,23 @@ void GameObject::RecreateBuffers() {
     glBindVertexArray(Mmesh.VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, Mmesh.VBO);
-    glBufferData(GL_ARRAY_BUFFER, Mmesh.positionsLocal.size() * sizeof(glm::vec3),
-        Mmesh.positionsLocal.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, Mmesh.vertices.size() * sizeof(float), Mmesh.vertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mmesh.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mmesh.indices.size() * sizeof(unsigned int),
-        Mmesh.indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mmesh.indices.size() * sizeof(unsigned int), Mmesh.indices.data(), GL_STATIC_DRAW);
 
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    // Normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
+    Mmesh.indexCount = Mmesh.indices.size();
 }
