@@ -275,28 +275,52 @@ void  GameObject::eraseChild(int childId)
     childrenID.erase(std::remove(childrenID.begin(), childrenID.end(), childId),childrenID.end());
 }
 // Cleanup all OpenGL buffers and textures
-void  GameObject::CleanUpChilds()
+//void  GameObject::CleanUpChilds()
+//{
+//    auto childCopy = childrenID; // copia segura
+//    for (int childId : childCopy)
+//    {
+//        // Solo borrar si realmente sigue siendo hijo tuyo
+//        if (Application::GetInstance().scene->models[childId].ParentID == modelId)
+//        {
+//            Application::GetInstance().scene->models[childId].CleanUpChilds();
+//
+//            // borrar del vector childrenID
+//            eraseChild(childId);
+//
+//            // borrar del sceneModels
+//            auto& sceneModels = Application::GetInstance().scene->models;
+//            sceneModels.erase(
+//                std::remove_if(sceneModels.begin(), sceneModels.end(),
+//                    [&](const GameObject& m) { return m.modelId == childId; }),
+//                sceneModels.end()
+//            );
+//        }
+//    }   
+//}
+
+void GameObject::CleanUpChilds()
 {
-    auto childCopy = childrenID; // copia segura
-    for (int childId : childCopy)
+    // Hacer copia de IDs para iterar sin invalidar
+    std::vector<int> childrenCopy = childrenID;
+
+    for (int childId : childrenCopy)
     {
-        // Solo borrar si realmente sigue siendo hijo tuyo
-        if (Application::GetInstance().scene->models[childId].ParentID == modelId)
-        {
-            Application::GetInstance().scene->models[childId].CleanUpChilds();
+        if (childId < 0 || childId >= Application::GetInstance().scene->models.size())
+            continue;
 
-            // borrar del vector childrenID
-            eraseChild(childId);
+        GameObject& child = Application::GetInstance().scene->models[childId];
 
-            // borrar del sceneModels
-            auto& sceneModels = Application::GetInstance().scene->models;
-            sceneModels.erase(
-                std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const GameObject& m) { return m.modelId == childId; }),
-                sceneModels.end()
-            );
-        }
-    }   
+        // Recursivamente limpiar hijos
+        child.CleanUpChilds();
+
+        // Limpiar buffers y texturas
+        child.CleanUp();
+
+        // Desasociar del vector childrenID
+        eraseChild(child.modelId);
+    }
+    childrenID.clear();
 }
 
 void GameObject::SaveInitialState() {
@@ -376,6 +400,7 @@ void GameObject::CleanUp()
     Mmesh.texture = nullptr;
     actualTexture = nullptr;
     blackWhite = nullptr;
+
 }
 
 void GameObject::RecreateBuffers() {

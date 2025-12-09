@@ -725,11 +725,16 @@ bool Scene::CleanUp()
 {
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
 
-    models.clear();
     imagesFiles.clear();
     for (auto& tex : images)
         tex.Delete();
     images.clear();
+
+    for (auto& model : models)
+    {
+        model.CleanUpChilds();
+        model.CleanUp();     
+    }
 
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp completed");
     return true;
@@ -739,12 +744,8 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
 {
     GameObject* newObjPtr = nullptr;
 
-    // 1. 🏗️ CREACIÓN DE LA GEOMETRÍA (Crea el objeto y sus buffers de OpenGL)
-
     if (blueprint.modelPath.empty() || blueprint.modelPath == "")
     {
-        // Es una primitiva (Cube, Pyramid, etc.)
-        // 🚩 LLAMADA CLAVE: Usamos las funciones del Render para crear la malla y añadir el objeto al vector 'models'.
         if (blueprint.name.find("Cube") != std::string::npos) {
             Application::GetInstance().render.get()->CreateCube();
         }
@@ -768,10 +769,9 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
     }
     else
     {
-        GameObject newObj(blueprint.modelPath);
-        models.push_back(newObj);
-        newObjPtr = &models.back();
-
+        LoadMesh(blueprint.modelPath);
+        if (!models.empty())
+            newObjPtr = &models.back();
     }
 
     if (!newObjPtr) {
@@ -781,25 +781,19 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
 
     GameObject& newObj = *newObjPtr;
 
-    //Texture
-    std::string initialTexturePath = blueprint.texturePath;
-
-    if (!initialTexturePath.empty()) {
-        Texture* tex = Application::GetInstance().menus->GetLoadedTexture(initialTexturePath);
-
-        if (!tex) {
-            Application::GetInstance().menus->LogToConsole("Advertencia: Recargando textura: " + initialTexturePath);
-            tex = new Texture(initialTexturePath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    // Textura
+    if (!blueprint.texturePath.empty())
+    {
+        Texture* tex = Application::GetInstance().menus->GetLoadedTexture(blueprint.texturePath);
+        if (!tex)
+        {
+            Application::GetInstance().menus->LogToConsole("Advertencia: Recargando textura: " + blueprint.texturePath);
+            tex = new Texture(blueprint.texturePath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
         }
-
-        newObj.ApplTexture(tex, initialTexturePath);
+        newObj.ApplTexture(tex, blueprint.texturePath);
     }
-    else {
+    else
         newObj.ApplTexture(nullptr, "");
-
-        //newObj.Mmesh.texture = nullptr;
-        //newObj.actualTexture = nullptr;
-    }
 
     newObj.name = blueprint.name;
     newObj.position = blueprint.pos;
