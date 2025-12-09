@@ -108,6 +108,12 @@ void Mesh::processOthers(const aiScene* scene)
         newModel.Mmesh.positionsLocal = Mmesh.positionsLocal;
         newModel.Mmesh.positionsWorld = Mmesh.positionsWorld;
         newModel.Mmesh.texture = Mmesh.texture;
+        if (Mmesh.texture != nullptr)
+        {
+            newModel.texturePath = filenameMaterial;
+            newModel.actualTexture = Mmesh.texture;
+        }
+         
 
         newModel.minAABB = minAABB;
         newModel.maxAABB = maxAABB;
@@ -261,7 +267,6 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 
-    
     // Draw vertex and face normals for debugging
     VertexNormalmesh = Application::GetInstance().render.get()->DrawVertexNormalsFromMesh(vertices.data(), vertices.size(), tangents, bitangents, {}, vertexNormalLines);
     Normalmesh = Application::GetInstance().render.get()->DrawFaceNormals(vertices.data(), indices.data(), indices.size(), normalLines);
@@ -306,22 +311,18 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
         aiString path;
         if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
         {
-            std::string filename = std::string(path.C_Str());
+            filenameMaterial = std::string(path.C_Str());
 
-            // Normalize backslashes
-            std::replace(filename.begin(), filename.end(), '\\', '/');
+            std::string materialName = filenameMaterial.substr(filenameMaterial.find_last_of("/\\") + 1);
+            materialName = materialName.substr(0, materialName.find_last_of('.'));
+            filenameMaterial = "../Library/Images/" + materialName + ".png";
 
-            // If the texture path is not absolute, prepend the model directory
-            if (filename[0] != '/' && !(filename.length() > 1 && filename[1] == ':'))
-                filename = directory + "/" + filename;
+            std::cout << "Loading texture from material: " << filenameMaterial << std::endl;
 
-            std::cout << "Loading texture from material: " << filename << std::endl;
+            Mmesh.texture = new Texture(filenameMaterial.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
-            Mmesh.texture = new Texture(filename.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-          
             if (Mmesh.texture)
                 hasTransparency = Mmesh.texture->hasAlpha;
-
         }
         else
         {
@@ -330,6 +331,7 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
             hasTransparency = false;
         }
     }
+    else filenameMaterial = "";
 }
 bool Mesh::CleanUp()
 {

@@ -544,7 +544,7 @@ void Menus::LoadTextures()
             // Filtrar por tipo de archivo
             fileName = data.cFileName;
             if (fileName.substr(fileName.size() - 4) == ".png") {
-                fileName = "../Images/" + fileName;
+                fileName = "../Library/Images/" + fileName;
                 for (auto& text : textures)
                 {
                     if (text->textPath == fileName) exist = true;
@@ -585,7 +585,7 @@ void Menus::LoadFbx()
                 continue;
             fileName = data.cFileName;
 
-            if (fileName.substr(fileName.size() - 4) == ".fbx" ) {
+            if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
                 for (auto& files : fbxFiles)
                 {
                     std::string TempfileName = "../Library/FBX/" + fileName;
@@ -659,91 +659,96 @@ void Menus::DrawResourceManager()
     ImGui::Separator();
     ImGui::Text("Texture");
 
-    for (int i = 0; i < textures.size(); i++) {
+    if (ImGui::BeginTable("TexturesTable", 8)) {
+        for (int i = 0; i < textures.size(); i++) {
+            ImGui::TableNextColumn();
 
-        ImGui::BeginGroup();                       
-        ImGui::Text("%s", textures[i]->textPath.c_str());
-        ImGui::Image(textures[i]->ID, ImVec2(150, 150));
-        ImGui::EndGroup();  
-        
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-           
-            dragTexture = i;
-            draged = true;
-            
-            ImGui::Text("Arrastrando %s", textures[dragTexture]->textPath.c_str());
-            ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture], textures[dragTexture]->textPath.size() + 1);
-               
-            ImGui::EndDragDropSource();
-        }
+            ImGui::BeginGroup();
+            ImGui::Text("%s", textures[i]->textPath.c_str());
+            ImGui::Image(textures[i]->ID, ImVec2(150, 150));
+            ImGui::EndGroup();
 
-        if (!ImGui::GetDragDropPayload() && draged)
-        {
-           Application::GetInstance().scene->ApplyTextureToSelected(textures[dragTexture]->textPath.c_str());
-           draged = false;
+            // Drag & Drop 
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                dragTexture = i;
+                draged = true;
+                ImGui::Text("Arrastrando %s", textures[dragTexture]->textPath.c_str());
+                ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture],
+                    textures[dragTexture]->textPath.size() + 1);
+                ImGui::EndDragDropSource();
+            }
+
+            if (!ImGui::GetDragDropPayload() && draged) {
+                Application::GetInstance().scene->ApplyTextureToSelected(textures[dragTexture]->textPath.c_str());
+                draged = false;
+            }
         }
-        if (i + 1 < textures.size())
-            ImGui::SameLine();                      
+        ImGui::EndTable();
     }
 
     ImGui::Separator();
     ImGui::Text("Meshes");
-    for (int i = 0; i < meshesFiles.size(); i++) {
+    if (ImGui::BeginTable("MeshTable", 8)) {
 
-        ImGui::BeginGroup();
-        ImGui::Text("%s", meshesFiles[i].c_str());
-        ImGui::EndGroup();
+        for (int i = 0; i < meshesFiles.size(); i++) {
+            ImGui::TableNextColumn();
 
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            ImGui::BeginGroup();
+            ImGui::Text("%s", meshesFiles[i].c_str());
+            ImGui::EndGroup();
 
-            dragMesh = i;
-            dragedMesh = true;
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 
-            ImGui::Text("Arrastrando %s", meshesFiles[dragMesh].c_str());
-            ImGui::SetDragDropPayload("TEXTURE_POINTER", &meshesFiles[dragMesh], meshesFiles[dragMesh].size() + 1);
+                dragMesh = i;
+                dragedMesh = true;
 
-            ImGui::EndDragDropSource();
+                ImGui::Text("Arrastrando %s", meshesFiles[dragMesh].c_str());
+                ImGui::SetDragDropPayload("TEXTURE_POINTER", &meshesFiles[dragMesh], meshesFiles[dragMesh].size() + 1);
 
+                ImGui::EndDragDropSource();
+
+            }
+            if (!ImGui::GetDragDropPayload() && dragedMesh)
+            {
+                Application::GetInstance().menus.get()->selectedObj = NULL;
+                Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
+                dragedMesh = false;
+            }
         }
-        if (!ImGui::GetDragDropPayload() && dragedMesh)
-        {
-            Application::GetInstance().menus.get()->selectedObj = NULL;
-            Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
-            dragedMesh = false;
-        }
-        if (i + 1 < textures.size())
-            ImGui::SameLine();
+        ImGui::EndTable();
     }
 
     ImGui::Separator();
     ImGui::Text("Fbx");
-    for (int i = 0; i < fbxFiles.size(); i++) {
+    if (ImGui::BeginTable("FbxTable", 8)) {
 
-        ImGui::BeginGroup();                        
-        ImGui::Text("%s", fbxFiles[i].c_str());
-        ImGui::EndGroup();
+        for (int i = 0; i < fbxFiles.size(); i++) {
+            ImGui::TableNextColumn();
 
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            ImGui::BeginGroup();                        
+            ImGui::Text("%s", fbxFiles[i].c_str());
+            ImGui::EndGroup();
 
-            dragFbx = i;
-            dragedFbx = true;
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 
-            ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
-            ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
+                dragFbx = i;
+                dragedFbx = true;
 
-            ImGui::EndDragDropSource();
+                ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
+                ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
 
+                ImGui::EndDragDropSource();
+
+            }
+            if (!ImGui::GetDragDropPayload() && dragedFbx)
+            {
+                Application::GetInstance().menus.get()->selectedObj = NULL;
+                Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
+                dragedFbx = false;
+            }                 
         }
-        if (!ImGui::GetDragDropPayload() && dragedFbx)
-        {
-            Application::GetInstance().menus.get()->selectedObj = NULL;
-            Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
-            dragedFbx = false;
-        }
-        if (i + 1 < textures.size())
-            ImGui::SameLine();                    
+        ImGui::EndTable();
     }
-
     ImGui::End();
 }
 

@@ -1,0 +1,12 @@
+GameObjects:
+{
+UID: 1
+Path: ../Library/Meshes/City_building_034.txt
+Component: -1
+Name: City_building_034
+ParentUID: -1
+Translation: -9.52094, -3.63977e-05, -11.113
+Scale: 2.28, 2.28, 2.28
+Rotation: 0, -0, 0
+Texture: ../Library/Images/building05 _c.png
+}
