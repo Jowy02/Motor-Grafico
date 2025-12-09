@@ -701,17 +701,17 @@ void Scene::LoadMesh(std::string filePath)
     NewModel.UpdateTransform();
     NewModel.UpdateAABB();
 
-    if (!Application::GetInstance().scene->octreeRoot) {
-        Application::GetInstance().scene->BuildOctree();
-    }
-    else {
-        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
-        root->Insert(&Application::GetInstance().scene->models.back());
-    }
+    //if (!Application::GetInstance().scene->octreeRoot) {
+    //    Application::GetInstance().scene->BuildOctree();
+    //}
+    //else {
+    //    OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+    //    root->Insert(&Application::GetInstance().scene->models.back());
+    //}
 
     //models.push_back(NewModel);
 
-    //BuildOctree();
+    BuildOctree();
 }
 
 

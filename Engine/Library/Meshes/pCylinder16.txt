@@ -1,8 +1,5 @@
 Mesh:
 {
-VAO: 4
-VBO: 7
-EBO: 8
 IndexCount: 20208
 Texture: 
 minAABB: -0.497373, 0.46742, -1.45689

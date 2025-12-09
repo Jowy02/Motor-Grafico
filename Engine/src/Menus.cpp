@@ -541,6 +541,32 @@ void Menus::LoadFbx()
 
         FindClose(h);
     }
+    
+    h = FindFirstFileA("..\\Library\\Meshes\\*", &data);
+    fileName = "";
+    exist = false;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
+            fileName = data.cFileName;
+
+            if (fileName.substr(fileName.size() - 4) == ".txt") {
+                for (auto& files : meshesFiles)
+                {
+                    std::string TempfileName = "../Library/Meshes/" + fileName;
+                    if (files == TempfileName) {
+                        exist = true;
+                    }
+                }
+                if (!exist)meshesFiles.push_back("../Library/Meshes/" + fileName);
+                exist = false;
+
+            }
+        } while (FindNextFileA(h, &data));
+
+        FindClose(h);
+    }
     init = false;
 }
 void Menus::LoadTxt()
@@ -596,6 +622,36 @@ void Menus::DrawResourceManager()
         if (i + 1 < textures.size())
             ImGui::SameLine();                      
     }
+
+    ImGui::Separator();
+    ImGui::Text("Meshes");
+    for (int i = 0; i < meshesFiles.size(); i++) {
+
+        ImGui::BeginGroup();
+        ImGui::Text("%s", meshesFiles[i].c_str());
+        ImGui::EndGroup();
+
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+            dragMesh = i;
+            dragedMesh = true;
+
+            ImGui::Text("Arrastrando %s", meshesFiles[dragMesh].c_str());
+            ImGui::SetDragDropPayload("TEXTURE_POINTER", &meshesFiles[dragMesh], meshesFiles[dragMesh].size() + 1);
+
+            ImGui::EndDragDropSource();
+
+        }
+        if (!ImGui::GetDragDropPayload() && dragedMesh)
+        {
+            Application::GetInstance().menus.get()->selectedObj = NULL;
+            Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
+            dragedMesh = false;
+        }
+        if (i + 1 < textures.size())
+            ImGui::SameLine();
+    }
+
     ImGui::Separator();
     ImGui::Text("Fbx");
     for (int i = 0; i < fbxFiles.size(); i++) {

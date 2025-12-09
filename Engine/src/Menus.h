@@ -90,7 +90,12 @@ private:
     int dragFbx = 0;
     bool dragedFbx = false;
 
+    int dragMesh = 0;
+    bool dragedMesh = false;
+
     std::vector<std::string> fbxFiles;
     std::vector<std::string> txtFiles;
+    std::vector<std::string> meshesFiles;
+
 
 };
