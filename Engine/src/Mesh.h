@@ -101,4 +101,5 @@ private:
     void processOthers(const aiScene* scene);
     std::vector<aiMesh*> otherMesh;
     int objNum = 0;
+    std::string filenameMaterial;
 };
