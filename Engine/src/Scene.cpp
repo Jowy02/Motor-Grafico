@@ -313,7 +313,12 @@ void Scene::ImGuizmo() {
 
 bool Scene::Update(float dt)
 {
-    frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(100.0f, 0.1f, 100.0f));
+    //frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(100.0f, 0.1f, 100.0f));
+    frustum.Update(Application::GetInstance().camera->GetVPMatrix(
+        Application::GetInstance().camera->FOV,
+        Application::GetInstance().camera->nearPlane,
+        Application::GetInstance().camera->farPlane
+    ));
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();

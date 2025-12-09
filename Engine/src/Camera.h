@@ -57,4 +57,22 @@ public:
     glm::mat4 GetProjectionMatrix(float FOVdeg = 45.0f, float nearPlane = 0.1f, float farPlane = 1000.0f) const;
     glm::mat4 GetVPMatrix(float FOVdeg, float nearPlane, float farPlane) const;
 
+
+    // Frustum
+    float nearPlane = 0.1f;
+    float farPlane = 1000.0f;
+    float FOV = 45.0f;
+    glm::mat4 viewMatrix;
+    glm::mat4 projectionMatrix;
+
+    void UpdateViewMatrix();
+
+    void UpdateProjectionMatrix();
+
+    void UpdateOrbit();
+    glm::vec3 target = glm::vec3(0.0f);
+    float yaw = -90.0f;  
+    float pitch = 0.0f;   
+    float distance = 10.0f;
+
 };

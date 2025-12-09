@@ -328,9 +328,24 @@ void Menus::Hierarchy_Menu()
 {
     ImGui::Begin("Hierarchy", &showHierarchy);
 
+    if (ImGui::TreeNodeEx((void*)Application::GetInstance().camera.get(), ImGuiTreeNodeFlags_DefaultOpen, "Main Camera"))
+    {
+        if (ImGui::IsItemClicked()) {
+
+            selectedCamera = Application::GetInstance().camera.get();
+            selectedObj = nullptr;
+        }
+
+        ImGui::TreePop();
+    }
+
+
     for (auto& Model : Application::GetInstance().scene.get()->models) {
         if(!Model.isChild)DrawGameObjectNode(&Model);
     }
+
+   
+
     ImGui::End();
 }
 
@@ -459,6 +474,54 @@ void Menus::DrawInspector()
                 }
             }
         }
+    }
+    else if (selectedCamera != nullptr)
+    {
+        Camera* cam = selectedCamera;
+        ImGui::Text("Camera: Main Camera");
+        ImGui::Separator();
+
+        if (ImGui::DragFloat3("Position", &cam->Position.x, 0.1f))
+        {
+            cam->Inputs(Application::GetInstance().window->window);
+        }
+
+        static glm::vec3 eulerAngles = glm::degrees(glm::vec3(
+            atan2(cam->Orientation.y, sqrt(cam->Orientation.x * cam->Orientation.x + cam->Orientation.z * cam->Orientation.z)),
+            atan2(cam->Orientation.x, cam->Orientation.z),
+            0.0f
+        ));
+
+        if (ImGui::DragFloat3("Rotation", &eulerAngles.x, 0.5f))
+        {
+            // Convertir euler a orientación de la cámara
+            float pitch = glm::radians(eulerAngles.x);
+            float yaw = glm::radians(eulerAngles.y);
+
+            cam->Orientation.x = cos(pitch) * sin(yaw);
+            cam->Orientation.y = sin(pitch);
+            cam->Orientation.z = cos(pitch) * cos(yaw);
+            cam->Orientation = glm::normalize(cam->Orientation);
+
+            cam->UpdateViewMatrix();
+        }
+
+        if (ImGui::DragFloat("FOV", &cam->FOV, 1.0f, 10.0f, 120.0f))
+        {
+            cam->UpdateProjectionMatrix();
+        }
+
+        if (ImGui::DragFloat("Near Plane", &cam->nearPlane, 0.01f, 0.01f, cam->farPlane - 0.01f))
+        {
+            cam->UpdateProjectionMatrix();
+        }
+
+        if (ImGui::DragFloat("Far Plane", &cam->farPlane, 0.1f, cam->nearPlane + 0.01f, 10000.0f))
+        {
+            cam->UpdateProjectionMatrix();
+        }
+        ImGui::DragFloat("Move Speed", &cam->MOVESPEED, 0.05f, 0.0f, 10.0f);
+        ImGui::DragFloat("Sensitivity", &cam->sensitivity, 0.01f, 0.0f, 1.0f);
     }
     else
     {

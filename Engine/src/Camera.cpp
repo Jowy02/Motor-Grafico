@@ -49,116 +49,92 @@ LineSegment Camera::CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float
     return LineSegment(Position, Position + rayWorld * farPlane);
 }
 
-
 void Camera::Inputs(SDL_Window* window)
 {
-
     ImGuiIO& io = ImGui::GetIO();
     auto& app = Application::GetInstance();
     auto* input = app.input.get();
     auto* menus = app.menus.get();
     auto* selectedObj = menus->selectedObj;
 
-    if (Application::GetInstance().input.get()->GetWindowEvent(WE_RESIZED)) {
-        SDL_GetWindowSize(window,&width,&height);
+    if (input->GetWindowEvent(WE_RESIZED)) {
+        SDL_GetWindowSize(window, &width, &height);
         glViewport(0, 0, width, height);
-        Application::GetInstance().input.get()->windowEvents[WE_RESIZED] = false;
+        input->windowEvents[WE_RESIZED] = false;
     }
 
-    // Center the camera on the selected object
-    if (input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && selectedObj)
-    {
+    if (input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && selectedObj) {
         glm::vec3 target = selectedObj->center;
         glm::vec3 size = selectedObj->size;
         target.y -= size.y * 0.25f;
 
-        float idealDistance = glm::length(size) * 1.0f;
-        glm::vec3 direction = glm::normalize(Position - target);
-
-        Position = target + direction * idealDistance;
-        Orientation = glm::normalize(target - Position);
+        distance = glm::length(size) * 1.0f; 
+        Position = target - Orientation * distance;
     }
 
-    // Increase camera speed with Shift
-    speed = (input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) ? MOVESPEED * 2 : MOVESPEED;
+    speed = (input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) ? MOVESPEED * 2.0f : MOVESPEED;
 
     float dx, dy;
     SDL_GetRelativeMouseState(&dx, &dy);
 
-    float rotX = sensitivity * dy;
-    float rotY = sensitivity * dx;
-
-    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT && input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT &&
+        input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT)
     {
         SDL_SetWindowRelativeMouseMode(window, true);
 
         glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3(0.0f);
-        glm::vec3 offset = Position - target;
-        float radius = glm::length(offset);
 
-        float pitch = glm::degrees(asin(offset.y / radius));
-        float yaw = glm::degrees(atan2(offset.z, offset.x));
-
-        float sensitivity = 0.2f;
-        pitch += sensitivity * dy;
         yaw += sensitivity * dx;
-
-        // Limita pitch
+        pitch += sensitivity * dy;
         pitch = glm::clamp(pitch, -89.0f, 89.0f);
 
-        // Reconstruye posición de cámara
         float pitchRad = glm::radians(pitch);
         float yawRad = glm::radians(yaw);
 
-        offset.x = radius * cos(pitchRad) * cos(yawRad);
-        offset.y = radius * sin(pitchRad);
-        offset.z = radius * cos(pitchRad) * sin(yawRad);
+        glm::vec3 offset;
+        offset.x = distance * cos(pitchRad) * cos(yawRad);
+        offset.y = distance * sin(pitchRad);
+        offset.z = distance * cos(pitchRad) * sin(yawRad);
 
         Position = target + offset;
         Orientation = glm::normalize(target - Position);
     }
-
     else if (input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT)
     {
         SDL_SetWindowRelativeMouseMode(window, true);
 
-        if (input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) Position += speed * Orientation;
-        if (input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) Position += speed * -Orientation;
-        if (input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) Position += speed * -glm::normalize(glm::cross(Orientation, Up));
-        if (input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) Position += speed * glm::normalize(glm::cross(Orientation, Up));
-        if (input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) Position += speed * Up;
-        if (input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) Position += speed * -Up;
-
-        //Free Look
         glm::vec3 right = glm::normalize(glm::cross(Orientation, Up));
-        glm::mat4 pitch = glm::rotate(glm::mat4(1.0f), glm::radians(-rotX), right);
-        glm::vec3 newOrientation = glm::vec3(pitch * glm::vec4(Orientation, 0.0f));
+        if (input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) Position += speed * Orientation;
+        if (input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) Position -= speed * Orientation;
+        if (input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) Position -= speed * right;
+        if (input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) Position += speed * right;
+        if (input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT) Position += speed * Up;
+        if (input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT) Position -= speed * Up;
 
-        float angleBetween = glm::degrees(acos(glm::dot(newOrientation, Up) /
-            (glm::length(newOrientation) * glm::length(Up))));
-        if (fabs(angleBetween - 90.0f) <= 85.0f) Orientation = newOrientation;
+        glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(-sensitivity * dy), right);
+        glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(-sensitivity * dx), Up);
 
-        glm::mat4 yaw = glm::rotate(glm::mat4(1.0f), glm::radians(-rotY), Up);
-        Orientation = glm::vec3(yaw * glm::vec4(Orientation, 0.0f));
+        Orientation = glm::normalize(glm::vec3(rotY * rotX * glm::vec4(Orientation, 0.0f)));
+
+        pitch = glm::degrees(asin(Orientation.y));
+        yaw = glm::degrees(atan2(Orientation.z, Orientation.x));
     }
     else
     {
-       
-       if(SDL_GetWindowRelativeMouseMode(window))
-           SDL_SetWindowRelativeMouseMode(window, false);
-
-       firstClick = true;
+        if (SDL_GetWindowRelativeMouseMode(window))
+            SDL_SetWindowRelativeMouseMode(window, false);
     }
 
-    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN && Application::GetInstance().input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
+    if (!io.WantCaptureMouse && input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN &&
+        input->GetKey(SDL_SCANCODE_LALT) == KEY_IDLE)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
-        LineSegment ray = CreatePickingRay(mx, my, 45.0f, 0.1f, 1e6f);
-        Application::GetInstance().scene->Raycast(ray);
+        LineSegment ray = CreatePickingRay(mx, my, FOV, nearPlane, farPlane);
+        app.scene->Raycast(ray);
     }
-
 }
+
 
 glm::mat4 Camera::GetViewMatrix() const
 {
@@ -178,6 +154,18 @@ glm::mat4 Camera::GetVPMatrix(float FOVdeg, float nearPlane, float farPlane) con
     glm::mat4 view = GetViewMatrix();
     return proj * view;
 }
+
+void Camera::UpdateViewMatrix()
+{
+    // Llama a glm::lookAt con Position y Orientation actual
+    viewMatrix = glm::lookAt(Position, Position + Orientation, Up);
+}
+
+void Camera::UpdateProjectionMatrix()
+{
+    projectionMatrix = glm::perspective(glm::radians(FOV), float(width) / height, nearPlane, farPlane);
+}
+
 
 bool Camera::CleanUp()
 {

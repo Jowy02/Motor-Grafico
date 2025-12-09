@@ -161,9 +161,9 @@ bool Input::PreUpdate()
 		Application::GetInstance().scene->currentGizmo = GizmoOperation::SCALE;
 	}
 
-
 	return true;
 }
+
 
 bool Input::CleanUp()
 {

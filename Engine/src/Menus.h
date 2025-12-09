@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include "Texture.h"
 #include <vector>
 #include <string>
@@ -97,5 +98,6 @@ private:
     std::vector<std::string> txtFiles;
     std::vector<std::string> meshesFiles;
 
+    Camera* selectedCamera = nullptr;
 
 };
