@@ -62,22 +62,25 @@ bool Scene::Start()
 void Scene::LoadFBX(const std::string& path) 
 {
     std::string dest = "../Library/FBX/" + std::filesystem::path(path).filename().string();
+    int cntModels = models.size();
+
     if (!std::filesystem::exists(dest)) {
         std::filesystem::create_directories("../Library/FBX");
         std::filesystem::copy_file(path, dest,
             std::filesystem::copy_options::update_existing);
         Application::GetInstance().menus.get()->init = true;
     }
+
     GameObject model(dest);
-    //Model model(path.c_str());
     model.modelId = models.size();
     models.push_back(model);
     BuildOctree();
- /*   if (octreeRoot) {
-        OctreeNode* root = octreeRoot.get();
-        root->Insert(&models.back());
-    }*/
 
+    for (cntModels; cntModels < models.size();cntModels++)
+    {   
+        dest = "../Library/Meshes/" + models[cntModels].name + ".txt";
+        Application::GetInstance().scene.get()->SaveMesh(dest, models[cntModels]);
+    }
 }
 
 //void Scene::BuildOctree() {
@@ -348,6 +351,36 @@ bool Scene::Update(float dt)
 
 	return true;
 }
+void Scene::SaveMesh(std::string filePath, GameObject model)
+{
+    std::ofstream file(filePath);
+    if (!file.is_open()) return;
+
+    file << "Mesh:\n";
+
+    file << "{" << "\n";
+    file << "VAO: " << model.Mmesh.VAO<< "\n";
+    file << "VBO: " << model.Mmesh.VBO << "\n";
+    file << "EBO: " << model.Mmesh.EBO << "\n";
+    file << "IndexCount: " << model.Mmesh.indexCount << "\n";
+    file << "Texture: " << model.texturePath << "\n";
+    file << "minAABB: " << model.minAABB.x << ", " << model.minAABB.y << ", " << model.minAABB.z << "\n";
+    file << "maxAABB: " << model.maxAABB.x << ", " << model.maxAABB.y << ", " << model.maxAABB.z << "\n";
+
+    file << "Indices:";
+    for (auto& indice : model.Mmesh.indices)
+        file << indice << "|";
+    file << "\n";
+
+    file << "PositionsLocal:";
+    for (auto& positionsLocal : model.Mmesh.positionsLocal)
+        file << positionsLocal.x << ", " << positionsLocal.y << ", " << positionsLocal.z << "|";
+    file << "\n";
+
+    file << "}" << "\n";
+
+    file.close();
+}
 void Scene::SaveScene(std::string filePath)
 {
     std::ofstream file(filePath);
@@ -369,21 +402,21 @@ void Scene::SaveScene(std::string filePath)
             file << "Rotation: " << model.rotation.x << ", " << model.rotation.y << ", " << model.rotation.z << "\n";
             file << "Texture: " << model.texturePath << "\n";
 
-            if (model.haveComponents)
-            {
-                for (const auto& Othermodel : models) 
-                {
-                    if(Othermodel.componentID == model.modelId)
-                    {
-                        file << "ComponentID: " << Othermodel.modelId << "\n";
-                        file << "Translation: " << Othermodel.position.x << ", " << Othermodel.position.y << ", " << Othermodel.position.z << "\n";
-                        file << "Scale: " << Othermodel.scale.x << ", " << Othermodel.scale.y << ", " << Othermodel.scale.z << "\n";
-                        file << "Rotation: " << Othermodel.rotation.x << ", " << Othermodel.rotation.y << ", " << Othermodel.rotation.z << "\n";
-                        file << "Texture: " << Othermodel.texturePath << "\n";
-                    }
-                }
+            //if (model.haveComponents)
+            //{
+            //    for (const auto& Othermodel : models) 
+            //    {
+            //        if(Othermodel.componentID == model.modelId)
+            //        {
+            //            file << "ComponentID: " << Othermodel.modelId << "\n";
+            //            file << "Translation: " << Othermodel.position.x << ", " << Othermodel.position.y << ", " << Othermodel.position.z << "\n";
+            //            file << "Scale: " << Othermodel.scale.x << ", " << Othermodel.scale.y << ", " << Othermodel.scale.z << "\n";
+            //            file << "Rotation: " << Othermodel.rotation.x << ", " << Othermodel.rotation.y << ", " << Othermodel.rotation.z << "\n";
+            //            file << "Texture: " << Othermodel.texturePath << "\n";
+            //        }
+            //    }
 
-            }
+            //}
             file << "}" << "\n";
         }
     }
@@ -443,8 +476,7 @@ void Scene::LoadScene(std::string filePath)
                     std::getline(iss, value);
                     // limpiar espacios
                     if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-                    if (!components)
-                    {
+                   
                         if (key == "Name") {
                             if (value.size() >= 4 && value.substr(0, 4) == "Cube") {
                                 Application::GetInstance().render.get()->CreateCube();
@@ -471,15 +503,20 @@ void Scene::LoadScene(std::string filePath)
                         {
                             if (value != "")
                             {
-                                Application::GetInstance().scene->LoadFBX(value);
+                                //Application::GetInstance().scene->LoadFBX(value);
+                                LoadMesh(value);
                                 UID = models.size() - 1;
+                                models[UID].modelId = UID;
                             }
                         }
                         else if (key == "ParentUID")
                         {
                             models[UID].ParentID = std::stoi(value);
                         }
-
+                        else if (key == "Name")
+                        {
+                            models[UID].name = value;
+                        }
                         else if (key == "Translation") {
                             std::stringstream ss(value);
                             ss >> models[UID].position.x;
@@ -515,59 +552,9 @@ void Scene::LoadScene(std::string filePath)
                             Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
                             models[UID].ApplTexture(tex, value);
                             models[UID].actualTexture = tex;
-                        }
-                        else if (key == "ComponentID")
-                        {
-                            std::stringstream ss(value);
-                            ss >> tempId;
-
-                            if (tempId >= 0) components = true;
-                        }
-                        else components = false;
-                    }
-                    else
-                    { 
-                        if (key == "Translation") {
-                            std::stringstream ss(value);
-                            ss >> models[tempId].position.x;
-                            ss.ignore(1);
-                            ss >> models[tempId].position.y;
-                            ss.ignore(1);
-                            ss >> models[tempId].position.z;
-                            models[tempId].UpdateTransform();
+                            //BuildOctree();
 
                         }
-                        else if (key == "Scale") {
-                            std::stringstream ss(value);
-                            ss >> models[tempId].scale.x;
-                            ss.ignore(1);
-                            ss >> models[tempId].scale.y;
-                            ss.ignore(1);
-                            ss >> models[tempId].scale.z;
-                            models[tempId].UpdateTransform();
-
-                        }
-                        else if (key == "Rotation") {
-                            std::stringstream ss(value);
-                            ss >> models[tempId].rotation.x;
-                            ss.ignore(1);
-                            ss >> models[tempId].rotation.y;
-                            ss.ignore(1);
-                            ss >> models[tempId].rotation.z;
-                            models[tempId].UpdateTransform();
-
-                        }
-                        else if (key == "Texture") {
-
-                            Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                            models[tempId].ApplTexture(tex, value);
-                            models[tempId].actualTexture = tex;
-
-                            components = false;
-                        }
-                    
-                    }
-
                 }
             }
         }
@@ -580,7 +567,128 @@ void Scene::LoadScene(std::string filePath)
                 models[parent].SetChild(&models[model.modelId]);
             }
         }
+        //BuildOctree();
+
     }
+}
+void Scene::LoadMesh(std::string filePath)
+{
+    std::ifstream file(filePath);
+    if (!file.is_open()) return;
+    bool insideMesh = false;
+    bool insideObject = false;
+    GameObject NewModel(filePath);
+
+    std::string line;
+    std::string prevLine;
+
+    while (std::getline(file, line)) {
+        if (line == "{") {
+            if (prevLine == "Mesh:") insideMesh = true;
+            else insideObject = true;
+        }
+        else if (line == "}") {
+            insideMesh = false;
+            insideObject = false;
+        }
+        else if (insideMesh) {
+            std::istringstream iss(line);
+            std::string key;
+            if (std::getline(iss, key, ':')) {
+                std::string value;
+                std::getline(iss, value);
+                if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+
+                if (key == "VAO") {
+                    NewModel.Mmesh.VAO = std::stoi(value);
+                }
+                else if (key == "VBO") {
+                    NewModel.Mmesh.VBO = std::stoi(value);
+                }
+                else if (key == "EBO") {
+                    NewModel.Mmesh.EBO = std::stoi(value);
+                }
+                else if (key == "IndexCount") {
+                    NewModel.Mmesh.indexCount = std::stoi(value);
+                }
+                else if (key == "minAABB") {
+                    std::stringstream ss(value);
+                    ss >> NewModel.minAABB.x;
+                    ss.ignore(1);
+                    ss >> NewModel.minAABB.y;
+                    ss.ignore(1);
+                    ss >> NewModel.minAABB.z;
+
+                }
+                else if (key == "maxAABB") {
+                    std::stringstream ss(value);
+                    ss >> NewModel.maxAABB.x;
+                    ss.ignore(1);
+                    ss >> NewModel.maxAABB.y;
+                    ss.ignore(1);
+                    ss >> NewModel.maxAABB.z;
+
+                }
+                else if (key == "Texture") {
+       
+                    NewModel.Mmesh.texture = nullptr;
+                }
+                else if (key == "Indices") {
+                    // leer línea completa con índices separados por '|'
+                    std::stringstream ss(value);
+                    std::string token;
+                    NewModel.Mmesh.indices.clear();
+                    while (std::getline(ss, token, '|')) {
+                        if (!token.empty())
+                            NewModel.Mmesh.indices.push_back(std::stoi(token));
+                    }
+                }
+                else if (key == "PositionsLocal") {
+                    std::stringstream ss(value);
+                    std::string token;
+                    NewModel.Mmesh.positionsLocal.clear();
+                    while (std::getline(ss, token, '|')) {
+                        if (!token.empty()) {
+                            std::stringstream vecStream(token);
+                            float x, y, z;
+                            vecStream >> x;
+                            vecStream.ignore(1);
+                            vecStream >> y;
+                            vecStream.ignore(1);
+                            vecStream >> z;
+                            NewModel.Mmesh.positionsLocal.push_back(glm::vec3(x, y, z));
+                        }
+                    }
+                }
+            }
+        }
+        prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
+    }
+    NewModel.modelPath = filePath;
+    NewModel.center = (NewModel.minAABB + NewModel.maxAABB) * 0.5f;
+    NewModel.size = NewModel.maxAABB - NewModel.minAABB;
+    NewModel.localMinAABB = NewModel.minAABB;
+    NewModel.localMaxAABB = NewModel.maxAABB;
+
+    NewModel.position = { 0,0,0 };
+    NewModel.rotation = { 0,0,0 };
+    NewModel.scale = { 1,1,1 };
+
+    if (!Application::GetInstance().scene->octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
+        OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
+        root->Insert(&Application::GetInstance().scene->models.back());
+    }
+
+
+    NewModel.UpdateTransform();
+    NewModel.UpdateAABB();
+
+    models.push_back(NewModel);
+
+    //BuildOctree();
 }
 
 bool Scene::PostUpdate()

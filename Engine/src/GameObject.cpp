@@ -52,7 +52,6 @@ void GameObject::Draw()
 
     GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
 
-
     if (hasTransparency) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -197,13 +196,13 @@ void GameObject::UpdateTransform()
 // Load a model using Assimp
 void GameObject::loadModel(const std::string& path)
 {
-    modelPath = path;
 
     directory = path.substr(0, path.find_last_of('/'));
 
     name = path.substr(path.find_last_of("/\\") + 1);
     name = name.substr(0, name.find_last_of('.'));
 
+    modelPath = "../Library/Meshes/" + name + ".txt";
 
     //processNode(scene->mRootNode, scene);
     Application::GetInstance().mesh.get()->loadModel(path, this);

@@ -92,7 +92,7 @@ void SimulationController::LoadInitialSceneState()
 
     Application::GetInstance().render.get()->CreateGrid(10, 20);
 
-   int objectStart = currentScene->models.size();
+    int objectStart = currentScene->models.size();
 
     if (!currentScene->models.empty() && currentScene->models[0].name == "Grid")
     {
@@ -100,6 +100,7 @@ void SimulationController::LoadInitialSceneState()
     }
 
     std::vector<int> newParentIDs;
+    int tr = 0;
     for (const auto& blueprint : modelsToRestore)
     {
         currentScene->RecreateGameObject(blueprint);

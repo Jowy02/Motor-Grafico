@@ -65,6 +65,8 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
     Obj->maxAABB = maxAABB;
     Obj->name = name;
 
+    Obj->modelPath = "../Library/Meshes/" + name + ".txt";
+
     maxAABB = { 0,0,0 };
     minAABB = {0,0,0};
     processOthers(scene);
@@ -106,7 +108,6 @@ void Mesh::processOthers(const aiScene* scene)
         newModel.minAABB = minAABB;
         newModel.maxAABB = maxAABB;
 
-
         newModel.name = mesh->mName.C_Str();
         newModel.modelId = Application::GetInstance().scene->models.size();
         newModel.center = (minAABB + maxAABB) * 0.5f;
@@ -131,8 +132,9 @@ void Mesh::processOthers(const aiScene* scene)
 
         newModel.UpdateTransform();
         newModel.UpdateAABB();
-        Application::GetInstance().scene->models.push_back(std::move(newModel));
 
+        newModel.modelPath = "../Library/Meshes/" + newModel.name + ".txt";
+        Application::GetInstance().scene->models.push_back(std::move(newModel));
     }
 }
 // Process all meshes in a node

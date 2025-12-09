@@ -47,6 +47,9 @@ public:
     void Raycast(const LineSegment& ray);
     void SelectObject(GameObject* obj);
 
+    void SaveMesh(std::string filePath, GameObject model);
+    void LoadMesh(std::string filePath);
+
     void SaveScene(std::string filePath);
     void LoadScene(std::string filePath);
 

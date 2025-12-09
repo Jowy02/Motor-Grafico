@@ -1,34 +1,23 @@
 GameObjects:
 {
 UID: 1
-Path: ../Library/FBX/Arcade.fbx
-Component: -1
-Name: pCylinder16
+Path: ../Library/Meshes/Baker_house.txt
+Component: -842150451
+Name: Baker_house
 ParentUID: -1
-Translation: -3.50674, -2.35613, -4.44749
+Translation: -3.8, -1.8, 0
 Scale: 1, 1, 1
-Rotation: 0, -0, 0
+Rotation: 0, 0, 0
 Texture: ../Images/BlancoNegro.png
 }
 {
 UID: 2
-Path: ../Library/FBX/Pizza Slice.fbx
+Path: ../Library/Meshes/Chimney.txt
 Component: -1
-Name: pasted__pCylinder6
+Name: Chimney
 ParentUID: -1
 Translation: 0, 0, 0
 Scale: 1, 1, 1
 Rotation: 0, 0, 0
 Texture: 
-}
-{
-UID: 3
-Path: ../Library/FBX/Pizza.fbx
-Component: -1
-Name: pasted__pCylinder21
-ParentUID: -1
-Translation: 0, 3.8103, 0
-Scale: 1, 1, 1
-Rotation: 0, -0, 0
-Texture: ../Images/BlancoNegro.png
 }
