@@ -28,6 +28,8 @@ public:
     bool Awake() override;
     bool CleanUp() override;
 
+    std::string CameraName;
+
     // Camera vectors
     glm::vec3 Position;
     glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f); // Default looking forward
@@ -57,6 +59,7 @@ public:
     glm::mat4 GetProjectionMatrix(float FOVdeg = 45.0f, float nearPlane = 0.1f, float farPlane = 1000.0f) const;
     glm::mat4 GetVPMatrix(float FOVdeg, float nearPlane, float farPlane) const;
 
+    void ChangeCamera(Camera*cam);
 
     // Frustum
     float nearPlane = 0.1f;

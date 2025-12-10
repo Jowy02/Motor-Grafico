@@ -50,6 +50,10 @@ void ResourceManager::LoadResource()
     std::string fileName;
     bool exist = false;
 
+    fbxFiles.clear();
+    textures.clear();
+    meshesFiles.clear();
+
     if (h != INVALID_HANDLE_VALUE) {
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)

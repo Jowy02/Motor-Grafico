@@ -151,7 +151,6 @@ void Scene::ApplyTextureToSelected(const std::string& path)
     {
         Application::GetInstance().menus->LogToConsole("ERROR APPLYING TEXTURE, NO OBJECT SELECTED");
     }
-
 }
 void Scene::SelectObject(GameObject* obj)
 {
@@ -161,7 +160,6 @@ void Scene::SelectObject(GameObject* obj)
         menus->selectedObj = obj;
         selected = true;
     }
-
     else {
         selected = false;
         menus->selectedObj = nullptr; // mismo comportamiento que en la jerarquía

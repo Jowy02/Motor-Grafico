@@ -15,7 +15,7 @@ bool Camera::Awake()
 {
     Position = { 0, 2, 10 }; // Default camera position
    // SDL_GetWindowSize(Application::GetInstance().window->window, &width, &height);
-
+    CameraName = "MainCamera";
     return true;
 }
 
@@ -166,6 +166,47 @@ void Camera::UpdateProjectionMatrix()
     projectionMatrix = glm::perspective(glm::radians(FOV), float(width) / height, nearPlane, farPlane);
 }
 
+void Camera::ChangeCamera(Camera * cam)
+{
+    Camera Temp; 
+    
+    Temp.Orientation.x = Orientation.x;
+    Temp.Orientation.y = Orientation.y;
+    Temp.Orientation.z = Orientation.z;
+    Temp.Orientation = Orientation;
+    Temp.FOV = FOV;
+    Temp.nearPlane = nearPlane;
+    Temp.farPlane = farPlane;
+    Temp.MOVESPEED = MOVESPEED;
+    Temp.sensitivity = sensitivity;
+    Temp.Position = Position;
+
+    Orientation.x = cam->Orientation.x;
+    Orientation.y = cam->Orientation.y;
+    Orientation.z = cam->Orientation.z;
+    Orientation = cam->Orientation;
+    UpdateViewMatrix();
+
+    FOV = cam->FOV;
+    nearPlane = cam->nearPlane;
+    farPlane = cam->farPlane;
+    MOVESPEED = cam->MOVESPEED;
+    sensitivity = cam->sensitivity;
+    Position =  cam->Position;
+    UpdateProjectionMatrix();
+
+    cam->Orientation.x = Temp.Orientation.x;
+    cam->Orientation.y = Temp.Orientation.y;
+    cam->Orientation.z = Temp.Orientation.z;
+    cam->Orientation = Temp.Orientation;
+    cam->FOV = Temp.FOV;
+    cam->nearPlane = Temp.nearPlane;
+    cam->farPlane = Temp.farPlane;
+    cam->MOVESPEED = Temp.MOVESPEED;
+    cam->sensitivity = Temp.sensitivity;
+    cam->Position = Temp.Position;
+
+}
 
 bool Camera::CleanUp()
 {

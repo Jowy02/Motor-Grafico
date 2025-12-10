@@ -643,6 +643,7 @@ void Render::CreateSphere()
     model.modelId = Application::GetInstance().scene.get()->models.size();
     Application::GetInstance().scene.get()->models.push_back(model);
     Application::GetInstance().scene.get()->models.back().UpdateTransform();
+
     if (!Application::GetInstance().scene->octreeRoot) {
         Application::GetInstance().scene->BuildOctree();
     }

@@ -96,10 +96,12 @@ private:
     int dragMesh = 0;
     bool dragedMesh = false;
 
-
-
     Camera* selectedCamera = nullptr;
+    std::vector<Camera*> cameras;       
 
-    std::string selectedResourcePath;
+    enum class ResourceType { None, Texture, Mesh, Fbx };
+    ResourceType selectedResourceType = ResourceType::None;
     int selectedResourceIndex = -1;
+    std::string selectedResourcePath;
+
 };

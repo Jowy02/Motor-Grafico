@@ -6,6 +6,7 @@
 #include "Menus.h"
 #include "Input.h"
 #include "SimulationController.h"
+#include "ResourceManager.h"
 
 #include <iostream> 
 
@@ -72,6 +73,9 @@ bool Menus::Start()
     ImGui_ImplOpenGL3_Init("#version 330");
 
     LogToConsole("ImGui initialized successfully");
+
+    cameras.push_back(Application::GetInstance().camera.get());
+
     return true;
 }
 
@@ -149,7 +153,6 @@ void Menus::MainMenu()
             ImGui::MenuItem("About", nullptr, &showAbout);
             ImGui::EndMenu();
         }
-
         // --- GEOMETRY CREATION MENU ---
         if (ImGui::BeginMenu("Create"))
         {
@@ -166,7 +169,12 @@ void Menus::MainMenu()
                 Application::GetInstance().render.get()->CreateDiamond();
             if (ImGui::MenuItem("Sphere"))
                 Application::GetInstance().render.get()->CreateSphere();
-            
+            if (ImGui::MenuItem("Camera"))
+            {
+                Camera* newCamera = new Camera;
+                newCamera->CameraName = "Camera" + std::to_string(cameras.size());
+                cameras.push_back(newCamera);
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Scene"))
@@ -329,25 +337,25 @@ void Menus::Hierarchy_Menu()
         selectedObj = NULL;
         selectedCamera = NULL;
     }
-
-    if (ImGui::TreeNodeEx((void*)Application::GetInstance().camera.get(), ImGuiTreeNodeFlags_DefaultOpen, "Main Camera"))
-    {
-        if (ImGui::IsItemClicked()) {
-
-            selectedCamera = Application::GetInstance().camera.get();
-            selectedObj = nullptr;
-            selectedResourcePath = "";
+    for (auto& camera : cameras) {
+        if (ImGui::TreeNodeEx(camera, ImGuiTreeNodeFlags_DefaultOpen, camera->CameraName.c_str()))
+        {
+            if (ImGui::IsItemClicked()) {
+                if (selectedCamera != camera)
+                {
+                    selectedCamera = camera;
+                    selectedObj = nullptr;
+                    selectedResourcePath = "";
+                }
+                else selectedCamera = nullptr;
+            }
+            ImGui::TreePop();
         }
-
-        ImGui::TreePop();
     }
-
 
     for (auto& Model : Application::GetInstance().scene.get()->models) {
         if(!Model.isChild)DrawGameObjectNode(&Model);
     }
-
-   
 
     ImGui::End();
 }
@@ -411,47 +419,48 @@ void Menus::DrawInspector()
     if (selectedObj != nullptr)
     {
         ImGui::Text("Selected: %s  id: %d", selectedObj->name.c_str(), selectedObj->modelId);
-        ImGui::Separator();
 
-        ImGui::Text("LOCAL TRANSFORM");
-        if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
-            selectedObj->UpdateTransform();
+        if (ImGui::CollapsingHeader("TRANSFORM", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        }
-        if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
-            selectedObj->UpdateTransform();
+            if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
+                selectedObj->UpdateTransform();
 
-        }
-        if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
-            selectedObj->UpdateTransform();
+            }
+            if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
+                selectedObj->UpdateTransform();
+
+            }
+            if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
+                selectedObj->UpdateTransform();
+            }
         }
         if (selectedObj->name != "Grid")
         {
-            ImGui::Separator();
-            ImGui::Text("MESH");
-            ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
+            if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-            Render* render = Application::GetInstance().render.get();
-            ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
-            ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
+                ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
 
-            ImGui::Separator();
-            ImGui::Text("TEXTURE");
-
-            if (selectedObj->actualTexture != NULL) {
-                ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
-
-                ImGui::Text("Size: %d %d", selectedObj->actualTexture->width, selectedObj->actualTexture->height);
-                ImGui::Image(selectedObj->actualTexture->ID, ImVec2(150, 150));
-                if (ImGui::Checkbox("Default texture", &checkbox))
-                    selectedObj->switchTexture(checkbox, "BlackWhite");
-                if (ImGui::Checkbox("Hide texture", &checkbox2))
-                    selectedObj->switchTexture(checkbox2, "Hide");
+                Render* render = Application::GetInstance().render.get();
+                ImGui::Checkbox("Show Face Normals", &render->FaceNormals);
+                ImGui::Checkbox("Show Vertex Normals", &render->VertexNormals);
             }
-            else  ImGui::Text("No texture on this object");
-            ImGui::Separator();
-            ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
 
+            if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+                if (selectedObj->actualTexture != NULL) {
+                    ImGui::Text("Path: %s", selectedObj->texturePath.c_str());
+
+                    ImGui::Text("Size: %d %d", selectedObj->actualTexture->width, selectedObj->actualTexture->height);
+                    ImGui::Image(selectedObj->actualTexture->ID, ImVec2(150, 150));
+                    if (ImGui::Checkbox("Default texture", &checkbox))
+                        selectedObj->switchTexture(checkbox, "BlackWhite");
+                    if (ImGui::Checkbox("Hide texture", &checkbox2))
+                        selectedObj->switchTexture(checkbox2, "Hide");
+                }
+                else  ImGui::Text("No texture on this object");
+                ImGui::Separator();
+                ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
+            }
             if (ImGui::Button("Delete Model"))
             {
                 if (Application::GetInstance().input->click) {
@@ -481,7 +490,7 @@ void Menus::DrawInspector()
     else if (selectedCamera != nullptr)
     {
         Camera* cam = selectedCamera;
-        ImGui::Text("Camera: Main Camera");
+        ImGui::Text(cam->CameraName.c_str());
         ImGui::Separator();
 
         if (ImGui::DragFloat3("Position", &cam->Position.x, 0.1f))
@@ -525,12 +534,48 @@ void Menus::DrawInspector()
         }
         ImGui::DragFloat("Move Speed", &cam->MOVESPEED, 0.05f, 0.0f, 10.0f);
         ImGui::DragFloat("Sensitivity", &cam->sensitivity, 0.01f, 0.0f, 1.0f);
+
+        if (ImGui::Button("Set us MainCamera")) 
+        {
+            Application::GetInstance().camera.get()->ChangeCamera(selectedCamera);
+            selectedCamera = Application::GetInstance().camera.get();
+        }
     }
     else if (selectedResourcePath != "")
     {
         ImGui::Text("Resource : %s", selectedResourcePath.c_str());
+        Texture* selectedTexture = nullptr;
 
-        //todo delete from library
+        if (ImGui::Button("Delete Selected")) {
+
+            switch (selectedResourceType) 
+            {
+                case ResourceType::Texture:
+                    // liberar memoria y borrar del vector
+                    for (auto& text : textures)
+                        if (text->textPath == selectedResourcePath) selectedTexture = text;
+
+                    textures.erase(std::remove(textures.begin(), textures.end(), selectedTexture), textures.end());
+                    selectedTexture = nullptr;
+                    break;
+
+                case ResourceType::Fbx:
+                    fbxFiles.erase(std::remove(fbxFiles.begin(), fbxFiles.end(), selectedResourcePath), fbxFiles.end());
+                    break;
+
+                case ResourceType::Mesh:
+                    meshesFiles.erase(std::remove(meshesFiles.begin(), meshesFiles.end(), selectedResourcePath), meshesFiles.end());
+                    break;
+
+                default: 
+                    break;
+            }
+            DeleteFileA(selectedResourcePath.c_str());
+
+            selectedResourceType = ResourceType::None;
+            selectedResourcePath.clear();
+            Application::GetInstance().resourceManager.get()->LoadResource();
+        }
         ImGui::Separator();
     }
     else
@@ -575,105 +620,111 @@ void Menus::DrawResourceManager()
 {
     ImGui::Begin("Resource Manager");
 
-    ImGui::Separator();
-    ImGui::Text("Texture");
+    if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::BeginTable("TexturesTable", 8)) {
+            for (int i = 0; i < textures.size(); i++) {
+                ImGui::TableNextColumn();
 
-    if (ImGui::BeginTable("TexturesTable", 8)) {
-        for (int i = 0; i < textures.size(); i++) {
-            ImGui::TableNextColumn();
+                ImGui::BeginGroup();
+                if (ImGui::Selectable(textures[i]->textPath.c_str(), selectedResourcePath == textures[i]->textPath)) {
+                    selectedResourcePath = textures[i]->textPath;
+                    selectedResourceType = ResourceType::Texture;
+                }
+                ImGui::Image(textures[i]->ID, ImVec2(150, 150));
+                ImGui::EndGroup();
 
-            ImGui::BeginGroup();
-            if (ImGui::Selectable(textures[i]->textPath.c_str(), selectedResourcePath == textures[i]->textPath)) {
-                selectedResourcePath = textures[i]->textPath;
+                // Drag & Drop 
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    dragTexture = i;
+                    draged = true;
+                    ImGui::Text("Arrastrando %s", textures[dragTexture]->textPath.c_str());
+                    ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture],
+                        textures[dragTexture]->textPath.size() + 1);
+                    ImGui::EndDragDropSource();
+                }
+
+                if (!ImGui::GetDragDropPayload() && draged) {
+                    Application::GetInstance().scene->ApplyTextureToSelected(textures[dragTexture]->textPath.c_str());
+                    draged = false;
+                }
             }
-            ImGui::Image(textures[i]->ID, ImVec2(150, 150));
-            ImGui::EndGroup();
-
-            // Drag & Drop 
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                dragTexture = i;
-                draged = true;
-                ImGui::Text("Arrastrando %s", textures[dragTexture]->textPath.c_str());
-                ImGui::SetDragDropPayload("TEXTURE_POINTER", &textures[dragTexture],
-                    textures[dragTexture]->textPath.size() + 1);
-                ImGui::EndDragDropSource();
-            }
-
-            if (!ImGui::GetDragDropPayload() && draged) {
-                Application::GetInstance().scene->ApplyTextureToSelected(textures[dragTexture]->textPath.c_str());
-                draged = false;
-            }
+            ImGui::EndTable();
         }
-        ImGui::EndTable();
     }
 
-    ImGui::Separator();
-    ImGui::Text("Meshes");
-    if (ImGui::BeginTable("MeshTable", 8)) {
+    if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::BeginTable("MeshTable", 8)) {
 
-        for (int i = 0; i < meshesFiles.size(); i++) {
-            ImGui::TableNextColumn();
+            for (int i = 0; i < meshesFiles.size(); i++) {
+                ImGui::TableNextColumn();
 
-            ImGui::BeginGroup();
-            if (ImGui::Selectable(meshesFiles[i].c_str(), selectedResourcePath == meshesFiles[i])) {
-                selectedResourcePath = meshesFiles[i];
+                ImGui::BeginGroup();
+                if (ImGui::Selectable(meshesFiles[i].c_str(), selectedResourcePath == meshesFiles[i])) 
+                {
+                    selectedResourcePath = meshesFiles[i];
+                    selectedResourceType = ResourceType::Mesh;
+                }
+
+                ImGui::EndGroup();
+
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+                    dragMesh = i;
+                    dragedMesh = true;
+
+                    ImGui::Text("Arrastrando %s", meshesFiles[dragMesh].c_str());
+                    ImGui::SetDragDropPayload("TEXTURE_POINTER", &meshesFiles[dragMesh], meshesFiles[dragMesh].size() + 1);
+
+                    ImGui::EndDragDropSource();
+
+                }
+                if (!ImGui::GetDragDropPayload() && dragedMesh)
+                {
+                    Application::GetInstance().menus.get()->selectedObj = NULL;
+                    Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
+                    dragedMesh = false;
+                }
             }
-
-            ImGui::EndGroup();
-
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-
-                dragMesh = i;
-                dragedMesh = true;
-
-                ImGui::Text("Arrastrando %s", meshesFiles[dragMesh].c_str());
-                ImGui::SetDragDropPayload("TEXTURE_POINTER", &meshesFiles[dragMesh], meshesFiles[dragMesh].size() + 1);
-
-                ImGui::EndDragDropSource();
-
-            }
-            if (!ImGui::GetDragDropPayload() && dragedMesh)
-            {
-                Application::GetInstance().menus.get()->selectedObj = NULL;
-                Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
-                dragedMesh = false;
-            }
+            ImGui::EndTable();
         }
-        ImGui::EndTable();
     }
 
-    ImGui::Separator();
-    ImGui::Text("Fbx");
-    if (ImGui::BeginTable("FbxTable", 8)) {
+    if (ImGui::CollapsingHeader("Fbx", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::BeginTable("FbxTable", 8)) {
 
-        for (int i = 0; i < fbxFiles.size(); i++) {
-            ImGui::TableNextColumn();
+            for (int i = 0; i < fbxFiles.size(); i++) {
+                ImGui::TableNextColumn();
 
-            ImGui::BeginGroup();                        
-            if (ImGui::Selectable(fbxFiles[i].c_str(), selectedResourcePath == fbxFiles[i])) {
-                selectedResourcePath = fbxFiles[i];
+                ImGui::BeginGroup();
+                if (ImGui::Selectable(fbxFiles[i].c_str(), selectedResourcePath == fbxFiles[i]))
+                {
+                    selectedResourcePath = fbxFiles[i];
+                    selectedResourceType = ResourceType::Fbx;
+                }
+                ImGui::EndGroup();
+
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+                    dragFbx = i;
+                    dragedFbx = true;
+
+                    ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
+                    ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
+
+                    ImGui::EndDragDropSource();
+
+                }
+                if (!ImGui::GetDragDropPayload() && dragedFbx)
+                {
+                    Application::GetInstance().menus.get()->selectedObj = NULL;
+                    Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
+                    dragedFbx = false;
+                }
             }
-            ImGui::EndGroup();
-
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-
-                dragFbx = i;
-                dragedFbx = true;
-
-                ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
-                ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
-
-                ImGui::EndDragDropSource();
-
-            }
-            if (!ImGui::GetDragDropPayload() && dragedFbx)
-            {
-                Application::GetInstance().menus.get()->selectedObj = NULL;
-                Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
-                dragedFbx = false;
-            }                 
+            ImGui::EndTable();
         }
-        ImGui::EndTable();
     }
     ImGui::End();
 }
