@@ -94,10 +94,7 @@ bool Menus::Update(float dt)
     //DrawSimulationToolbar();
 
     CalculateFPS(dt);
-    if (init) {
-        LoadTextures();
-        LoadFbx();
-    }
+
     if (showConsole) DrawConsole();
     if (showFPS) FPS_graph();
     if (showHierarchy) Hierarchy_Menu();
@@ -105,7 +102,7 @@ bool Menus::Update(float dt)
     if (showAbout) DrawAboutWindow();
     if(showInspector)DrawInspector();
     if(showSystemConfig)DrawSystemConfig();
-    if (isLoad || isSave)LoadTxt();
+    if (isLoad || isSave)SaveLoad();
 
     DrawResourceManager();
     return true;
@@ -542,37 +539,6 @@ void Menus::DrawInspector()
     }
     ImGui::End();
 }
-void Menus::LoadTextures()
-{
-    WIN32_FIND_DATAA data;
-    HANDLE h = FindFirstFileA("..\\Library\\Images\\*", &data);
-    std::string fileName;
-    bool exist = false;
-
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-
-            // Filtrar por tipo de archivo
-            fileName = data.cFileName;
-            if (fileName.substr(fileName.size() - 4) == ".png") {
-                fileName = "../Library/Images/" + fileName;
-                for (auto& text : textures)
-                {
-                    if (text->textPath == fileName) exist = true;
-                }
-                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); 
-                if(!exist)textures.push_back(tex);
-                exist = false;
-
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-    init = false;
-}
 
 Texture* Menus::GetLoadedTexture(const std::string& path)
 {
@@ -585,67 +551,7 @@ Texture* Menus::GetLoadedTexture(const std::string& path)
     }
     return nullptr; // No encontrada.
 }
-
-void Menus::LoadFbx()
-{
-    WIN32_FIND_DATAA data;
-    HANDLE h = FindFirstFileA("..\\Library\\FBX\\*", &data);
-    std::string fileName;
-    bool exist = false;
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-            fileName = data.cFileName;
-
-            if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
-                for (auto& files : fbxFiles)
-                {
-                    std::string TempfileName = "../Library/FBX/" + fileName;
-                    if (files == TempfileName) {
-                        exist = true;
-                    }
-                }
-                if(!exist)fbxFiles.push_back("../Library/FBX/" + fileName);
-                exist = false;
-
-            }
-            if (fileName.substr(fileName.size() - 4) == ".txt") {
-                txtFiles.push_back("../Library/FBX/" + fileName);
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-    
-    h = FindFirstFileA("..\\Library\\Meshes\\*", &data);
-    fileName = "";
-    exist = false;
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-            fileName = data.cFileName;
-
-            if (fileName.substr(fileName.size() - 4) == ".txt") {
-                for (auto& files : meshesFiles)
-                {
-                    std::string TempfileName = "../Library/Meshes/" + fileName;
-                    if (files == TempfileName) {
-                        exist = true;
-                    }
-                }
-                if (!exist)meshesFiles.push_back("../Library/Meshes/" + fileName);
-                exist = false;
-
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-    init = false;
-}
-void Menus::LoadTxt()
+void Menus::SaveLoad()
 {
     if (ImGuiFileDialog::Instance()->Display("ChooseScene")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {

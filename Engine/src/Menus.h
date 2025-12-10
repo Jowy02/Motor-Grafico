@@ -50,18 +50,20 @@ public:
     void MainMenu();
     void BuildDockSpace();
 
-    void LoadFbx();
-    void LoadTxt();
-
-    void LoadTextures();
-    bool init = true;
+    void SaveLoad();
 
     Texture* GetLoadedTexture(const std::string& path);
 
     void DrawSimulationToolbar();
+
+    std::vector<std::string> fbxFiles;
+    std::vector<std::string> txtFiles;
+    std::vector<std::string> meshesFiles;
+    std::vector<Texture*> textures;           // Loaded models
+
+
 private:
     std::vector<GameObject> models;           // Loaded models
-    std::vector<Texture*> textures;           // Loaded models
     std::vector<float> fpsHistory;       // FPS history for graphs
 
     uint32_t lastFrameTime = 0;
@@ -94,9 +96,7 @@ private:
     int dragMesh = 0;
     bool dragedMesh = false;
 
-    std::vector<std::string> fbxFiles;
-    std::vector<std::string> txtFiles;
-    std::vector<std::string> meshesFiles;
+
 
     Camera* selectedCamera = nullptr;
 

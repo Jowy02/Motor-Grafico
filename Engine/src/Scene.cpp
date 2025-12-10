@@ -7,6 +7,8 @@
 #include "Window.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "ResourceManager.h"
+
 #include "Input.h"
 #include <iostream> 
 
@@ -68,7 +70,8 @@ void Scene::LoadFBX(const std::string& path)
         std::filesystem::create_directories("../Library/FBX");
         std::filesystem::copy_file(path, dest,
             std::filesystem::copy_options::update_existing);
-        Application::GetInstance().menus.get()->init = true;
+        //Application::GetInstance().menus.get()->init = true;
+        Application::GetInstance().resourceManager.get()->LoadResource();
     }
 
     GameObject model(dest);
@@ -133,7 +136,8 @@ void Scene::ApplyTextureToSelected(const std::string& path)
             std::filesystem::create_directories("../Library/Images");
             std::filesystem::copy_file(path, dest,
                 std::filesystem::copy_options::update_existing);
-            Application::GetInstance().menus.get()->init = true;
+           // Application::GetInstance().menus.get()->init = true;
+            Application::GetInstance().resourceManager.get()->LoadResource();
         }
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
@@ -162,8 +166,6 @@ void Scene::SelectObject(GameObject* obj)
         selected = false;
         menus->selectedObj = nullptr; // mismo comportamiento que en la jerarquía
     }
-
-
 }
 
 bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t)

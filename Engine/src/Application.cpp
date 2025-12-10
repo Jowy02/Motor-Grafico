@@ -7,6 +7,8 @@
 #include "Mesh.h"
 #include "Menus.h"
 #include "SimulationController.h"
+#include "ResourceManager.h"
+
 // Constructor
 Application::Application() 
 {
@@ -18,6 +20,8 @@ Application::Application()
     menus = std::make_shared<Menus>();
     mesh = std::make_shared<Mesh>();
     simulationController = std::make_shared<SimulationController>();
+    resourceManager = std::make_shared<ResourceManager>();
+
 
     // Ordered for awake / Start / Update // Reverse order of CleanUp
     AddModule(std::static_pointer_cast<Module>(window));
@@ -28,6 +32,8 @@ Application::Application()
     AddModule(std::static_pointer_cast<Module>(render));
     AddModule(std::static_pointer_cast<Module>(camera));
     AddModule(std::static_pointer_cast<Module>(simulationController));
+    AddModule(std::static_pointer_cast<Module>(resourceManager));
+
 }
 
 // Static method to get the instance of the Engine class, following the singletn pattern

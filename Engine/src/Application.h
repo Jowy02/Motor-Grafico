@@ -20,6 +20,7 @@ class Scene;
 class Menus;
 class Mesh;
 class SimulationController;
+class ResourceManager;
 
 class Application
 {
@@ -76,6 +77,8 @@ public:
     std::shared_ptr<Menus> menus;
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<SimulationController> simulationController;
+    std::shared_ptr<ResourceManager> resourceManager;
+
     bool requestExit = false;
 
 private:
