@@ -1,12 +1,23 @@
+Cameras:
+{
+Name: MainCamera
+Orientation: -0.0951542,-0.304128,-0.947867
+FOV: 45
+NearPlane: 0.1
+FarPlane: 1000
+MovesSpeed: 0.1
+Sensitivity: 0.1
+Position: 3.27822,8.61324,21.4852
+}
 GameObjects:
 {
 UID: 1
-Path: ../Library/Meshes/City_building_034.txt
+Path: ../Library/Meshes/City_building_032.txt
 Component: -1
-Name: City_building_034
+Name: City_building_032
 ParentUID: -1
-Translation: -9.52094, -3.63977e-05, -11.113
-Scale: 2.28, 2.28, 2.28
+Translation: 15.0881, 0.1, 10.024
+Scale: 2, 2, 2
 Rotation: 0, -0, 0
-Texture: ../Library/Images/building05 _c.png
+Texture: ../Library/Images/building03_c.png
 }

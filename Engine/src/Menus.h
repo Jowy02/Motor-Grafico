@@ -61,7 +61,6 @@ public:
     std::vector<std::string> meshesFiles;
     std::vector<Texture*> textures;           // Loaded models
 
-
 private:
     std::vector<GameObject> models;           // Loaded models
     std::vector<float> fpsHistory;       // FPS history for graphs
@@ -97,7 +96,6 @@ private:
     bool dragedMesh = false;
 
     Camera* selectedCamera = nullptr;
-    std::vector<Camera*> cameras;       
 
     enum class ResourceType { None, Texture, Mesh, Fbx };
     ResourceType selectedResourceType = ResourceType::None;

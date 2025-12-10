@@ -55,6 +55,8 @@ public:
 
     // --- Scene content ---
     std::vector<GameObject> models;
+    std::vector<Camera*> cameras;
+
     GizmoOperation currentGizmo = GizmoOperation::TRANSLATE;
 
     void ImGuizmo();

@@ -184,12 +184,12 @@ void Camera::ChangeCamera(Camera * cam)
     Orientation.x = cam->Orientation.x;
     Orientation.y = cam->Orientation.y;
     Orientation.z = cam->Orientation.z;
-    Orientation = cam->Orientation;
+    //Orientation =   cam->Orientation;
     UpdateViewMatrix();
 
     FOV = cam->FOV;
     nearPlane = cam->nearPlane;
-    farPlane = cam->farPlane;
+    farPlane =  cam->farPlane;
     MOVESPEED = cam->MOVESPEED;
     sensitivity = cam->sensitivity;
     Position =  cam->Position;
@@ -205,7 +205,6 @@ void Camera::ChangeCamera(Camera * cam)
     cam->MOVESPEED = Temp.MOVESPEED;
     cam->sensitivity = Temp.sensitivity;
     cam->Position = Temp.Position;
-
 }
 
 bool Camera::CleanUp()

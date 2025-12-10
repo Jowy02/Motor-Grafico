@@ -392,11 +392,25 @@ void Scene::SaveScene(std::string filePath)
 {
     std::ofstream file(filePath);
     if (!file.is_open()) return;
+    for (const auto& camera : cameras) {
+        file << "Cameras:\n";
+        file << "{" << "\n";
 
-    file << "GameObjects:\n";
+        file << "Name: " << camera->CameraName << "\n";
+        file << "Orientation: " << camera->Orientation.x <<"," << camera->Orientation.y <<","<< camera->Orientation.z << "\n";
+        file << "FOV: " << camera->FOV << "\n";
+        file << "NearPlane: " << camera->nearPlane << "\n";
+        file << "FarPlane: " << camera->farPlane << "\n";
+        file << "MovesSpeed: " << camera->MOVESPEED << "\n";
+        file << "Sensitivity: " << camera->sensitivity << "\n";
+        file << "Position: " << camera->Position.x <<","<< camera->Position.y << "," << camera->Position.z << "\n";
+        file << "}" << "\n";
+        
+    }
     for (const auto& model : models) {
         if (model.name != "Grid" && model.componentID < 0)
         {
+            file << "GameObjects:\n";
             file << "{" << "\n";
 
             file << "UID: " << model.modelId << "\n";
@@ -408,22 +422,6 @@ void Scene::SaveScene(std::string filePath)
             file << "Scale: " << model.scale.x << ", " << model.scale.y << ", " << model.scale.z << "\n";
             file << "Rotation: " << model.rotation.x << ", " << model.rotation.y << ", " << model.rotation.z << "\n";
             file << "Texture: " << model.texturePath << "\n";
-
-            //if (model.haveComponents)
-            //{
-            //    for (const auto& Othermodel : models) 
-            //    {
-            //        if(Othermodel.componentID == model.modelId)
-            //        {
-            //            file << "ComponentID: " << Othermodel.modelId << "\n";
-            //            file << "Translation: " << Othermodel.position.x << ", " << Othermodel.position.y << ", " << Othermodel.position.z << "\n";
-            //            file << "Scale: " << Othermodel.scale.x << ", " << Othermodel.scale.y << ", " << Othermodel.scale.z << "\n";
-            //            file << "Rotation: " << Othermodel.rotation.x << ", " << Othermodel.rotation.y << ", " << Othermodel.rotation.z << "\n";
-            //            file << "Texture: " << Othermodel.texturePath << "\n";
-            //        }
-            //    }
-
-            //}
             file << "}" << "\n";
         }
     }
@@ -431,7 +429,6 @@ void Scene::SaveScene(std::string filePath)
 }
 void Scene::LoadScene(std::string filePath)
 {
-
     if (!models.empty()) {
         GameObject grid = models.front(); // Guarda la Grid (asumiendo índice 0)
         models.clear();                   // Borra todos los objetos
@@ -445,16 +442,24 @@ void Scene::LoadScene(std::string filePath)
 
         Application::GetInstance().menus.get()->selectedObj = nullptr;
     }
+    if (cameras.size() > 1) {
+        cameras.clear();
+        cameras.push_back(Application::GetInstance().camera.get());
+    }
 
     //"../Library/FBX/Scene.txt"
     std::ifstream file(filePath);
     if (!file.is_open()) return;
     std::string ModelName;
     std::string line;
+    std::string prevline = "";
+
+    int C_UID = -1;
     int UID = -1;
     int tempId = -1;
     bool components = false;
     bool insideObject = false;
+    bool insideCam = false;
 
     if (models.size() > 1) {
         deleteScene = true;
@@ -483,13 +488,21 @@ void Scene::LoadScene(std::string filePath)
     if (!deleteScene)
     {
         while (std::getline(file, line)) {
-            if (line == "{") {
+
+            if (line == "{" && prevline == "GameObjects:") {
                 insideObject = true;
             }
             else if (line == "}") {
                 insideObject = false;
+                insideCam = false;
             }
-            else if (insideObject) {
+            else if (line == "{" && prevline == "Cameras:")
+            {
+                insideCam = true;
+            }
+            prevline = line;
+
+            if (insideObject) {
                 // parsear clave: valor
                 std::istringstream iss(line);
                 std::string key;
@@ -579,6 +592,58 @@ void Scene::LoadScene(std::string filePath)
                     }
                 }
             }
+            else if (insideCam)
+            {
+                std::istringstream iss(line);
+                std::string key;
+                if (std::getline(iss, key, ':')) {
+                    std::string value;
+                    std::getline(iss, value);
+                    // limpiar espacios
+                    if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+
+                    if (key == "Name"){
+                        if (C_UID < 0) C_UID = 0;
+                        else {
+                            Camera* NewCamera = new Camera;
+                            cameras.push_back(NewCamera);
+                            C_UID += 1;
+                        }
+                        cameras[C_UID]->CameraName = value;
+                    }
+                    else if (key == "Orientation") {
+                        std::stringstream ss(value);
+                        ss >> cameras[C_UID]->Orientation.x;
+                        ss.ignore(1);
+                        ss >> cameras[C_UID]->Orientation.y;
+                        ss.ignore(1);
+                        ss >> cameras[C_UID]->Orientation.z;
+                    }
+                    else if (key == "FOV") {
+                        cameras[C_UID]->FOV = std::stof(value);
+                    }
+                    else if (key == "NearPlane") {
+                        cameras[C_UID]->nearPlane = std::stof(value);
+                    }
+                    else if (key == "FarPlane") {
+                        cameras[C_UID]->farPlane = std::stof(value);
+                    }
+                    else if (key == "MovesSpeed") {
+                        cameras[C_UID]->MOVESPEED = std::stof(value);
+                    }
+                    else if (key == "Sensitivity") {
+                        cameras[C_UID]->sensitivity = std::stof(value);
+                    }
+                    else if (key == "Position") {
+                        std::stringstream ss(value);
+                        ss >> cameras[C_UID]->Position.x;
+                        ss.ignore(1);
+                        ss >> cameras[C_UID]->Position.y;
+                        ss.ignore(1);
+                        ss >> cameras[C_UID]->Position.z;
+                    }
+                }
+            }
         }
 
         for (const auto& model : models)
@@ -590,8 +655,9 @@ void Scene::LoadScene(std::string filePath)
             }
         }
         BuildOctree();
-
     }
+    cameras[0]->UpdateViewMatrix();
+    cameras[0]->UpdateProjectionMatrix();
 }
 void Scene::LoadMesh(std::string filePath)
 {

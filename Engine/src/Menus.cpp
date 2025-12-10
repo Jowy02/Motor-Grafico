@@ -75,7 +75,7 @@ bool Menus::Start()
 
     LogToConsole("ImGui initialized successfully");
 
-    cameras.push_back(Application::GetInstance().camera.get());
+    Application::GetInstance().scene.get()->cameras.push_back(Application::GetInstance().camera.get());
 
     return true;
 }
@@ -175,8 +175,8 @@ void Menus::MainMenu()
             if (ImGui::MenuItem("Camera"))
             {
                 Camera* newCamera = new Camera;
-                newCamera->CameraName = "Camera" + std::to_string(cameras.size());
-                cameras.push_back(newCamera);
+                newCamera->CameraName = "Camera" + std::to_string(Application::GetInstance().scene.get()->cameras.size());
+                Application::GetInstance().scene.get()->cameras.push_back(newCamera);
             }
             ImGui::EndMenu();
         }
@@ -392,7 +392,7 @@ void Menus::Hierarchy_Menu()
         selectedObj = NULL;
         selectedCamera = NULL;
     }
-    for (auto& camera : cameras) {
+    for (auto& camera : Application::GetInstance().scene.get()->cameras) {
         if (ImGui::TreeNodeEx(camera, ImGuiTreeNodeFlags_DefaultOpen, camera->CameraName.c_str()))
         {
             if (ImGui::IsItemClicked()) {
