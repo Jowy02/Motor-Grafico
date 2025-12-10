@@ -7,19 +7,48 @@
 SimulationController::SimulationController() : Module()
 {
     currentState = GameState::STOPPED;
-    name = "SimulationController"; 
+    name = "SimulationController";
 }
 
 SimulationController::~SimulationController()
 {
-    
+
+}
+
+void SimulationController::OnCameraCreatedDuringPlay(Camera* cam)
+{
+    if (currentState == GameState::RUNNING)
+    {
+        addedCamerasDuringPlay.push_back(cam);
+    }
+}
+
+void SimulationController::OnCameraRemovedDuringPlay(Camera* cam)
+{
+    if (currentState == GameState::RUNNING)
+    {
+        removedCamerasDuringPlay.push_back(cam);
+    }
 }
 
 void SimulationController::Play()
 {
     if (currentState == GameState::STOPPED) {
         SaveInitialSceneState();
+
+        Camera* cam = Application::GetInstance().camera.get();
+        for (auto& cam : Application::GetInstance().scene.get()->cameras) {
+            savedCamera.Position = cam->Position;
+            savedCamera.Orientation = cam->Orientation;
+            savedCamera.FOV = cam->FOV;
+            savedCamera.nearPlane = cam->nearPlane;
+            savedCamera.farPlane = cam->farPlane;
+            savedCamera.MOVESPEED = cam->MOVESPEED;
+            savedCamera.sensitivity = cam->sensitivity;
+        }
     }
+
+
     currentState = GameState::RUNNING;
     Time::Resume();
 
@@ -42,6 +71,8 @@ void SimulationController::Stop()
 {
     if (currentState != GameState::STOPPED) {
         LoadInitialSceneState();
+        LoadInitialcamaras();
+
         currentState = GameState::STOPPED;
         Time::Init(Time::fixedDeltaTime);
         Time::Pause();
@@ -86,7 +117,7 @@ void SimulationController::SaveInitialSceneState()
     savedSceneBlueprints.clear();
 
     for (auto& model : currentScene->models) {
-      
+
         model.SaveInitialState();
 
         savedSceneBlueprints.push_back({
@@ -100,7 +131,7 @@ void SimulationController::SaveInitialSceneState()
                     model.name,
                     model.modelId
             });
-        
+
     }
 }
 
@@ -111,8 +142,8 @@ void SimulationController::LoadInitialSceneState()
     //Clean up
     for (auto& model : currentScene->models)
     {
-        model.CleanUpChilds(); 
-        model.CleanUp();    
+        model.CleanUpChilds();
+        model.CleanUp();
     }
     currentScene->models.clear();
 
@@ -152,4 +183,51 @@ void SimulationController::LoadInitialSceneState()
     // Reset selección y estado
     Application::GetInstance().menus.get()->selectedObj = nullptr;
     currentState = GameState::STOPPED;
+}
+
+void SimulationController::LoadInitialcamaras() {
+
+    auto& menusCams = Application::GetInstance().scene.get()->cameras;
+
+    //Eliminar
+    for (Camera* cam : addedCamerasDuringPlay)
+    {
+        auto it = std::find(menusCams.begin(), menusCams.end(), cam);
+        if (it != menusCams.end())
+        {
+            menusCams.erase(it);
+            delete cam;
+        }
+    }
+    addedCamerasDuringPlay.clear();
+
+    //Restaurar
+    for (Camera* cam : removedCamerasDuringPlay)
+    {
+        menusCams.push_back(cam);
+    }
+    removedCamerasDuringPlay.clear();
+
+    for (Camera* cam : menusCams)
+    {
+        cam->UpdateViewMatrix();
+        cam->UpdateProjectionMatrix();
+    }
+
+
+    Camera* cam = Application::GetInstance().camera.get();
+
+
+    for (auto& cam : Application::GetInstance().scene.get()->cameras) {
+        cam->Position = savedCamera.Position;
+        cam->Orientation = savedCamera.Orientation;
+        cam->FOV = savedCamera.FOV;
+        cam->nearPlane = savedCamera.nearPlane;
+        cam->farPlane = savedCamera.farPlane;
+        cam->MOVESPEED = savedCamera.MOVESPEED;
+        cam->sensitivity = savedCamera.sensitivity;
+
+        cam->UpdateViewMatrix();
+        cam->UpdateProjectionMatrix();
+    }
 }

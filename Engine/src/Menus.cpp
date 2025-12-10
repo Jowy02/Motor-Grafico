@@ -174,9 +174,13 @@ void Menus::MainMenu()
                 Application::GetInstance().render.get()->CreateSphere();
             if (ImGui::MenuItem("Camera"))
             {
+               
                 Camera* newCamera = new Camera;
                 newCamera->CameraName = "Camera" + std::to_string(Application::GetInstance().scene.get()->cameras.size());
                 Application::GetInstance().scene.get()->cameras.push_back(newCamera);
+                if (Application::GetInstance().simulationController->GetState() == GameState::RUNNING) {
+                    Application::GetInstance().simulationController->OnCameraCreatedDuringPlay(newCamera);
+                }
             }
             ImGui::EndMenu();
         }
@@ -327,24 +331,6 @@ void Menus::BuildDockSpace()
 
     ImGui::End();
 }
-
-//void Menus::CalculateFPS(float dt)
-//{
-//    framesCounter++;
-//    timeAccumulator += dt;
-//
-//    if (timeAccumulator >= 1.0f)
-//    {
-//        currentFPS = (float)framesCounter / timeAccumulator;
-//        fpsHistory.push_back(currentFPS);
-//
-//        if (fpsHistory.size() > 100)
-//            fpsHistory.erase(fpsHistory.begin());
-//
-//        framesCounter = 0;
-//        timeAccumulator = 0.0f;
-//    }
-//}
 
 void Menus::CalculateFPS(float dt)
 {
@@ -553,7 +539,7 @@ void Menus::DrawInspector()
             cam->Inputs(Application::GetInstance().window->window);
         }
 
-        static glm::vec3 eulerAngles = glm::degrees(glm::vec3(
+        glm::vec3 eulerAngles = glm::degrees(glm::vec3(
             atan2(cam->Orientation.y, sqrt(cam->Orientation.x * cam->Orientation.x + cam->Orientation.z * cam->Orientation.z)),
             atan2(cam->Orientation.x, cam->Orientation.z),
             0.0f
@@ -592,10 +578,27 @@ void Menus::DrawInspector()
 
         if (selectedCamera->CameraName != "MainCamera")
         {
-            if (ImGui::Button("Set us MainCamera")) 
+            if (ImGui::Button("Set us MainCamera"))
             {
                 Application::GetInstance().camera.get()->ChangeCamera(selectedCamera);
                 selectedCamera = Application::GetInstance().camera.get();
+
+            }
+
+            if (ImGui::Button("Delete Camera"))
+            {
+                auto& cams = Application::GetInstance().scene->cameras;
+
+                cams.erase(std::remove(cams.begin(), cams.end(), cam), cams.end());
+
+                if (Application::GetInstance().simulationController->GetState() == GameState::RUNNING) {
+                    Application::GetInstance().simulationController->OnCameraRemovedDuringPlay(cam);
+                }
+                else {
+                    delete cam;
+                }
+                selectedCamera = nullptr;
+
             }
         }
     }

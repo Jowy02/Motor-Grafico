@@ -20,10 +20,19 @@ struct InitialGameObjectData
     int modelId;
 };
 
+struct CameraSnapshot {
+    glm::vec3 Position;
+    glm::vec3 Orientation;
+    float FOV;
+    float nearPlane;
+    float farPlane;
+    float MOVESPEED;
+    float sensitivity;
+};
 enum class GameState {
-    STOPPED, 
+    STOPPED,
     RUNNING,
-    PAUSED  
+    PAUSED
 };
 
 class SimulationController : public Module
@@ -41,12 +50,18 @@ public:
     float GetGameDeltaTime(float realDeltaTime) const;
 
     void SaveInitialSceneState();
+    void OnCameraRemovedDuringPlay(Camera* cam);
+    void OnCameraCreatedDuringPlay(Camera* cam);
 
 private:
     GameState currentState;
 
     void LoadInitialSceneState();
-
+    void LoadInitialcamaras();
     std::vector<InitialGameObjectData> savedSceneBlueprints;
+    CameraSnapshot savedCamera;
+
+    std::vector<Camera*> addedCamerasDuringPlay;
+    std::vector<Camera*> removedCamerasDuringPlay;
 
 };

@@ -311,14 +311,37 @@ void Scene::ImGuizmo() {
     }
 }
 
+Camera* Scene::GetActiveCamera()
+{
+    auto& menus = Application::GetInstance().menus;
+
+    // Si hay una cámara seleccionada en el menú, devuélvela
+    if (menus->selectedCamera)
+        return menus->selectedCamera;
+
+    return Application::GetInstance().camera.get();
+}
+
+
 bool Scene::Update(float dt)
 {
+    Camera* activeCamera = GetActiveCamera();
+    if (activeCamera)
+    {
+        activeCamera->UpdateProjectionMatrix();
+
+        frustum.Update(activeCamera->GetVPMatrix(
+            activeCamera->FOV,
+            activeCamera->nearPlane,
+            activeCamera->farPlane
+        ));
+    }
     //frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(100.0f, 0.1f, 100.0f));
-    frustum.Update(Application::GetInstance().camera->GetVPMatrix(
+ /*   frustum.Update(Application::GetInstance().camera->GetVPMatrix(
         Application::GetInstance().camera->FOV,
         Application::GetInstance().camera->nearPlane,
         Application::GetInstance().camera->farPlane
-    ));
+    ));*/
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();

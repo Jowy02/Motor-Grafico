@@ -67,6 +67,8 @@ public:
     std::unique_ptr<OctreeNode> octreeRoot;
 
     void RecreateGameObject(const InitialGameObjectData& blueprint);
+    Camera* GetActiveCamera();
+
 private:
     // --- Internal data ---
     SDL_Texture* mouseTileTex = nullptr;

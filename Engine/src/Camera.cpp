@@ -4,9 +4,12 @@
 #include "Menus.h"
 #include "LineSegment.h"
 
-Camera::Camera() : Module(), width(0), height(0), Position(0.0f, 0.0f, 0.0f)
+Camera::Camera() : Module(), width(800), height(600), Position(0.0f, 2.0f, 10.0f),
+FOV(60.0f), nearPlane(0.1f), farPlane(100.0f), MOVESPEED(5.0f), sensitivity(0.1f)
 {
     name = "Camera";
+    Up = glm::vec3(0.0f, 1.0f, 0.0f);
+    Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
 Camera::~Camera() {}
