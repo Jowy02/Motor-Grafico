@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include <vector>
 #include <string>
+#include "Time.h"
 
 struct InitialGameObjectData
 {
@@ -34,6 +35,7 @@ public:
     void Play();
     void Pause();
     void Stop();
+    void Step();
 
     GameState GetState() const { return currentState; }
     float GetGameDeltaTime(float realDeltaTime) const;

@@ -21,6 +21,7 @@ class Menus;
 class Mesh;
 class SimulationController;
 class ResourceManager;
+//class Time;
 
 class Application
 {
@@ -78,6 +79,7 @@ public:
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<SimulationController> simulationController;
     std::shared_ptr<ResourceManager> resourceManager;
+    //std::shared_ptr<Time> time;
 
     bool requestExit = false;
 

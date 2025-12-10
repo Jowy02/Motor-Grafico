@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "SimulationController.h"
 #include "ResourceManager.h"
+#include "Time.h"
 
 #include <iostream> 
 
@@ -84,6 +85,8 @@ bool Menus::PreUpdate()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
+
+
 
     return true;
 }
@@ -192,13 +195,12 @@ void Menus::MainMenu()
     }
 }
 
-// Menus.cpp (Implementación de la nueva función)
 void Menus::DrawSimulationToolbar()
 {
-
     SimulationController* simController = Application::GetInstance().simulationController.get();
     GameState currentState = simController->GetState();
 
+    // PLAY / PAUSE
     if (currentState == GameState::STOPPED || currentState == GameState::PAUSED) {
         if (ImGui::Button("PLAY")) {
             simController->Play();
@@ -212,17 +214,52 @@ void Menus::DrawSimulationToolbar()
         }
     }
 
-    ImGui::SameLine(); // Poner el siguiente elemento en la misma línea
+    ImGui::SameLine();
 
-    bool stopDisabled = currentState == GameState::STOPPED;
+    // STOP
+    bool stopDisabled = (currentState == GameState::STOPPED);
     if (stopDisabled) ImGui::BeginDisabled();
-
     if (ImGui::Button("STOP")) {
         simController->Stop();
         Application::GetInstance().menus->LogToConsole("Simulation Stopped and Reset");
     }
-
     if (stopDisabled) ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    // STEP (One Frame)
+    if (ImGui::Button("STEP")) {
+        simController->Step();
+        Application::GetInstance().menus->LogToConsole("Simulation Step requested (one frame).");
+    }
+
+    ImGui::SameLine();
+
+    // Faster / Slower
+    if (ImGui::Button("<< Slower")) {
+        Time::SetTimeScale(Time::timeScale - 0.25f);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Faster >>")) {
+        Time::SetTimeScale(Time::timeScale + 0.25f);
+    }
+
+    ImGui::SameLine();
+
+    // TimeScale slider
+    float ts = Time::timeScale;
+    if (ImGui::SliderFloat("TimeScale", &ts, Time::minTimeScale, Time::maxTimeScale, "%.2f")) {
+        Time::SetTimeScale(ts);
+    }
+
+    // Mostrar estados y relojes
+
+    ImGui::Begin("Debug");
+    ImGui::Text("State: %s", (currentState == GameState::STOPPED) ? "STOPPED" : (currentState == GameState::RUNNING ? "RUNNING" : "PAUSED"));
+    ImGui::SameLine();
+    ImGui::Text(" | Game Time: %.2f s | Real Time: %.2f s | dt (game): %.4f s", (float)Time::time, (float)Time::realTime, Time::deltaTime);
+    ImGui::End();
+
 }
 
 void Menus::BuildDockSpace() 
@@ -291,10 +328,28 @@ void Menus::BuildDockSpace()
     ImGui::End();
 }
 
+//void Menus::CalculateFPS(float dt)
+//{
+//    framesCounter++;
+//    timeAccumulator += dt;
+//
+//    if (timeAccumulator >= 1.0f)
+//    {
+//        currentFPS = (float)framesCounter / timeAccumulator;
+//        fpsHistory.push_back(currentFPS);
+//
+//        if (fpsHistory.size() > 100)
+//            fpsHistory.erase(fpsHistory.begin());
+//
+//        framesCounter = 0;
+//        timeAccumulator = 0.0f;
+//    }
+//}
+
 void Menus::CalculateFPS(float dt)
 {
     framesCounter++;
-    timeAccumulator += dt;
+    timeAccumulator += Time::realDeltaTime;
 
     if (timeAccumulator >= 1.0f)
     {

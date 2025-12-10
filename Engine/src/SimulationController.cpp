@@ -1,6 +1,7 @@
 ﻿#include "SimulationController.h"
 #include "Application.h" 
 #include "Scene.h"       
+#include "Time.h"
 
 
 SimulationController::SimulationController() : Module()
@@ -20,15 +21,20 @@ void SimulationController::Play()
         SaveInitialSceneState();
     }
     currentState = GameState::RUNNING;
+    Time::Resume();
+
 }
 
 void SimulationController::Pause()
 {
     if (currentState == GameState::RUNNING) {
         currentState = GameState::PAUSED;
+        Time::Pause();
+
     }
     else if (currentState == GameState::PAUSED) {
         currentState = GameState::RUNNING;
+        Time::Resume();
     }
 }
 
@@ -37,16 +43,40 @@ void SimulationController::Stop()
     if (currentState != GameState::STOPPED) {
         LoadInitialSceneState();
         currentState = GameState::STOPPED;
+        Time::Init(Time::fixedDeltaTime);
+        Time::Pause();
+    }
+
+}
+
+void SimulationController::Step()
+{
+    if (currentState == GameState::STOPPED) {
+        SaveInitialSceneState();
+        currentState = GameState::PAUSED;
+        Time::Pause();
+        Time::RequestStepOnce();
+        return;
+    }
+
+    if (currentState == GameState::RUNNING) {
+        return;
+    }
+
+    if (currentState == GameState::PAUSED) {
+        Time::RequestStepOnce();
     }
 }
 
-
 float SimulationController::GetGameDeltaTime(float realDeltaTime) const
 {
-    if (currentState == GameState::RUNNING) {
+    /*if (currentState == GameState::RUNNING) {
         return realDeltaTime;
     }
-    return 0.0f;
+    return 0.0f;*/
+
+    return Time::deltaTime;
+
 }
 
 void SimulationController::SaveInitialSceneState()
