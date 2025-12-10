@@ -535,10 +535,13 @@ void Menus::DrawInspector()
         ImGui::DragFloat("Move Speed", &cam->MOVESPEED, 0.05f, 0.0f, 10.0f);
         ImGui::DragFloat("Sensitivity", &cam->sensitivity, 0.01f, 0.0f, 1.0f);
 
-        if (ImGui::Button("Set us MainCamera")) 
+        if (selectedCamera->CameraName != "MainCamera")
         {
-            Application::GetInstance().camera.get()->ChangeCamera(selectedCamera);
-            selectedCamera = Application::GetInstance().camera.get();
+            if (ImGui::Button("Set us MainCamera")) 
+            {
+                Application::GetInstance().camera.get()->ChangeCamera(selectedCamera);
+                selectedCamera = Application::GetInstance().camera.get();
+            }
         }
     }
     else if (selectedResourcePath != "")
