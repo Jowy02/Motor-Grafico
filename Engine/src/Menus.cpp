@@ -327,6 +327,11 @@ void Menus::DrawConsole()
 void Menus::Hierarchy_Menu()
 {
     ImGui::Begin("Hierarchy", &showHierarchy);
+    if (selectedResourcePath != "" && (selectedObj != NULL || selectedCamera != NULL))
+    {
+        selectedObj = NULL;
+        selectedCamera = NULL;
+    }
 
     if (ImGui::TreeNodeEx((void*)Application::GetInstance().camera.get(), ImGuiTreeNodeFlags_DefaultOpen, "Main Camera"))
     {
@@ -334,6 +339,7 @@ void Menus::Hierarchy_Menu()
 
             selectedCamera = Application::GetInstance().camera.get();
             selectedObj = nullptr;
+            selectedResourcePath = "";
         }
 
         ImGui::TreePop();
@@ -523,6 +529,13 @@ void Menus::DrawInspector()
         ImGui::DragFloat("Move Speed", &cam->MOVESPEED, 0.05f, 0.0f, 10.0f);
         ImGui::DragFloat("Sensitivity", &cam->sensitivity, 0.01f, 0.0f, 1.0f);
     }
+    else if (selectedResourcePath != "")
+    {
+        ImGui::Text("Resource : %s", selectedResourcePath.c_str());
+
+        //todo delete from library
+        ImGui::Separator();
+    }
     else
     {
         ImGui::Text("No object selected");
@@ -664,7 +677,9 @@ void Menus::DrawResourceManager()
             ImGui::TableNextColumn();
 
             ImGui::BeginGroup();
-            ImGui::Text("%s", textures[i]->textPath.c_str());
+            if (ImGui::Selectable(textures[i]->textPath.c_str(), selectedResourcePath == textures[i]->textPath)) {
+                selectedResourcePath = textures[i]->textPath;
+            }
             ImGui::Image(textures[i]->ID, ImVec2(150, 150));
             ImGui::EndGroup();
 
@@ -694,7 +709,10 @@ void Menus::DrawResourceManager()
             ImGui::TableNextColumn();
 
             ImGui::BeginGroup();
-            ImGui::Text("%s", meshesFiles[i].c_str());
+            if (ImGui::Selectable(meshesFiles[i].c_str(), selectedResourcePath == meshesFiles[i])) {
+                selectedResourcePath = meshesFiles[i];
+            }
+
             ImGui::EndGroup();
 
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -726,7 +744,9 @@ void Menus::DrawResourceManager()
             ImGui::TableNextColumn();
 
             ImGui::BeginGroup();                        
-            ImGui::Text("%s", fbxFiles[i].c_str());
+            if (ImGui::Selectable(fbxFiles[i].c_str(), selectedResourcePath == fbxFiles[i])) {
+                selectedResourcePath = fbxFiles[i];
+            }
             ImGui::EndGroup();
 
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {

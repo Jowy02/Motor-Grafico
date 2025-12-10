@@ -100,4 +100,6 @@ private:
 
     Camera* selectedCamera = nullptr;
 
+    std::string selectedResourcePath;
+    int selectedResourceIndex = -1;
 };
