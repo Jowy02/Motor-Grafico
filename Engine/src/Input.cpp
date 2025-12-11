@@ -50,7 +50,7 @@ bool Input::PreUpdate()
 {
 	auto camera = Application::GetInstance().camera.get();
 	auto selectedObj = Application::GetInstance().menus->selectedObj;  
-	glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3(0.0f);
+	glm::vec3 target = selectedObj ? selectedObj->myTransform->center : glm::vec3(0.0f);
 
 	static SDL_Event event;
 	

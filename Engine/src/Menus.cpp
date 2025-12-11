@@ -463,15 +463,15 @@ void Menus::DrawInspector()
 
         if (ImGui::CollapsingHeader("TRANSFORM", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-            if (ImGui::DragFloat3("Position", &selectedObj->position.x, 0.1f)) {
+            if (ImGui::DragFloat3("Position", &selectedObj->myTransform->position.x, 0.1f)) {
                 selectedObj->UpdateTransform();
 
             }
-            if (ImGui::DragFloat3("Rotation", &selectedObj->rotation.x, 0.1f)) {
+            if (ImGui::DragFloat3("Rotation", &selectedObj->myTransform->rotation.x, 0.1f)) {
                 selectedObj->UpdateTransform();
 
             }
-            if (ImGui::DragFloat3("Scale", &selectedObj->scale.x, 0.1f)) {
+            if (ImGui::DragFloat3("Scale", &selectedObj->myTransform->scale.x, 0.1f)) {
                 selectedObj->UpdateTransform();
             }
         }
@@ -479,7 +479,7 @@ void Menus::DrawInspector()
         {
             if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->size.x, selectedObj->size.y, selectedObj->size.z);
+                ImGui::Text("Size: (%.2f, %.2f, %.2f)", selectedObj->myTransform->size.x, selectedObj->myTransform->size.y, selectedObj->myTransform->size.z);
 
                 Render* render = Application::GetInstance().render.get();
                 ImGui::Checkbox("Show Face Normals", &render->FaceNormals);

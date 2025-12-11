@@ -74,8 +74,8 @@ void Camera::Inputs(SDL_Window* window)
     }
 
     if (input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && selectedObj) {
-        glm::vec3 target = selectedObj->center;
-        glm::vec3 size = selectedObj->size;
+        glm::vec3 target = selectedObj->myTransform->center;
+        glm::vec3 size = selectedObj->myTransform->size;
         target.y -= size.y * 0.25f;
 
         distance = glm::length(size) * 1.0f; 
@@ -92,7 +92,7 @@ void Camera::Inputs(SDL_Window* window)
     {
         SDL_SetWindowRelativeMouseMode(window, true);
 
-        glm::vec3 target = selectedObj ? selectedObj->center : glm::vec3(0.0f);
+        glm::vec3 target = selectedObj ? selectedObj->myTransform->center : glm::vec3(0.0f);
 
         yaw += sensitivity * dx;
         pitch += sensitivity * dy;

@@ -16,16 +16,16 @@ void OctreeNode::Clear() {
 }
 
 bool OctreeNode::FitsInNode(GameObject* m) const {
-    return !(m->maxAABB.x < min.x || m->minAABB.x > max.x ||
-        m->maxAABB.y < min.y || m->minAABB.y > max.y ||
-        m->maxAABB.z < min.z || m->minAABB.z > max.z);
+    return !(m->myTransform->maxAABB.x < min.x || m->myTransform->minAABB.x > max.x ||
+        m->myTransform->maxAABB.y < min.y || m->myTransform->minAABB.y > max.y ||
+        m->myTransform->maxAABB.z < min.z || m->myTransform->minAABB.z > max.z);
 }
 
 
 static bool IntersectsBox(const glm::vec3& nodeMin, const glm::vec3& nodeMax, const GameObject* m) {
-    return !(m->maxAABB.x < nodeMin.x || m->minAABB.x > nodeMax.x ||
-        m->maxAABB.y < nodeMin.y || m->minAABB.y > nodeMax.y ||
-        m->maxAABB.z < nodeMin.z || m->minAABB.z > nodeMax.z);
+    return !(m->myTransform->maxAABB.x < nodeMin.x || m->myTransform->minAABB.x > nodeMax.x ||
+        m->myTransform->maxAABB.y < nodeMin.y || m->myTransform->minAABB.y > nodeMax.y ||
+        m->myTransform->maxAABB.z < nodeMin.z || m->myTransform->minAABB.z > nodeMax.z);
 }
 
 void OctreeNode::Insert(GameObject* m) {
@@ -77,9 +77,9 @@ void OctreeNode::Subdivide() {
         bool moved = false;
         for (int i = 0; i < 8; ++i) {
             auto& c = children[i];
-            if (!(obj->maxAABB.x < c->min.x || obj->minAABB.x > c->max.x ||
-                obj->maxAABB.y < c->min.y || obj->minAABB.y > c->max.y ||
-                obj->maxAABB.z < c->min.z || obj->minAABB.z > c->max.z))
+            if (!(obj->myTransform->maxAABB.x < c->min.x || obj->myTransform->minAABB.x > c->max.x ||
+                obj->myTransform->maxAABB.y < c->min.y || obj->myTransform->minAABB.y > c->max.y ||
+                obj->myTransform->maxAABB.z < c->min.z || obj->myTransform->minAABB.z > c->max.z))
             {
                 c->Insert(obj);
                 moved = true;
@@ -98,7 +98,7 @@ void OctreeNode::CollectObjectsInFrustum(const Frustum& frustum, std::vector<Gam
 
     for (int objId : objects) {
         GameObject* obj = &scene->models[objId]; // necesitas pasar scene
-        if (frustum.IsBoxVisible(obj->minAABB, obj->maxAABB) && std::find(result.begin(), result.end(), obj) == result.end())
+        if (frustum.IsBoxVisible(obj->myTransform->minAABB, obj->myTransform->maxAABB) && std::find(result.begin(), result.end(), obj) == result.end())
             result.push_back(obj);
     }
 
@@ -119,7 +119,7 @@ void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, st
         if (id < 0 || id >= (int)scene->models.size()) continue; // seguridad
         GameObject* obj = &scene->models[id];
         float tobj;
-        if (scene->RayIntersectsAABB(ray, obj->minAABB, obj->maxAABB, tobj)) {
+        if (scene->RayIntersectsAABB(ray, obj->myTransform->minAABB, obj->myTransform->maxAABB, tobj)) {
             std::cout << "  hit obj " << obj->name << " t=" << tobj << "\n";
             result.push_back(obj);
         }

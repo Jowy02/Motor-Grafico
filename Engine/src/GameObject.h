@@ -15,6 +15,7 @@
 
 //Components
 #include "ComponentMesh.h"
+#include "ComponentTransform.h"
 
 // Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
@@ -42,7 +43,7 @@ public:
     // --- Core functions ---
     GameObject(const std::string& path);
     void Draw();
-    void UpdateAABB();
+    //void UpdateAABB();
     void UpdateTransform();
     void CleanUpChilds();
     void CleanUp();
@@ -68,26 +69,7 @@ public:
     gemotryMesh VertexNormalmesh;
 
     ComponentMesh* myMesh;
-    
-    // --- Transformations ---
-    glm::mat4 transformMatrix;
-    glm::mat4 localMatrix;
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
-
-    glm::vec3 worldPosition ;
-    glm::vec3 worldRotation ;
-    glm::vec3 worldScale;
-
-    // --- Bounding box ---
-    glm::vec3 center;
-    glm::vec3 minAABB;
-    glm::vec3 maxAABB;
-    glm::vec3 size;
-
-    glm::vec3 localMinAABB;
-    glm::vec3 localMaxAABB;
+    ComponentTransform* myTransform;
 
     // --- Normals and tangents ---
     std::vector<float> normalLines;

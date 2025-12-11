@@ -109,8 +109,8 @@ void Scene::BuildOctree() {
     glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
     for (auto& m : models) {
         m.UpdateTransform();
-        globalMin = glm::min(globalMin, m.minAABB);
-        globalMax = glm::max(globalMax, m.maxAABB);
+        globalMin = glm::min(globalMin, m.myTransform->minAABB);
+        globalMax = glm::max(globalMax, m.myTransform->maxAABB);
     }
 
     // Añadir un pequeño padding para evitar cajas degeneradas
@@ -291,7 +291,7 @@ void Scene::ImGuizmo() {
 
         glm::mat4 view = Application::GetInstance().camera->GetViewMatrix();
         glm::mat4 proj = Application::GetInstance().camera->GetProjectionMatrix();
-        glm::mat4 model = menus->selectedObj->transformMatrix;
+        glm::mat4 model = menus->selectedObj->myTransform->transformMatrix;
 
         ImGuizmo::OPERATION op = ImGuizmo::TRANSLATE;
         switch (Application::GetInstance().scene->currentGizmo) {
@@ -310,7 +310,7 @@ void Scene::ImGuizmo() {
 
             glm::mat4 parentMatrix = glm::mat4(1.0f);
             if (menus->selectedObj->isChild) {
-                parentMatrix = Application::GetInstance().scene->models[menus->selectedObj->ParentID].transformMatrix;
+                parentMatrix = Application::GetInstance().scene->models[menus->selectedObj->ParentID].myTransform->transformMatrix;
             }
 
             // Convertir world a local
@@ -320,9 +320,9 @@ void Scene::ImGuizmo() {
             float translation[3], rotationDeg[3], scaleArr[3];
             ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localModel), translation, rotationDeg, scaleArr);
 
-            menus->selectedObj->position = glm::vec3(translation[0], translation[1], translation[2]);
-            menus->selectedObj->rotation = glm::vec3(rotationDeg[0], rotationDeg[1], rotationDeg[2]);
-            menus->selectedObj->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
+            menus->selectedObj-> myTransform->position = glm::vec3(translation[0], translation[1], translation[2]);
+            menus->selectedObj-> myTransform->rotation = glm::vec3(rotationDeg[0], rotationDeg[1], rotationDeg[2]);
+            menus->selectedObj-> myTransform->scale = glm::vec3(scaleArr[0], scaleArr[1], scaleArr[2]);
 
             menus->selectedObj->UpdateTransform();
             BuildOctree();
@@ -408,8 +408,8 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
     file << "{" << "\n";
     file << "IndexCount: " << model.myMesh->mesh.indexCount << "\n";
     file << "Texture: " << model.texturePath << "\n";
-    file << "minAABB: " << model.minAABB.x << ", " << model.minAABB.y << ", " << model.minAABB.z << "\n";
-    file << "maxAABB: " << model.maxAABB.x << ", " << model.maxAABB.y << ", " << model.maxAABB.z << "\n";
+    file << "minAABB: " << model.myTransform->minAABB.x << ", " << model.myTransform->minAABB.y << ", " << model.myTransform->minAABB.z << "\n";
+    file << "maxAABB: " << model.myTransform->maxAABB.x << ", " << model.myTransform->maxAABB.y << ", " << model.myTransform->maxAABB.z << "\n";
 
     file << "Indices:";
     for (auto& indice : model.myMesh->mesh.indices)
@@ -460,9 +460,9 @@ void Scene::SaveScene(std::string filePath)
             file << "Component: " << model.componentID << "\n";
             file << "Name: " << model.name << "\n";
             file << "ParentUID: " << model.ParentID << "\n";
-            file << "Translation: " << model.position.x << ", " << model.position.y << ", " << model.position.z << "\n";
-            file << "Scale: " << model.scale.x << ", " << model.scale.y << ", " << model.scale.z << "\n";
-            file << "Rotation: " << model.rotation.x << ", " << model.rotation.y << ", " << model.rotation.z << "\n";
+            file << "Translation: " << model.myTransform->position.x << ", " << model.myTransform->position.y << ", " << model.myTransform->position.z << "\n";
+            file << "Scale: " << model.myTransform->scale.x << ", " << model.myTransform->scale.y << ", " << model.myTransform->scale.z << "\n";
+            file << "Rotation: " << model.myTransform->rotation.x << ", " << model.myTransform->rotation.y << ", " << model.myTransform->rotation.z << "\n";
             file << "Texture: " << model.texturePath << "\n";
             file << "}" << "\n";
         }
@@ -596,31 +596,31 @@ void Scene::LoadScene(std::string filePath)
                     }
                     else if (key == "Translation") {
                         std::stringstream ss(value);
-                        ss >> models[UID].position.x;
+                        ss >> models[UID].myTransform->position.x;
                         ss.ignore(1);
-                        ss >> models[UID].position.y;
+                        ss >> models[UID].myTransform->position.y;
                         ss.ignore(1);
-                        ss >> models[UID].position.z;
+                        ss >> models[UID].myTransform->position.z;
                         models[UID].UpdateTransform();
 
                     }
                     else if (key == "Scale") {
                         std::stringstream ss(value);
-                        ss >> models[UID].scale.x;
+                        ss >> models[UID].myTransform->scale.x;
                         ss.ignore(1);
-                        ss >> models[UID].scale.y;
+                        ss >> models[UID].myTransform->scale.y;
                         ss.ignore(1);
-                        ss >> models[UID].scale.z;
+                        ss >> models[UID].myTransform->scale.z;
                         models[UID].UpdateTransform();
 
                     }
                     else if (key == "Rotation") {
                         std::stringstream ss(value);
-                        ss >> models[UID].rotation.x;
+                        ss >> models[UID].myTransform->rotation.x;
                         ss.ignore(1);
-                        ss >> models[UID].rotation.y;
+                        ss >> models[UID].myTransform->rotation.y;
                         ss.ignore(1);
-                        ss >> models[UID].rotation.z;
+                        ss >> models[UID].myTransform->rotation.z;
                         models[UID].UpdateTransform();
 
                     }
@@ -734,20 +734,20 @@ void Scene::LoadMesh(std::string filePath)
                 }
                 else if (key == "minAABB") {
                     std::stringstream ss(value);
-                    ss >> NewModel.minAABB.x;
+                    ss >> NewModel.myTransform->minAABB.x;
                     ss.ignore(1);
-                    ss >> NewModel.minAABB.y;
+                    ss >> NewModel.myTransform->minAABB.y;
                     ss.ignore(1);
-                    ss >> NewModel.minAABB.z;
+                    ss >> NewModel.myTransform->minAABB.z;
 
                 }
                 else if (key == "maxAABB") {
                     std::stringstream ss(value);
-                    ss >> NewModel.maxAABB.x;
+                    ss >> NewModel.myTransform->maxAABB.x;
                     ss.ignore(1);
-                    ss >> NewModel.maxAABB.y;
+                    ss >> NewModel.myTransform->maxAABB.y;
                     ss.ignore(1);
-                    ss >> NewModel.maxAABB.z;
+                    ss >> NewModel.myTransform->maxAABB.z;
 
                 }
                 else if (key == "Texture") {
@@ -796,14 +796,14 @@ void Scene::LoadMesh(std::string filePath)
         prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
     }
     NewModel.modelPath = filePath;
-    NewModel.center = (NewModel.minAABB + NewModel.maxAABB) * 0.5f;
-    NewModel.size = NewModel.maxAABB - NewModel.minAABB;
-    NewModel.localMinAABB = NewModel.minAABB;
-    NewModel.localMaxAABB = NewModel.maxAABB;
+    NewModel.myTransform->center = (NewModel.myTransform->minAABB + NewModel.myTransform->maxAABB) * 0.5f;
+    NewModel.myTransform->size = NewModel.myTransform->maxAABB - NewModel.myTransform->minAABB;
+    NewModel.myTransform->localMinAABB = NewModel.myTransform->minAABB;
+    NewModel.myTransform->localMaxAABB = NewModel.myTransform->maxAABB;
 
-    NewModel.position = { 0,0,0 };
-    NewModel.rotation = { 0,0,0 };
-    NewModel.scale = { 1,1,1 };
+    NewModel.myTransform->position = { 0,0,0 };
+    NewModel.myTransform->rotation = { 0,0,0 };
+    NewModel.myTransform->scale = { 1,1,1 };
 
     NewModel.modelId = (int)models.size();
 
@@ -811,7 +811,7 @@ void Scene::LoadMesh(std::string filePath)
     models.back().myMesh->RecreateBuffers();
 
     NewModel.UpdateTransform();
-    NewModel.UpdateAABB();
+    NewModel.myTransform->UpdateAABB();
 
     //if (!Application::GetInstance().scene->octreeRoot) {
     //    Application::GetInstance().scene->BuildOctree();
@@ -908,9 +908,9 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
         newObj.ApplTexture(nullptr, "");
 
     newObj.name = blueprint.name;
-    newObj.position = blueprint.pos;
-    newObj.rotation = blueprint.rot;
-    newObj.scale = blueprint.scale;
+    newObj.myTransform->position = blueprint.pos;
+    newObj.myTransform->rotation = blueprint.rot;
+    newObj.myTransform->scale = blueprint.scale;
     newObj.isHidden = blueprint.isHidden;
 
 

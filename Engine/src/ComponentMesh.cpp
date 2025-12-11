@@ -1,19 +1,15 @@
 #include "ComponentMesh.h"
 
-ComponentMesh::ComponentMesh(const GameObject* owner) : Component(Component::Type::MESH, owner)
+ComponentMesh::ComponentMesh(const GameObject* owner)
 {
 }
-
 ComponentMesh::~ComponentMesh()
-{
-}
-
-void ComponentMesh::Update(float dt)
 {
 }
 
 void ComponentMesh::RecreateBuffers() {
     // Create OpenGL buffers
+   
     glGenVertexArrays(1, &mesh.VAO);
     glGenBuffers(1, &mesh.VBO);
     glGenBuffers(1, &mesh.EBO);

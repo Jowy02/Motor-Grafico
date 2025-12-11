@@ -1,4 +1,4 @@
-#include "Component.h"
+#pragma once
 #include "Texture.h"
 #include <vector>
 #include <string>
@@ -26,12 +26,11 @@ struct ModelMesh {
 	std::vector<float> vertices;
 };
 
-class ComponentMesh : public Component
+class ComponentMesh 
 {
 public:
 	ComponentMesh(const GameObject* owner);
 	~ComponentMesh();
-	void Update(float dt) override;
 	std::vector<unsigned int> GetIndexCount() const { return mesh.indices; }
 	std::vector<float> GetVertexCount() const { return mesh.vertices; }
 	void RecreateBuffers();

@@ -158,11 +158,11 @@ void Render::InitRaycastData(GameObject& model, const GLfloat* vertices, int ver
     }
     model.myMesh->mesh.indexCount = indexCount;
     // Actualizar AABB local
-    model.localMinAABB = glm::vec3(FLT_MAX);
-    model.localMaxAABB = glm::vec3(-FLT_MAX);
+    model.myTransform->localMinAABB = glm::vec3(FLT_MAX);
+    model.myTransform->localMaxAABB = glm::vec3(-FLT_MAX);
     for (auto& v : model.myMesh->mesh.positionsLocal) {
-        model.localMinAABB = glm::min(model.localMinAABB, v);
-        model.localMaxAABB = glm::max(model.localMaxAABB, v);
+        model.myTransform->localMinAABB = glm::min(model.myTransform->localMinAABB, v);
+        model.myTransform->localMaxAABB = glm::max(model.myTransform->localMaxAABB, v);
     }
     
 }
@@ -182,19 +182,19 @@ void Render::InitRaycastDataSphere(GameObject& model, const std::vector<float>& 
     }
     model.myMesh->mesh.indexCount = static_cast<int>(indices.size());
 
-    model.localMinAABB = glm::vec3(FLT_MAX);
-    model.localMaxAABB = glm::vec3(-FLT_MAX);
+    model.myTransform->localMinAABB = glm::vec3(FLT_MAX);
+    model.myTransform->localMaxAABB = glm::vec3(-FLT_MAX);
     for (auto& v : model.myMesh->mesh.positionsLocal) {
-        model.localMinAABB = glm::min(model.localMinAABB, v);
-        model.localMaxAABB = glm::max(model.localMaxAABB, v);
+        model.myTransform->localMinAABB = glm::min(model.myTransform->localMinAABB, v);
+        model.myTransform->localMaxAABB = glm::max(model.myTransform->localMaxAABB, v);
     }
 }
 
 void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 {
     // Si no hay datos de AABB, salir
-    glm::vec3 minL = model.localMinAABB;
-    glm::vec3 maxL = model.localMaxAABB;
+    glm::vec3 minL = model.myTransform->localMinAABB;
+    glm::vec3 maxL = model.myTransform->localMaxAABB;
     if (minL == glm::vec3(FLT_MAX) && maxL == glm::vec3(-FLT_MAX)) return;
 
     glm::vec3 cornersLocal[8] = {
@@ -694,8 +694,8 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.modelId = Application::GetInstance().scene.get()->models.size();
 
     float thickness = 0.00001f; // Altura de la AABB
-    model.localMinAABB = glm::vec3(-half, -thickness, -half);
-    model.localMaxAABB = glm::vec3(half, thickness, half);
+    model.myTransform->localMinAABB = glm::vec3(-half, -thickness, -half);
+    model.myTransform->localMaxAABB = glm::vec3(half, thickness, half);
     model.UpdateTransform();
 
 
@@ -996,7 +996,7 @@ void  Render::OrderModels()
         GameObject& model = Application::GetInstance().scene->models[i];
         if (model.hasTransparency)
         {
-            float distance = glm::length(cameraPos - model.position);
+            float distance = glm::length(cameraPos - model.myTransform->position);
             modelOrder.push_back({ distance, i });
         }
 
@@ -1021,7 +1021,7 @@ void  Render::OrderModels()
     for (auto& m : models)
     {
    
-        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(m.minAABB, m.maxAABB);
+        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(m.myTransform->minAABB, m.myTransform->maxAABB);
         if (!visible)
             continue;
         
@@ -1045,7 +1045,7 @@ void  Render::OrderModels()
             GameObject& model = models[pair.second];
             if (model.name!="Grid")
             {
-                bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(model.minAABB, model.maxAABB);
+                bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(model.myTransform->minAABB, model.myTransform->maxAABB);
                 if (!visible)
                     continue;
             }
@@ -1091,7 +1091,7 @@ void Render::FrustumModels() {
 
     if (selected && !selected->isHidden) {
         bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
-            selected->minAABB, selected->maxAABB);
+            selected->myTransform->minAABB, selected->myTransform->maxAABB);
         glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
         Application::GetInstance().render->DrawAABBOutline(*selected, color);
     }

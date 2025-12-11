@@ -63,8 +63,8 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
 
     Obj->hasTransparency = hasTransparency;
 
-    Obj->minAABB = minAABB;
-    Obj->maxAABB = maxAABB;
+    Obj->myTransform->minAABB = minAABB;
+    Obj->myTransform->maxAABB = maxAABB;
     Obj->name = name;
 
     Obj->modelPath = "../Library/Meshes/" + name + ".txt";
@@ -115,22 +115,22 @@ void Mesh::processOthers(const aiScene* scene)
         }
          
 
-        newModel.minAABB = minAABB;
-        newModel.maxAABB = maxAABB;
+        newModel.myTransform->minAABB = minAABB;
+        newModel.myTransform->maxAABB = maxAABB;
 
         newModel.name = mesh->mName.C_Str();
         newModel.modelId = Application::GetInstance().scene->models.size();
-        newModel.center = (minAABB + maxAABB) * 0.5f;
-        newModel.size = maxAABB - minAABB;
+        newModel.myTransform->center = (minAABB + maxAABB) * 0.5f;
+        newModel.myTransform->size = maxAABB - minAABB;
 
-        newModel.localMinAABB = newModel.minAABB;
-        newModel.localMaxAABB = newModel.maxAABB;
+        newModel.myTransform->localMinAABB = newModel.myTransform->minAABB;
+        newModel.myTransform->localMaxAABB = newModel.myTransform->maxAABB;
 
         newModel.componentID = modelId;
 
-        newModel.position = { 0,0,0 };
-        newModel.rotation = { 0,0,0 };
-        newModel.scale = { 1,1,1 };
+        newModel.myTransform->position = { 0,0,0 };
+        newModel.myTransform->rotation = { 0,0,0 };
+        newModel.myTransform->scale = { 1,1,1 };
 
         if (!Application::GetInstance().scene->octreeRoot) {
             Application::GetInstance().scene->BuildOctree();
@@ -141,7 +141,7 @@ void Mesh::processOthers(const aiScene* scene)
         }
 
         newModel.UpdateTransform();
-        newModel.UpdateAABB();
+        newModel.myTransform->UpdateAABB();
 
         newModel.modelPath = "../Library/Meshes/" + newModel.name + ".txt";
         Application::GetInstance().scene->models.push_back(std::move(newModel));
