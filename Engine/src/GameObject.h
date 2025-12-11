@@ -13,20 +13,23 @@
 #include "Texture.h"
 #include "Render.h"
 
+//Components
+#include "ComponentMesh.h"
+
 // Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
 
-struct ModelMesh {
-    GLuint VAO = 0, VBO = 0, EBO = 0;
-    unsigned int indexCount = 0;
-    Texture* texture = nullptr;
-
-    // Copias CPU para raycast
-    std::vector<glm::vec3> positionsLocal;
-    std::vector<unsigned int> indices;
-    std::vector<float> vertices;
-    std::vector<glm::vec3> positionsWorld;
-};
+//struct ModelMesh {
+//    GLuint VAO = 0, VBO = 0, EBO = 0;
+//    unsigned int indexCount = 0;
+//    Texture* texture = nullptr;
+//
+//    // Copias CPU para raycast
+//    std::vector<glm::vec3> positionsLocal;
+//    std::vector<unsigned int> indices;
+//    std::vector<float> vertices;
+//    std::vector<glm::vec3> positionsWorld;
+//};
 
 class GameObject
 {
@@ -60,9 +63,11 @@ public:
     void SetInitialParentID(int id);
 
     // --- Meshes ---
-    ModelMesh Mmesh;
+    //ModelMesh Mmesh;
     gemotryMesh Normalmesh;
     gemotryMesh VertexNormalmesh;
+
+    ComponentMesh* myMesh;
     
     // --- Transformations ---
     glm::mat4 transformMatrix;
@@ -112,7 +117,7 @@ public:
     std::string modelPath;
     bool haveComponents = false;
 
-    void GameObject::RecreateBuffers();
+    //void GameObject::RecreateBuffers();
 private:
     // --- Internal data ---
     std::string directory;
@@ -134,4 +139,6 @@ private:
 
     std::string initial_modelPath;
     int initial_ParentID = -1;
+
+
 };

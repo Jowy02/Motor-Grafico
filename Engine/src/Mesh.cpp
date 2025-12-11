@@ -49,17 +49,17 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
     Obj->modelId = Application::GetInstance().scene.get()->models.size() + otherMesh.size();
 
     //Obj = &Application::GetInstance().scene->models.back();
-    Obj->Mmesh.VAO = Mmesh.VAO;
-    Obj->Mmesh.VBO = Mmesh.VBO;
-    Obj->Mmesh.EBO = Mmesh.EBO;
+    Obj->myMesh->mesh.VAO = Mmesh.VAO;
+    Obj->myMesh->mesh.VBO = Mmesh.VBO;
+    Obj->myMesh->mesh.EBO = Mmesh.EBO;
 
-    Obj->Mmesh.indexCount = Mmesh.indexCount;
-    Obj->Mmesh.indices = Mmesh.indices;
-    Obj->Mmesh.vertices = Mmesh.vertices;
+    Obj->myMesh->mesh.indexCount = Mmesh.indexCount;
+    Obj->myMesh->mesh.indices = Mmesh.indices;
+    Obj->myMesh->mesh.vertices = Mmesh.vertices;
 
-    Obj->Mmesh.positionsLocal = Mmesh.positionsLocal;
-    Obj->Mmesh.positionsWorld = Mmesh.positionsWorld;
-    Obj->Mmesh.texture = Mmesh.texture; 
+    Obj->myMesh->mesh.positionsLocal = Mmesh.positionsLocal;
+    Obj->myMesh->mesh.positionsWorld = Mmesh.positionsWorld;
+    Obj->myMesh->mesh.texture = Mmesh.texture;
 
     Obj->hasTransparency = hasTransparency;
 
@@ -97,17 +97,17 @@ void Mesh::processOthers(const aiScene* scene)
 
         processMesh(mesh, scene);
 
-        newModel.Mmesh.VAO = Mmesh.VAO;
-        newModel.Mmesh.VBO = Mmesh.VBO;
-        newModel.Mmesh.EBO = Mmesh.EBO;
+        newModel.myMesh->mesh.VAO = Mmesh.VAO;
+        newModel.myMesh->mesh.VBO = Mmesh.VBO;
+        newModel.myMesh->mesh.EBO = Mmesh.EBO;
 
-        newModel.Mmesh.indexCount = Mmesh.indexCount;
-        newModel.Mmesh.indices = Mmesh.indices;
-        newModel.Mmesh.vertices = Mmesh.vertices;
+        newModel.myMesh->mesh.indexCount = Mmesh.indexCount;
+        newModel.myMesh->mesh.indices = Mmesh.indices;
+        newModel.myMesh->mesh.vertices = Mmesh.vertices;
 
-        newModel.Mmesh.positionsLocal = Mmesh.positionsLocal;
-        newModel.Mmesh.positionsWorld = Mmesh.positionsWorld;
-        newModel.Mmesh.texture = Mmesh.texture;
+        newModel.myMesh->mesh.positionsLocal = Mmesh.positionsLocal;
+        newModel.myMesh->mesh.positionsWorld = Mmesh.positionsWorld;
+        newModel.myMesh->mesh.texture = Mmesh.texture;
         if (Mmesh.texture != nullptr)
         {
             newModel.texturePath = filenameMaterial;

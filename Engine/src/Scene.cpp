@@ -233,10 +233,10 @@ void Scene::Raycast(const LineSegment& ray)
     GameObject* selected = nullptr;
 
     for (auto* model : hitModels) {
-        for (size_t i = 0; i < model->Mmesh.indices.size(); i += 3) {
-            glm::vec3 v0 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 0]];
-            glm::vec3 v1 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 1]];
-            glm::vec3 v2 = model->Mmesh.positionsWorld[model->Mmesh.indices[i + 2]];
+        for (size_t i = 0; i < model->myMesh->mesh.indices.size(); i += 3) {
+            glm::vec3 v0 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 0]];
+            glm::vec3 v1 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 1]];
+            glm::vec3 v2 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 2]];
 
             float t;
             if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
@@ -387,23 +387,23 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
     file << "Mesh:\n";
 
     file << "{" << "\n";
-    file << "IndexCount: " << model.Mmesh.indexCount << "\n";
+    file << "IndexCount: " << model.myMesh->mesh.indexCount << "\n";
     file << "Texture: " << model.texturePath << "\n";
     file << "minAABB: " << model.minAABB.x << ", " << model.minAABB.y << ", " << model.minAABB.z << "\n";
     file << "maxAABB: " << model.maxAABB.x << ", " << model.maxAABB.y << ", " << model.maxAABB.z << "\n";
 
     file << "Indices:";
-    for (auto& indice : model.Mmesh.indices)
+    for (auto& indice : model.myMesh->mesh.indices)
         file << indice << "|";
     file << "\n";
 
     file << "Vertices:";
-    for (auto& indice : model.Mmesh.vertices)
+    for (auto& indice : model.myMesh->mesh.vertices)
         file << indice << "|";
     file << "\n";
 
     file << "PositionsLocal:";
-    for (auto& positionsLocal : model.Mmesh.positionsLocal)
+    for (auto& positionsLocal : model.myMesh->mesh.positionsLocal)
         file << positionsLocal.x << ", " << positionsLocal.y << ", " << positionsLocal.z << "|";
     file << "\n";
 
@@ -711,7 +711,7 @@ void Scene::LoadMesh(std::string filePath)
                 if (!value.empty() && value[0] == ' ') value.erase(0, 1);
 
                 if (key == "IndexCount") {
-                    NewModel.Mmesh.indexCount = std::stoi(value);
+                    NewModel.myMesh->mesh.indexCount = std::stoi(value);
                 }
                 else if (key == "minAABB") {
                     std::stringstream ss(value);
@@ -733,32 +733,32 @@ void Scene::LoadMesh(std::string filePath)
                 }
                 else if (key == "Texture") {
        
-                    NewModel.Mmesh.texture = nullptr;
+                    NewModel.myMesh->mesh.texture = nullptr;
                 }
                 else if (key == "Indices") {
                     // leer línea completa con índices separados por '|'
                     std::stringstream ss(value);
                     std::string token;
-                    NewModel.Mmesh.indices.clear();
+                    NewModel.myMesh->mesh.indices.clear();
                     while (std::getline(ss, token, '|')) {
                         if (!token.empty())
-                            NewModel.Mmesh.indices.push_back(std::stoi(token));
+                            NewModel.myMesh->mesh.indices.push_back(std::stoi(token));
                     }
                 }
                 else if (key == "Vertices") {
                     // leer línea completa con índices separados por '|'
                     std::stringstream ss(value);
                     std::string token;
-                    NewModel.Mmesh.vertices.clear();
+                    NewModel.myMesh->mesh.vertices.clear();
                     while (std::getline(ss, token, '|')) {
                         if (!token.empty())
-                            NewModel.Mmesh.vertices.push_back(std::stof(token));
+                            NewModel.myMesh->mesh.vertices.push_back(std::stof(token));
                     }
                 }
                 else if (key == "PositionsLocal") {
                     std::stringstream ss(value);
                     std::string token;
-                    NewModel.Mmesh.positionsLocal.clear();
+                    NewModel.myMesh->mesh.positionsLocal.clear();
                   while (std::getline(ss, token, '|')) {
                         if (!token.empty()) {
                             std::stringstream vecStream(token);
@@ -768,7 +768,7 @@ void Scene::LoadMesh(std::string filePath)
                             vecStream >> y;
                             vecStream.ignore(1);
                             vecStream >> z;
-                            NewModel.Mmesh.positionsLocal.push_back(glm::vec3(x, y, z));
+                            NewModel.myMesh->mesh.positionsLocal.push_back(glm::vec3(x, y, z));
                         }
                     }
                 }
@@ -789,8 +789,7 @@ void Scene::LoadMesh(std::string filePath)
     NewModel.modelId = (int)models.size();
 
     models.push_back(NewModel);
-
-    models.back().RecreateBuffers();
+    models.back().myMesh->RecreateBuffers();
 
     NewModel.UpdateTransform();
     NewModel.UpdateAABB();
