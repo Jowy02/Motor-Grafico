@@ -45,6 +45,8 @@ public:
     bool RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
     bool RayIntersectsAABB(const LineSegment& ray, const glm::vec3& min, const glm::vec3& max, float& t);
     void Raycast(const LineSegment& ray);
+    void RaycastFromMouse(int mouseX, int mouseY);
+
     void SelectObject(GameObject* obj);
 
     void SaveMesh(std::string filePath, GameObject model);

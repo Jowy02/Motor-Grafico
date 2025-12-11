@@ -33,24 +33,31 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, GLuint shader
     glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 }
 
-LineSegment Camera::CreatePickingRay(int mouseX, int mouseY, float FOVdeg, float nearPlane, float farPlane)
+LineSegment Camera::CreatePickingRay(int mouseX, int mouseY)
 {
-    float x = (2.0f * mouseX) / width - 1.0f;
-    float y = 1.0f - (2.0f * mouseY) / height;
+    glm::mat4 view = GetViewMatrix();
+    glm::mat4 proj = GetProjectionMatrix();
+    return GenerateRayFromMouse(mouseX, mouseY, width, height, view, proj);
+}
 
-    glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
+LineSegment Camera::GenerateRayFromMouse(int mouseX, int mouseY, int screenWidth, int screenHeight, const glm::mat4& view, const glm::mat4& projection)
+{
+    // Normalizar coordenadas de pantalla
+    float x = (2.0f * mouseX) / screenWidth - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / screenHeight; // invertir Y
+    glm::vec4 rayClip(x, y, -1.0f, 1.0f);
 
-    float aspect = (height != 0) ? float(width) / float(height) : 1.0f;
-    glm::mat4 proj = glm::perspective(glm::radians(FOVdeg), aspect, nearPlane, farPlane);
-    glm::vec4 rayEye = glm::inverse(proj) * rayClip;
+    // Pasar a espacio de vista
+    glm::vec4 rayEye = glm::inverse(projection) * rayClip;
     rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
-    glm::mat4 view = glm::lookAt(Position, Position + Orientation, Up);
-    glm::vec4 rayWorld4 = glm::inverse(view) * rayEye;
-    glm::vec3 rayWorld = glm::normalize(glm::vec3(rayWorld4));
+    // Pasar a espacio mundo
+    glm::vec3 rayDir = glm::normalize(glm::vec3(glm::inverse(view) * rayEye));
+    glm::vec3 rayOrigin = glm::vec3(glm::inverse(view)[3]); // posición de la cámara
 
-    return LineSegment(Position, Position + rayWorld * farPlane);
+    return LineSegment(rayOrigin, rayOrigin + rayDir * 1000.0f); // rayo largo
 }
+
 
 void Camera::Inputs(SDL_Window* window)
 {
@@ -133,7 +140,7 @@ void Camera::Inputs(SDL_Window* window)
     {
         float mx, my;
         SDL_GetMouseState(&mx, &my);
-        LineSegment ray = CreatePickingRay(mx, my, FOV, nearPlane, farPlane);
+        LineSegment ray = CreatePickingRay(mx, my);
         app.scene->Raycast(ray);
     }
 }

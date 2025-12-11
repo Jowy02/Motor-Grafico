@@ -166,6 +166,20 @@ void Scene::SelectObject(GameObject* obj)
     }
 }
 
+void Scene::RaycastFromMouse(int mouseX, int mouseY)
+{
+    auto camera = Application::GetInstance().camera.get();
+    glm::mat4 view = camera->GetViewMatrix();
+    glm::mat4 proj = camera->GetProjectionMatrix();
+
+    LineSegment ray = Application::GetInstance().camera->GenerateRayFromMouse(mouseX, mouseY,
+        Application::GetInstance().window->width,
+        Application::GetInstance().window->height,
+        view, proj);
+
+    Raycast(ray); // usa tu lógica actual de intersección
+}
+
 bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t)
 {
     const float EPSILON = 1e-8f;
@@ -189,6 +203,7 @@ bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, c
     t = f * glm::dot(edge2, q);
     return t > EPSILON;
 }
+
 
 bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, const glm::vec3& boxMax, float& t)
 {
@@ -260,6 +275,10 @@ void Scene::Raycast(const LineSegment& ray)
 }
 bool Scene::PreUpdate()
 {
+    for (auto& m : models) {
+        m.UpdateTransform();
+    }
+    BuildOctree();
     return true;
 }
 
