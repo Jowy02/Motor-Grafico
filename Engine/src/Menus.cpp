@@ -453,7 +453,7 @@ void Menus::DrawGameObjectNode(GameObject* obj)
 }
 void  Menus::DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels)
 {
-    // Primero eliminar recursivamente los hijos
+    // Eliminar recursivamente los hijos
     for (int childId : obj->childrenID)
     {
         auto it = std::find_if(sceneModels.begin(), sceneModels.end(),
@@ -465,7 +465,7 @@ void  Menus::DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels)
         }
     }
     selectedObj->CleanUpChilds();
-    // Ahora eliminar el propio objeto
+    // Eliminar el propio objeto
     sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
         [&](const GameObject& m) { return m.modelId == obj->modelId; }),
         sceneModels.end());
