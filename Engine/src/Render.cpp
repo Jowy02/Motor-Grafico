@@ -1061,25 +1061,6 @@ void  Render::OrderModels()
 
 }
 
-//void Render::FrustumModels() {
-//    Model* selected = Application::GetInstance().menus.get()->selectedObj;
-//    if (selected && !selected->isHidden) {
-//
-//        bool visible = Application::GetInstance().scene->frustum.IsBoxVisible(
-//            selected->minAABB, selected->maxAABB);
-//
-//        glm::vec3 color = visible ? glm::vec3(0, 0.8f, 1) : glm::vec3(1, 0, 0);
-//        Application::GetInstance().render->DrawAABBOutline(*selected, color);
-//
-//        std::cout << "Color: ("
-//            << color.x << ", "
-//            << color.y << ", "
-//            << color.z << ")" << std::endl;
-//
-//    }
-//
-//
-//}
 void Render::FrustumModels() {
     GameObject* selected = Application::GetInstance().menus.get()->selectedObj;
     std::vector<GameObject*> visibleModels;

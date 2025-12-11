@@ -38,6 +38,7 @@ public:
     void DrawGameObjectNode(GameObject* model);
     void DrawInspector();
     void DrawResourceManager();
+    void DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels);
     GameObject* selectedObj = nullptr;
 
     // --- System Info ---

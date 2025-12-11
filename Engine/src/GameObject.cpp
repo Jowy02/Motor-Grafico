@@ -29,7 +29,6 @@ GameObject::GameObject(const std::string& path)
         myTransform->maxAABB = { 1,1,1 };
 
         //UpdateTransform();
-        ModelMesh defaultMesh;
     }
 }
 void GameObject::ApplTexture(Texture* tex, std::string path)
@@ -217,30 +216,6 @@ void  GameObject::eraseChild(int childId)
 {
     childrenID.erase(std::remove(childrenID.begin(), childrenID.end(), childId),childrenID.end());
 }
-// Cleanup all OpenGL buffers and textures
-//void  GameObject::CleanUpChilds()
-//{
-//    auto childCopy = childrenID; // copia segura
-//    for (int childId : childCopy)
-//    {
-//        // Solo borrar si realmente sigue siendo hijo tuyo
-//        if (Application::GetInstance().scene->models[childId].ParentID == modelId)
-//        {
-//            Application::GetInstance().scene->models[childId].CleanUpChilds();
-//
-//            // borrar del vector childrenID
-//            eraseChild(childId);
-//
-//            // borrar del sceneModels
-//            auto& sceneModels = Application::GetInstance().scene->models;
-//            sceneModels.erase(
-//                std::remove_if(sceneModels.begin(), sceneModels.end(),
-//                    [&](const GameObject& m) { return m.modelId == childId; }),
-//                sceneModels.end()
-//            );
-//        }
-//    }   
-//}
 
 void GameObject::CleanUpChilds()
 {
@@ -259,10 +234,8 @@ void GameObject::CleanUpChilds()
 
         // Limpiar buffers y texturas
         child.CleanUp();
-
-        // Desasociar del vector childrenID
-        eraseChild(child.modelId);
     }
+
     childrenID.clear();
 }
 
@@ -285,7 +258,6 @@ void GameObject::LoadInitialState() {
     modelPath = initial_modelPath;
     texturePath = initial_texturePath;
     UpdateTransform();
-
 }
 
 glm::vec3 GameObject::GetInitialPosition() const
@@ -325,52 +297,22 @@ void GameObject::SetInitialParentID(int id)
 
 void GameObject::CleanUp()
 {
-    //if (Mmesh.VAO != 0)
-    //    glDeleteVertexArrays(1, &Mmesh.VAO);
-    //if (Mmesh.VBO != 0)
-    //    glDeleteBuffers(1, &Mmesh.VBO);
-    //if (Mmesh.EBO != 0)
-    //    glDeleteBuffers(1, &Mmesh.EBO);
-    //if (Mmesh.texture)
-    //    delete Mmesh.texture;
-    //if (blackWhite)
-    //    delete blackWhite;
+ 
+    if (myMesh->mesh.VAO != 0)
+        glDeleteVertexArrays(1, &myMesh->mesh.VAO);
+    if (myMesh->mesh.VBO != 0)
+        glDeleteBuffers(1, &myMesh->mesh.VBO);
+    if (myMesh->mesh.EBO != 0)
+        glDeleteBuffers(1, &myMesh->mesh.EBO);
+    if (myMesh->mesh.texture)
+        delete myMesh->mesh.texture;
+    if (blackWhite)
+        delete blackWhite;
 
-    //Mmesh.VAO = 0;
-    //Mmesh.VBO = 0;
-    //Mmesh.EBO = 0;
+    myMesh->mesh.VAO = 0;
+    myMesh->mesh.VBO = 0;
+    myMesh->mesh.EBO = 0;
 
-    //Mmesh.texture = nullptr;
     actualTexture = nullptr;
     blackWhite = nullptr;
 }
-
-//void GameObject::RecreateBuffers() {
-    // Create OpenGL buffers
-    //glGenVertexArrays(1, &Mmesh.VAO);
-    //glGenBuffers(1, &Mmesh.VBO);
-    //glGenBuffers(1, &Mmesh.EBO);
-
-    //glBindVertexArray(Mmesh.VAO);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, Mmesh.VBO);
-    //glBufferData(GL_ARRAY_BUFFER, Mmesh.vertices.size() * sizeof(float), Mmesh.vertices.data(), GL_STATIC_DRAW);
-
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Mmesh.EBO);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mmesh.indices.size() * sizeof(unsigned int), Mmesh.indices.data(), GL_STATIC_DRAW);
-
-    //// Position attribute
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-
-    //// Normal attribute
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
-    //// Texture attribute
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
-
-    //glBindVertexArray(0);
-    //Mmesh.indexCount = Mmesh.indices.size();
-//}

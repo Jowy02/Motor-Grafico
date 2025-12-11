@@ -66,23 +66,8 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
             if (alpha < minAlpha) minAlpha = alpha;
             if (alpha > maxAlpha) maxAlpha = alpha;
         }
-
-        //if (foundTransparent)
-        //    std::cout << "[Texture] Transparencia real detectada. Alfa min=" << (int)minAlpha << ", max=" << (int)maxAlpha << "\n";
-        //else
-        //    std::cout << "[Texture]  Tiene canal alfa pero todos los píxeles son opacos (alfa=" << (int)maxAlpha << ")\n";
     }
-    //else
-    //{
-    //    std::cout << "[Texture] La imagen no tiene canal alfa.\n";
-    //}
 
-    //std::cout << "Loaded: " << imagePath
-    //    << " (" << width << "x" << height << ")\n";
-
- /*   std::cout << "Loaded: " << imagePath
-        << " (" << ilGetInteger(IL_IMAGE_WIDTH) << "x"
-        << ilGetInteger(IL_IMAGE_HEIGHT) << ")\n";*/
     width = ilGetInteger(IL_IMAGE_WIDTH);
     height = ilGetInteger(IL_IMAGE_HEIGHT);
 
@@ -95,11 +80,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
 
     glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // ✅ evita bordes blancos/negros
-    //glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    //glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-    //glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(texType, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(texType, GL_TEXTURE_WRAP_T, GL_REPEAT);
 

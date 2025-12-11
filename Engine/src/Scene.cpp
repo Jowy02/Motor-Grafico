@@ -38,25 +38,6 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    //Application::GetInstance().scene->LoadFBX("../FBX/BakerHouse.fbx");
-
-    //Texture* tex = new Texture("../Images/Baker_house.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    //models[0].texturePath = "../Images/Baker_house.png";
-
-    //models[0].Mmesh.texture = tex;
-    //models[0].actualTexture = tex;
-    //models[0].modelId = 0;
-
-//   std::string parentDir = std::string("../Images/");
-//imagesFiles.push_back(std::string("textura.png"));
-//
-//for (size_t i = 0; i < imagesFiles.size(); ++i)
-//{
-//    std::string fullPath = parentDir + imagesFiles[i];
-//    // Crear la textura con tu clase Texture (usa DevIL internamente)
-//    Texture tex(fullPath.c_str(), GL_TEXTURE_2D, GL_TEXTURE0 + i, GL_RGBA, GL_UNSIGNED_BYTE);
-//    images.push_back(tex);
-//}
     BuildOctree();
     return true;
 }
@@ -70,7 +51,6 @@ void Scene::LoadFBX(const std::string& path)
         std::filesystem::create_directories("../Library/FBX");
         std::filesystem::copy_file(path, dest,
             std::filesystem::copy_options::update_existing);
-        //Application::GetInstance().menus.get()->init = true;
         Application::GetInstance().resourceManager.get()->LoadResource();
     }
 
@@ -85,20 +65,6 @@ void Scene::LoadFBX(const std::string& path)
         Application::GetInstance().scene.get()->SaveMesh(dest, models[cntModels]);
     }
 }
-
-//void Scene::BuildOctree() {
-//    glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
-//    for (auto& m : models) {
-//        m.UpdateTransform();
-//        std::cout << "[AABB world] " << m.name
-//            << " min(" << m.minAABB.x << "," << m.minAABB.y << "," << m.minAABB.z << ")"
-//            << " max(" << m.maxAABB.x << "," << m.maxAABB.y << "," << m.maxAABB.z << ")\n";
-//        globalMin = glm::min(globalMin, m.minAABB);
-//        globalMax = glm::max(globalMax, m.maxAABB);
-//    }
-//    octreeRoot = std::make_unique<OctreeNode>(globalMin, globalMax, 0, 10, 5, this);
-//    for (auto& m : models) octreeRoot->Insert(&m);
-//}
 
 void Scene::BuildOctree() {
     if (models.empty()) {
@@ -355,45 +321,9 @@ bool Scene::Update(float dt)
             activeCamera->farPlane
         ));
     }
-    //frustum.Update(Application::GetInstance().camera.get()->GetVPMatrix(100.0f, 0.1f, 100.0f));
- /*   frustum.Update(Application::GetInstance().camera->GetVPMatrix(
-        Application::GetInstance().camera->FOV,
-        Application::GetInstance().camera->nearPlane,
-        Application::GetInstance().camera->farPlane
-    ));*/
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();
-
-    //GLuint shaderProgram = Application::GetInstance().render->shaderProgram;
-    // 
-    ////Image 2D
-    //for (int i = 0; i < images.size(); i++)
-    //{
-    //    images[i].texUnit(shaderProgram, "tex0", 0);
-    //    images[i].Bind();
-
-    //    GLfloat vertices2[] =
-    //    {
-    //        -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, // inferior izquierda
-    //         0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, // inferior derecha
-    //         0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f, // superior derecha
-    //        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f  // superior izquierda
-    //    };
-
-    //    //// Indices para formar dos tri�ngulos
-    //    GLuint indices2[] =
-    //    {
-    //        0, 1, 2,  // primer tri�ngulo
-    //        2, 3, 0   // segundo tri�ngulo
-    //    };
-
-    //    int vertexCount = sizeof(vertices2) / sizeof(float);
-    //    int indexCount = sizeof(indices2) / sizeof(unsigned int);
-    //    Application::GetInstance().render.get()->Draw3D(vertices2, vertexCount, indices2, indexCount, 0.0f, &images[i]);
-
-    //    images[i].Unbind();
-    //}
     ImGuizmo();
 
     return true;
@@ -630,7 +560,6 @@ void Scene::LoadScene(std::string filePath)
                         models[UID].ApplTexture(tex, value);
                         models[UID].actualTexture = tex;
                         //BuildOctree();
-
                     }
                 }
             }
@@ -813,16 +742,6 @@ void Scene::LoadMesh(std::string filePath)
     NewModel.UpdateTransform();
     NewModel.myTransform->UpdateAABB();
 
-    //if (!Application::GetInstance().scene->octreeRoot) {
-    //    Application::GetInstance().scene->BuildOctree();
-    //}
-    //else {
-    //    OctreeNode* root = Application::GetInstance().scene->octreeRoot.get();
-    //    root->Insert(&Application::GetInstance().scene->models.back());
-    //}
-
-    //models.push_back(NewModel);
-
     BuildOctree();
 }
 
@@ -871,8 +790,6 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
             Application::GetInstance().render.get()->CreateDiamond();
         }
         else if (blueprint.name.find("Grid") != std::string::npos) {
-            // Application::GetInstance().render.get()->CreateGrid(100,20);
-             //blueprint.parentID = 0;
         }
 
         if (!models.empty()) {

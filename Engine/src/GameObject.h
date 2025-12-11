@@ -20,18 +20,6 @@
 // Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
 
-//struct ModelMesh {
-//    GLuint VAO = 0, VBO = 0, EBO = 0;
-//    unsigned int indexCount = 0;
-//    Texture* texture = nullptr;
-//
-//    // Copias CPU para raycast
-//    std::vector<glm::vec3> positionsLocal;
-//    std::vector<unsigned int> indices;
-//    std::vector<float> vertices;
-//    std::vector<glm::vec3> positionsWorld;
-//};
-
 class GameObject
 {
 public:
@@ -43,7 +31,6 @@ public:
     // --- Core functions ---
     GameObject(const std::string& path);
     void Draw();
-    //void UpdateAABB();
     void UpdateTransform();
     void CleanUpChilds();
     void CleanUp();
@@ -64,7 +51,6 @@ public:
     void SetInitialParentID(int id);
 
     // --- Meshes ---
-    //ModelMesh Mmesh;
     gemotryMesh Normalmesh;
     gemotryMesh VertexNormalmesh;
 
@@ -93,13 +79,13 @@ public:
 
     bool isChild = false;
     int ParentID = -1;
+
     bool parentTransform = false;
 
     int componentID = -1;
     std::string modelPath;
     bool haveComponents = false;
 
-    //void GameObject::RecreateBuffers();
 private:
     // --- Internal data ---
     std::string directory;

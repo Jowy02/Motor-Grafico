@@ -73,14 +73,6 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
     minAABB = {0,0,0};
     processOthers(scene);
 
-    //Mmesh.positionsLocal.clear();
-    //Mmesh.positionsWorld.clear();
-    //Mmesh.indices.clear();
-    //maxAABB = { 0,0,0 };
-    //minAABB = {0,0,0};
-    //Mmesh.indexCount = 0;
-    //Mmesh.indices.clear();
-
     otherMesh.clear();
     objNum = 0;
 
@@ -295,10 +287,6 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
     // Texture attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
-    //// Alpha
-    //glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
-    //glEnableVertexAttribArray(3);
 
     glBindVertexArray(0);
 

@@ -438,7 +438,6 @@ void Menus::DrawGameObjectNode(GameObject* obj)
             else {
                 selectedObj = NULL;
             }
-            
         }
         ImGui::EndDragDropTarget();
     }
@@ -451,6 +450,25 @@ void Menus::DrawGameObjectNode(GameObject* obj)
 
         ImGui::TreePop();
     }
+}
+void  Menus::DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels)
+{
+    // Primero eliminar recursivamente los hijos
+    for (int childId : obj->childrenID)
+    {
+        auto it = std::find_if(sceneModels.begin(), sceneModels.end(),
+            [&](const GameObject& m) { return m.modelId == childId; });
+
+        if (it != sceneModels.end())
+        {
+            DeleteObject(&(*it), sceneModels);
+        }
+    }
+    selectedObj->CleanUpChilds();
+    // Ahora eliminar el propio objeto
+    sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
+        [&](const GameObject& m) { return m.modelId == obj->modelId; }),
+        sceneModels.end());
 }
 
 void Menus::DrawInspector()
@@ -509,16 +527,12 @@ void Menus::DrawInspector()
                 }
                 Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
                 if (selectedObj->isChild)Application::GetInstance().scene.get()->models[selectedObj->ParentID].eraseChild(selectedObj->modelId);
-                selectedObj->CleanUpChilds();
-                int id = selectedObj->modelId;
                 auto& sceneModels = Application::GetInstance().scene->models;
-                sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
-                    [&](const GameObject& m) { return &m == selectedObj; }), sceneModels.end());
 
-                for (id; id < Application::GetInstance().scene.get()->models.size();id++)
-                {
-                    Application::GetInstance().scene.get()->models[id].modelId -= 1;
-                }
+                DeleteObject(selectedObj,sceneModels);
+
+                for (size_t i = 1; i < sceneModels.size(); ++i) sceneModels[i].modelId = i;
+                
                 selectedObj = nullptr;
                 Application::GetInstance().scene->BuildOctree();
                 if (Application::GetInstance().simulationController->GetState() == GameState::STOPPED) {
