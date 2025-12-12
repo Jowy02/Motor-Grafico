@@ -140,11 +140,114 @@ void ResourceManager::LoadResource()
 
     Application::GetInstance().menus.get()->meshesFiles.clear();
     Application::GetInstance().menus.get()->meshesFiles = meshesFiles;
+    LoadMeshResource();
+}
+
+void ResourceManager::LoadMeshResource()
+{
+    //Meshes.clear();
+    for (int i = Meshes.size();i < meshesFiles.size();i++)
+    {
+        GameObject NewModel("NULL");
+        ComponentMesh* tempMesh = new ComponentMesh(&NewModel);
+
+        std::ifstream file(meshesFiles[i]);
+        if (!file.is_open()) return;
+        bool insideMesh = false;
+        bool insideObject = false;
+
+        std::string line;
+        std::string prevLine;
+
+        while (std::getline(file, line)) {
+            if (line == "{") {
+                if (prevLine == "Mesh:") insideMesh = true;
+                else insideObject = true;
+            }
+            else if (line == "}") {
+                insideMesh = false;
+                insideObject = false;
+            }
+            else if (insideMesh) {
+                std::istringstream iss(line);
+                std::string key;
+                if (std::getline(iss, key, ':')) {
+                    std::string value;
+                    std::getline(iss, value);
+                    if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+
+                    if (key == "IndexCount") {                        
+                        tempMesh->mesh.indexCount = std::stoi(value);
+                        tempMesh->filenameMesh = meshesFiles[i];
+                    }
+                    else if (key == "minAABB") {
+                        std::stringstream ss(value);
+                        ss >> tempMesh->minAABB.x;
+                        ss.ignore(1);
+                        ss >> tempMesh->minAABB.y;
+                        ss.ignore(1);
+                        ss >> tempMesh->minAABB.z;
+
+                    }
+                    else if (key == "maxAABB") {
+                        std::stringstream ss(value);
+                        ss >> tempMesh->maxAABB.x;
+                        ss.ignore(1);
+                        ss >> tempMesh->maxAABB.y;
+                        ss.ignore(1);
+                        ss >> tempMesh->maxAABB.z;
+
+                    }
+                    else if (key == "Texture") {
+
+                        tempMesh->mesh.texture = nullptr;
+                    }
+                    else if (key == "Indices") {
+                        // leer línea completa con índices separados por '|'
+                        std::stringstream ss(value);
+                        std::string token;
+                        tempMesh->mesh.indices.clear();
+                        while (std::getline(ss, token, '|')) {
+                            if (!token.empty())
+                                tempMesh->mesh.indices.push_back(std::stoi(token));
+                        }
+                    }
+                    else if (key == "Vertices") {
+                        // leer línea completa con índices separados por '|'
+                        std::stringstream ss(value);
+                        std::string token;
+                        tempMesh->mesh.vertices.clear();
+                        while (std::getline(ss, token, '|')) {
+                            if (!token.empty())
+                                tempMesh->mesh.vertices.push_back(std::stof(token));
+                        }
+                    }
+                    else if (key == "PositionsLocal") {
+                        std::stringstream ss(value);
+                        std::string token;
+                        tempMesh->mesh.positionsLocal.clear();
+                        while (std::getline(ss, token, '|')) {
+                            if (!token.empty()) {
+                                std::stringstream vecStream(token);
+                                float x, y, z;
+                                vecStream >> x;
+                                vecStream.ignore(1);
+                                vecStream >> y;
+                                vecStream.ignore(1);
+                                vecStream >> z;
+                                tempMesh->mesh.positionsLocal.push_back(glm::vec3(x, y, z));
+                            }
+                        }
+                        Meshes.push_back(tempMesh);
+                    }
+                }
+            }
+            prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
+        }
+    }
 }
 bool ResourceManager::PostUpdate()
 {
-
-
     return true;
 }
 

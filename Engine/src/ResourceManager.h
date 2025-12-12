@@ -26,11 +26,15 @@ public:
     void LoadResource();
     bool init = true;
 
-private:
     std::vector<GameObject> models;           // Loaded models
-    std::vector<Texture*> textures;           // Loaded models
+    std::vector<Texture*> textures;           // Loaded Textures
+
+    std::vector<std::string> meshesFiles;
+    std::vector<ComponentMesh*> Meshes;           // Loaded Textures
+
+private:
+    void LoadMeshResource();
 
     std::vector<std::string> fbxFiles;
     std::vector<std::string> txtFiles;
-    std::vector<std::string> meshesFiles;
 };

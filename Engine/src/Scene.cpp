@@ -51,7 +51,6 @@ void Scene::LoadFBX(const std::string& path)
         std::filesystem::create_directories("../Library/FBX");
         std::filesystem::copy_file(path, dest,
             std::filesystem::copy_options::update_existing);
-        Application::GetInstance().resourceManager.get()->LoadResource();
     }
 
     GameObject model(dest);
@@ -64,6 +63,8 @@ void Scene::LoadFBX(const std::string& path)
         dest = "../Library/Meshes/" + models[cntModels].name + ".txt";
         Application::GetInstance().scene.get()->SaveMesh(dest, models[cntModels]);
     }
+    Application::GetInstance().resourceManager.get()->LoadResource();
+
 }
 
 void Scene::BuildOctree() {
@@ -626,99 +627,110 @@ void Scene::LoadScene(std::string filePath)
 }
 void Scene::LoadMesh(std::string filePath)
 {
-    std::ifstream file(filePath);
-    if (!file.is_open()) return;
-    bool insideMesh = false;
-    bool insideObject = false;
+    //std::ifstream file(filePath);
+    //if (!file.is_open()) return;
+    //bool insideMesh = false;
+    //bool insideObject = false;
     GameObject NewModel(filePath);
 
-    std::string line;
-    std::string prevLine;
+    //std::string line;
+    //std::string prevLine;
 
-    while (std::getline(file, line)) {
-        if (line == "{") {
-            if (prevLine == "Mesh:") insideMesh = true;
-            else insideObject = true;
+    //while (std::getline(file, line)) {
+    //    if (line == "{") {
+    //        if (prevLine == "Mesh:") insideMesh = true;
+    //        else insideObject = true;
+    //    }
+    //    else if (line == "}") {
+    //        insideMesh = false;
+    //        insideObject = false;
+    //    }
+    //    else if (insideMesh) {
+    //        std::istringstream iss(line);
+    //        std::string key;
+    //        if (std::getline(iss, key, ':')) {
+    //            std::string value;
+    //            std::getline(iss, value);
+    //            if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+
+    //            if (key == "IndexCount") {
+    //                NewModel.myMesh->mesh.indexCount = std::stoi(value);
+    //            }
+    //            else if (key == "minAABB") {
+    //                std::stringstream ss(value);
+    //                ss >> NewModel.myTransform->minAABB.x;
+    //                ss.ignore(1);
+    //                ss >> NewModel.myTransform->minAABB.y;
+    //                ss.ignore(1);
+    //                ss >> NewModel.myTransform->minAABB.z;
+
+    //            }
+    //            else if (key == "maxAABB") {
+    //                std::stringstream ss(value);
+    //                ss >> NewModel.myTransform->maxAABB.x;
+    //                ss.ignore(1);
+    //                ss >> NewModel.myTransform->maxAABB.y;
+    //                ss.ignore(1);
+    //                ss >> NewModel.myTransform->maxAABB.z;
+
+    //            }
+    //            else if (key == "Texture") {
+    //   
+    //                NewModel.myMesh->mesh.texture = nullptr;
+    //            }
+    //            else if (key == "Indices") {
+    //                // leer línea completa con índices separados por '|'
+    //                std::stringstream ss(value);
+    //                std::string token;
+    //                NewModel.myMesh->mesh.indices.clear();
+    //                while (std::getline(ss, token, '|')) {
+    //                    if (!token.empty())
+    //                        NewModel.myMesh->mesh.indices.push_back(std::stoi(token));
+    //                }
+    //            }
+    //            else if (key == "Vertices") {
+    //                // leer línea completa con índices separados por '|'
+    //                std::stringstream ss(value);
+    //                std::string token;
+    //                NewModel.myMesh->mesh.vertices.clear();
+    //                while (std::getline(ss, token, '|')) {
+    //                    if (!token.empty())
+    //                        NewModel.myMesh->mesh.vertices.push_back(std::stof(token));
+    //                }
+    //            }
+    //            else if (key == "PositionsLocal") {
+    //                std::stringstream ss(value);
+    //                std::string token;
+    //                NewModel.myMesh->mesh.positionsLocal.clear();
+    //                while (std::getline(ss, token, '|')) {
+    //                    if (!token.empty()) {
+    //                        std::stringstream vecStream(token);
+    //                        float x, y, z;
+    //                        vecStream >> x;
+    //                        vecStream.ignore(1);
+    //                        vecStream >> y;
+    //                        vecStream.ignore(1);
+    //                        vecStream >> z;
+    //                        NewModel.myMesh->mesh.positionsLocal.push_back(glm::vec3(x, y, z));
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
+    //}
+    for (int i = 0; i< Application::GetInstance().resourceManager.get()->meshesFiles.size(); i++)
+    {
+        if (Application::GetInstance().resourceManager.get()->Meshes[i]->filenameMesh == filePath)
+        {
+            Application::GetInstance().resourceManager.get()->Meshes;
+            NewModel.myMesh = Application::GetInstance().resourceManager.get()->Meshes[i];
+            NewModel.myTransform->minAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->minAABB;
+            NewModel.myTransform->maxAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->maxAABB;
         }
-        else if (line == "}") {
-            insideMesh = false;
-            insideObject = false;
-        }
-        else if (insideMesh) {
-            std::istringstream iss(line);
-            std::string key;
-            if (std::getline(iss, key, ':')) {
-                std::string value;
-                std::getline(iss, value);
-                if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-
-                if (key == "IndexCount") {
-                    NewModel.myMesh->mesh.indexCount = std::stoi(value);
-                }
-                else if (key == "minAABB") {
-                    std::stringstream ss(value);
-                    ss >> NewModel.myTransform->minAABB.x;
-                    ss.ignore(1);
-                    ss >> NewModel.myTransform->minAABB.y;
-                    ss.ignore(1);
-                    ss >> NewModel.myTransform->minAABB.z;
-
-                }
-                else if (key == "maxAABB") {
-                    std::stringstream ss(value);
-                    ss >> NewModel.myTransform->maxAABB.x;
-                    ss.ignore(1);
-                    ss >> NewModel.myTransform->maxAABB.y;
-                    ss.ignore(1);
-                    ss >> NewModel.myTransform->maxAABB.z;
-
-                }
-                else if (key == "Texture") {
-       
-                    NewModel.myMesh->mesh.texture = nullptr;
-                }
-                else if (key == "Indices") {
-                    // leer línea completa con índices separados por '|'
-                    std::stringstream ss(value);
-                    std::string token;
-                    NewModel.myMesh->mesh.indices.clear();
-                    while (std::getline(ss, token, '|')) {
-                        if (!token.empty())
-                            NewModel.myMesh->mesh.indices.push_back(std::stoi(token));
-                    }
-                }
-                else if (key == "Vertices") {
-                    // leer línea completa con índices separados por '|'
-                    std::stringstream ss(value);
-                    std::string token;
-                    NewModel.myMesh->mesh.vertices.clear();
-                    while (std::getline(ss, token, '|')) {
-                        if (!token.empty())
-                            NewModel.myMesh->mesh.vertices.push_back(std::stof(token));
-                    }
-                }
-                else if (key == "PositionsLocal") {
-                    std::stringstream ss(value);
-                    std::string token;
-                    NewModel.myMesh->mesh.positionsLocal.clear();
-                    while (std::getline(ss, token, '|')) {
-                        if (!token.empty()) {
-                            std::stringstream vecStream(token);
-                            float x, y, z;
-                            vecStream >> x;
-                            vecStream.ignore(1);
-                            vecStream >> y;
-                            vecStream.ignore(1);
-                            vecStream >> z;
-                            NewModel.myMesh->mesh.positionsLocal.push_back(glm::vec3(x, y, z));
-                        }
-                    }
-                }
-            }
-        }
-        prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
     }
     NewModel.modelPath = filePath;
+
     NewModel.myTransform->center = (NewModel.myTransform->minAABB + NewModel.myTransform->maxAABB) * 0.5f;
     NewModel.myTransform->size = NewModel.myTransform->maxAABB - NewModel.myTransform->minAABB;
     NewModel.myTransform->localMinAABB = NewModel.myTransform->minAABB;
@@ -735,7 +747,6 @@ void Scene::LoadMesh(std::string filePath)
 
     NewModel.UpdateTransform();
     NewModel.myTransform->UpdateAABB();
-
     BuildOctree();
 }
 

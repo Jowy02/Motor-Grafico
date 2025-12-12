@@ -9,12 +9,6 @@
 
 class GameObject;
 
-struct Vertex
-{
-	float pos[3];
-	float norm[3];
-	float uv[2];
-};
 struct ModelMesh {
 	GLuint VAO = 0, VBO = 0, EBO = 0;
 	unsigned int indexCount = 0;
@@ -35,4 +29,8 @@ public:
 	std::vector<float> GetVertexCount() const { return mesh.vertices; }
 	void RecreateBuffers();
 	ModelMesh mesh;
+
+	std::string filenameMesh;
+	glm::vec3 minAABB;
+	glm::vec3 maxAABB;
 };
