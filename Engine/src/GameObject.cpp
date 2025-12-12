@@ -127,7 +127,6 @@ void GameObject::UpdateTransform()
     }
     // Actualiza AABB mundo usando los bounds locales (funci�n ya existente)
     myTransform->UpdateAABB();
-    octreeDirty = true;
 }
 
 // Load a model using Assimp

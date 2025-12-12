@@ -532,8 +532,6 @@ void Menus::DrawInspector()
                 }
                 else {
                     Application::GetInstance().scene->octreeRoot->octreeNodesToDraw.clear();
-                    selectedObj->octreeDirty = true;
-
                 }
 
                 ImGui::Separator();
