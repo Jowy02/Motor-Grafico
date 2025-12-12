@@ -323,6 +323,8 @@ void Menus::BuildDockSpace()
         ImGui::DockBuilderDockWindow("Console", dock_bottom);
         ImGui::DockBuilderDockWindow("FPS Monitor", dock_bottom);
         ImGui::DockBuilderDockWindow("System Info", dock_bottom);
+        ImGui::DockBuilderDockWindow("Debug", dock_bottom);
+        ImGui::DockBuilderDockWindow("Resource Manager", dock_bottom);
         
         ImGui::DockBuilderFinish(dockspace_id);
 
