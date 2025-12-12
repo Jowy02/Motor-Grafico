@@ -7,12 +7,8 @@
 #include "Render.h"
 #include "LineSegment.h"
 
-class Scene; // forward declaration
-//inline bool IntersectsAABB(const Model* a, const Model* b) {
-//     return (a->minAABB.x <= b->maxAABB.x && a->maxAABB.x >= b->minAABB.x) && 
-//         (a->minAABB.y <= b->maxAABB.y && a->maxAABB.y >= b->minAABB.y) && 
-//         (a->minAABB.z <= b->maxAABB.z && a->maxAABB.z >= b->minAABB.z); 
-//}
+class Scene;
+
 struct OctreeNode {
     glm::vec3 min;
     glm::vec3 max;

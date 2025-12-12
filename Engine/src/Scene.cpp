@@ -74,7 +74,7 @@ void Scene::BuildOctree() {
 
     glm::vec3 globalMin(FLT_MAX), globalMax(-FLT_MAX);
     for (auto& m : models) {
-        m.UpdateTransform();
+        m.myTransform->UpdateAABB();
         globalMin = glm::min(globalMin, m.myTransform->minAABB);
         globalMax = glm::max(globalMax, m.myTransform->maxAABB);
     }
@@ -91,7 +91,6 @@ void Scene::BuildOctree() {
     }
 }
 
-
 void Scene::ApplyTextureToSelected(const std::string& path)
 {
     auto selected = Application::GetInstance().menus.get()->selectedObj;
@@ -102,7 +101,6 @@ void Scene::ApplyTextureToSelected(const std::string& path)
             std::filesystem::create_directories("../Library/Images");
             std::filesystem::copy_file(path, dest,
                 std::filesystem::copy_options::update_existing);
-           // Application::GetInstance().menus.get()->init = true;
             Application::GetInstance().resourceManager.get()->LoadResource();
         }
         Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -239,13 +237,9 @@ void Scene::Raycast(const LineSegment& ray)
         Application::GetInstance().menus.get()->selectedCamera = NULL;
         Application::GetInstance().menus.get()->selectedResourcePath = "";
     }
-
 }
 bool Scene::PreUpdate()
 {
-    for (auto& m : models) {
-        m.UpdateTransform();
-    }
     BuildOctree();
     return true;
 }
@@ -308,7 +302,6 @@ Camera* Scene::GetActiveCamera()
 
     return Application::GetInstance().camera.get();
 }
-
 
 bool Scene::Update(float dt)
 {
@@ -512,7 +505,6 @@ void Scene::LoadScene(std::string filePath)
                     {
                         if (value != "")
                         {
-                            //Application::GetInstance().scene->LoadFBX(value);
                             LoadMesh(value);
                             UID = models.size() - 1;
                             models[UID].modelId = UID;
@@ -561,7 +553,6 @@ void Scene::LoadScene(std::string filePath)
                         Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
                         models[UID].ApplTexture(tex, value);
                         models[UID].actualTexture = tex;
-                        //BuildOctree();
                     }
                 }
             }
@@ -709,7 +700,7 @@ void Scene::LoadMesh(std::string filePath)
                     std::stringstream ss(value);
                     std::string token;
                     NewModel.myMesh->mesh.positionsLocal.clear();
-                  while (std::getline(ss, token, '|')) {
+                    while (std::getline(ss, token, '|')) {
                         if (!token.empty()) {
                             std::stringstream vecStream(token);
                             float x, y, z;
@@ -747,10 +738,8 @@ void Scene::LoadMesh(std::string filePath)
     BuildOctree();
 }
 
-
 bool Scene::PostUpdate()
 {
-
     return true;
 }
 
@@ -831,11 +820,7 @@ void Scene::RecreateGameObject(const InitialGameObjectData& blueprint)
     newObj.myTransform->rotation = blueprint.rot;
     newObj.myTransform->scale = blueprint.scale;
     newObj.isHidden = blueprint.isHidden;
-
-
     newObj.modelId = models.size() - 1;
     newObj.SetInitialParentID(blueprint.parentID);
-
     newObj.UpdateTransform();
-
 }
