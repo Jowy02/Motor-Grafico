@@ -12,11 +12,11 @@
 
 #include "Texture.h"
 #include "Render.h"
+#include "OctreeNode.h"
 
 //Components
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
-
 // Base mesh structure used for OpenGL buffers
 struct gemotryMesh;
 
@@ -86,6 +86,10 @@ public:
     std::string modelPath;
     bool haveComponents = false;
 
+
+    //Octree
+    bool showOctree = false;
+   
 private:
     // --- Internal data ---
     std::string directory;
@@ -107,6 +111,5 @@ private:
 
     std::string initial_modelPath;
     int initial_ParentID = -1;
-
 
 };

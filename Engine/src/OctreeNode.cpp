@@ -1,5 +1,6 @@
 #include "OctreeNode.h"
 #include "Scene.h"
+#include "GameObject.h"
 #include <iostream>
 OctreeNode::OctreeNode(const glm::vec3& min, const glm::vec3& max,
     int depth, int maxObjects, int maxDepth, Scene* scene)
@@ -29,22 +30,27 @@ static bool IntersectsBox(const glm::vec3& nodeMin, const glm::vec3& nodeMax, co
 }
 
 void OctreeNode::Insert(GameObject* m) {
-    // si el objeto no intersecta este nodo, ignorar
+    // Si el objeto no intersecta este nodo, ignorar
     if (!IntersectsBox(min, max, m)) return;
 
-    if (depth >= maxDepth || (int)objects.size() < maxObjects) {
-        objects.push_back(m->modelId); // guardamos id, no puntero
-        return;
+    // Subdividir si no hay hijos y aún no se llegó a la profundidad máxima
+    if (!children[0] && depth < maxDepth)
+        Subdivide();
+
+    // Intentar insertar en hijos que intersecten
+    bool insertedIntoChild = false;
+    for (int i = 0; i < 8; ++i) {
+        if (children[i] && IntersectsBox(children[i]->min, children[i]->max, m)) {
+            children[i]->Insert(m);
+            insertedIntoChild = true;
+        }
     }
 
-    if (!children[0]) Subdivide();
-
-    // insertar en hijos que intersecten
-    for (int i = 0; i < 8; ++i) {
-        children[i]->Insert(m);
+    // Si no entró en ningún hijo (por ser nodo hoja o objeto muy grande), lo guardamos aquí
+    if (!insertedIntoChild || depth == maxDepth) {
+        objects.push_back(m->modelId);
     }
 }
-
 
 
 void OctreeNode::Subdivide() {
@@ -129,14 +135,42 @@ void OctreeNode::CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, st
         if (children[i]) children[i]->CollectObjectsHitByRay(ray, scene, result);
 }
 
+void OctreeNode::CollectNodesForObject(int objectId, std::vector<OctreeNode*>& outNodes) {
+    GameObject* obj = &scene->models[objectId];
+    if (obj->name == "Grid") return;
+    if (!IntersectsBox(min, max, obj)) return;
 
-void OctreeNode::DebugDraw(Render* render) const {
-    for (int objId : objects) {
-        GameObject* obj = &scene->models[objId];
-        render->DrawAABBOutline(*obj);
+    // Verificar si este nodo contiene el objeto
+    bool containsObject = false;
+    for (int storedId : objects) {
+        if (storedId == objectId) {
+            containsObject = true;
+            break;
+        }
     }
 
+    // Buscar en los hijos 
+    bool foundInChildren = false;
+    for (int i = 0; i < 8; i++) {
+        if (children[i]) {
+            size_t sizeBefore = outNodes.size();
+            children[i]->CollectNodesForObject(objectId, outNodes);
+            // Si algún hijo añadió nodos, significa que encontró el objeto
+            if (outNodes.size() > sizeBefore) {
+                foundInChildren = true;
+            }
+        }
+    }
 
-    for (int i = 0; i < 8; i++)
-        if (children[i]) children[i]->DebugDraw(render);
+    if (containsObject && !foundInChildren) {
+        outNodes.push_back(this);
+    }
 }
+
+void OctreeNode::DrawOctree(Render* render) {
+    std::cout << "[DrawOctree] Dibujando " << octreeNodesToDraw.size() << " nodos\n";
+    for (OctreeNode* node : octreeNodesToDraw) {
+        render->DrawAABBOctree(node->min, node->max, glm::vec3(1, 0, 0));
+    }
+}
+

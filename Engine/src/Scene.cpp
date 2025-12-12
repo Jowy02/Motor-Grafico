@@ -319,6 +319,7 @@ bool Scene::Update(float dt)
 
     Application::GetInstance().render->OrderModels();
     Application::GetInstance().render->FrustumModels();
+
     ImGuizmo();
 
     return true;

@@ -190,6 +190,82 @@ void Render::InitRaycastDataSphere(GameObject& model, const std::vector<float>& 
     }
 }
 
+void Render::DrawAABBOctree(const glm::vec3& min, const glm::vec3& max, const glm::vec3& color)
+{
+    if (Application::GetInstance().menus.get()->selectedObj != nullptr) {
+        glm::vec3 corners[8] = {
+            {min.x, min.y, min.z},
+            {max.x, min.y, min.z},
+            {max.x, max.y, min.z},
+            {min.x, max.y, min.z},
+            {min.x, min.y, max.z},
+            {max.x, min.y, max.z},
+            {max.x, max.y, max.z},
+            {min.x, max.y, max.z}
+        };
+
+        const int edgeIndexPairs[12][2] = {
+            {0,1},{1,2},{2,3},{3,0},
+            {4,5},{5,6},{6,7},{7,4},
+            {0,4},{1,5},{2,6},{3,7}
+        };
+
+        std::vector<glm::vec3> lineVerts;
+        lineVerts.reserve(24);
+        for (int e = 0; e < 12; ++e) {
+            lineVerts.push_back(corners[edgeIndexPairs[e][0]]);
+            lineVerts.push_back(corners[edgeIndexPairs[e][1]]);
+        }
+
+        GLuint tmpVAO = 0, tmpVBO = 0;
+        glGenVertexArrays(1, &tmpVAO);
+        glGenBuffers(1, &tmpVBO);
+        glBindVertexArray(tmpVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, tmpVBO);
+        glBufferData(GL_ARRAY_BUFFER, lineVerts.size() * sizeof(glm::vec3), lineVerts.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+        glUseProgram(shaderProgram);
+
+        // Matrices
+        Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
+        glm::mat4 modelMat(1.0f);
+        GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
+        if (modelLoc != -1) {
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat));
+        }
+
+        GLint useOverrideLoc = glGetUniformLocation(shaderProgram, "useOverrideColor");
+        GLint overrideColorLoc = glGetUniformLocation(shaderProgram, "overrideColor");
+        GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
+
+        if (useOverrideLoc != -1) glUniform1i(useOverrideLoc, 1);
+        if (overrideColorLoc != -1) {
+            glm::vec4 c(color, 1.0f);
+            glUniform4fv(overrideColorLoc, 1, glm::value_ptr(c));
+        }
+        if (useTexLoc != -1) glUniform1i(useTexLoc, 0);
+
+        // Dibujar
+        glLineWidth(3.0f);
+        glEnable(GL_POLYGON_OFFSET_LINE);
+        glPolygonOffset(-1.0f, -1.0f);
+        glDrawArrays(GL_LINES, 0, (GLsizei)lineVerts.size());
+        glDisable(GL_POLYGON_OFFSET_LINE);
+        glLineWidth(1.0f);
+
+        if (useOverrideLoc != -1) glUniform1i(useOverrideLoc, 0);
+        if (overrideColorLoc != -1) glUniform4f(overrideColorLoc, 0.0f, 0.0f, 0.0f, 0.0f);
+
+        glDisableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        glDeleteBuffers(1, &tmpVBO);
+        glDeleteVertexArrays(1, &tmpVAO);
+    }
+}
+
 void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 {
     // Si no hay datos de AABB, salir
@@ -1082,7 +1158,7 @@ void Render::FrustumModels() {
 // --- DEATH CYCLE ---
 bool Render::PostUpdate()
 {
-       
+    
     // Swap the window buffers (double buffering)
     SDL_GL_SwapWindow(temp);
 

@@ -112,6 +112,7 @@ bool Menus::Update(float dt)
     if (isLoad || isSave)SaveLoad();
 
     DrawResourceManager();
+
     return true;
 }
 
@@ -521,6 +522,20 @@ void Menus::DrawInspector()
                         selectedObj->switchTexture(checkbox2, "Hide");
                 }
                 else  ImGui::Text("No texture on this object");
+                ImGui::Separator();
+                ImGui::Checkbox("Draw Octree", &selectedObj->showOctree);
+                if (selectedObj->showOctree) {
+
+                Application::GetInstance().scene->octreeRoot->CollectNodesForObject(selectedObj->modelId, Application::GetInstance().scene->octreeRoot->octreeNodesToDraw);                
+                   
+                Application::GetInstance().scene->octreeRoot->DrawOctree(Application::GetInstance().render.get());
+                }
+                else {
+                    Application::GetInstance().scene->octreeRoot->octreeNodesToDraw.clear();
+                    selectedObj->octreeDirty = true;
+
+                }
+
                 ImGui::Separator();
                 ImGui::Checkbox("Hide Model", &selectedObj->isHidden);
             }

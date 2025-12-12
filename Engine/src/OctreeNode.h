@@ -6,6 +6,8 @@
 #include "Frustum.h"
 #include "Render.h"
 #include "LineSegment.h"
+#include "Menus.h"
+#include "GameObject.h"
 
 class Scene;
 
@@ -30,6 +32,8 @@ struct OctreeNode {
 
     void CollectObjectsInFrustum(const Frustum& frustum, std::vector<GameObject*>& result) const;
     void CollectObjectsHitByRay(const LineSegment& ray, Scene* scene, std::vector<GameObject*>& result) const;
-    void DebugDraw(Render* render) const;
+    void CollectNodesForObject(int objectId, std::vector<OctreeNode*>& outNodes);
 
+    std::vector<OctreeNode*> octreeNodesToDraw;
+    void DrawOctree(Render* render);
 };

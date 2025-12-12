@@ -82,6 +82,7 @@ public:
 
 
     void DrawAABBOutline(GameObject& model, glm::vec3 color= glm::vec3(0.0f, 0.8f, 1.0f));
+    void DrawAABBOctree(const glm::vec3& min, const glm::vec3& max, const glm::vec3& color);
 
 private:
     unsigned int VBO = 0, VAO = 0, EBO = 0; // OpenGL buffers

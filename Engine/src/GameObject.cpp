@@ -7,7 +7,6 @@
 #include "Mesh.h"
 #include "Menus.h"
 #include "Scene.h"
-#include "OctreeNode.h" 
 
 GameObject::GameObject(const std::string& path)
 {
@@ -128,6 +127,7 @@ void GameObject::UpdateTransform()
     }
     // Actualiza AABB mundo usando los bounds locales (funci�n ya existente)
     myTransform->UpdateAABB();
+    octreeDirty = true;
 }
 
 // Load a model using Assimp
