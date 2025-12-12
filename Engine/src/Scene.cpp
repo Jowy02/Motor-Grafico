@@ -236,6 +236,8 @@ void Scene::Raycast(const LineSegment& ray)
             Application::GetInstance().menus->selectedObj ?
             "Selected: " + Application::GetInstance().menus->selectedObj->name :
             "Deselected");
+        Application::GetInstance().menus.get()->selectedCamera = NULL;
+        Application::GetInstance().menus.get()->selectedResourcePath = "";
     }
 
 }

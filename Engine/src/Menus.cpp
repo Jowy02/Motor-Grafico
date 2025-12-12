@@ -413,6 +413,8 @@ void Menus::DrawGameObjectNode(GameObject* obj)
     {
         if (selectedObj != obj) { 
             selectedObj = obj;
+            selectedResourcePath = "";
+            selectedCamera = NULL;
         }
         else selectedObj = NULL;
     }

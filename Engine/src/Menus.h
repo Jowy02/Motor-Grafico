@@ -65,6 +65,8 @@ public:
 
    // std::vector<Camera*> cameras;
     Camera* selectedCamera = nullptr;
+    std::string selectedResourcePath;
+
 private:
     std::vector<GameObject> models;           // Loaded models
     std::vector<float> fpsHistory;       // FPS history for graphs
@@ -102,6 +104,5 @@ private:
     enum class ResourceType { None, Texture, Mesh, Fbx };
     ResourceType selectedResourceType = ResourceType::None;
     int selectedResourceIndex = -1;
-    std::string selectedResourcePath;
 
 };
