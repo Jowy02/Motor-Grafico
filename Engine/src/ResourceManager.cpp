@@ -66,7 +66,6 @@ void ResourceManager::LoadResource()
                 Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); 
                 if(!exist)textures.push_back(tex);
                 exist = false;
-
             }
         } while (FindNextFileA(h, &data));
 
@@ -82,18 +81,18 @@ void ResourceManager::LoadResource()
                 continue;
             fileName = data.cFileName;
 
-            if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
-                for (auto& files : fbxFiles)
-                {
-                    std::string TempfileName = "../Library/FBX/" + fileName;
-                    if (files == TempfileName) {
-                        exist = true;
-                    }
-                }
-                if(!exist)fbxFiles.push_back("../Library/FBX/" + fileName);
-                exist = false;
+            //if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
+            //    for (auto& files : fbxFiles)
+            //    {
+            //        std::string TempfileName = "../Library/FBX/" + fileName;
+            //        if (files == TempfileName) {
+            //            exist = true;
+            //        }
+            //    }
+            //    if(!exist)fbxFiles.push_back("../Library/FBX/" + fileName);
+            //    exist = false;
 
-            }
+            //}
             if (fileName.substr(fileName.size() - 4) == ".txt") {
                 txtFiles.push_back("../Library/FBX/" + fileName);
             }
@@ -101,7 +100,32 @@ void ResourceManager::LoadResource()
 
         FindClose(h);
     }
-    
+    h = FindFirstFileA("..\\Library\\Meta\\*", &data);
+    fileName = "";
+    exist = false;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
+            fileName = data.cFileName;
+
+            if (fileName.substr(fileName.size() - 5) == ".meta") {
+                for (auto& files : metaFiles)
+                {
+                    std::string TempfileName = "../Library/Meta/" + fileName;
+                    if (files == TempfileName) {
+                        exist = true;
+                    }
+                }
+                if (!exist)metaFiles.push_back("../Library/Meta/" + fileName);
+                exist = false;
+
+            }
+        } while (FindNextFileA(h, &data));
+
+        FindClose(h);
+    }
+
     h = FindFirstFileA("..\\Library\\Meshes\\*", &data);
     fileName = "";
     exist = false;
@@ -129,7 +153,7 @@ void ResourceManager::LoadResource()
     }
 
     Application::GetInstance().menus.get()->fbxFiles.clear();
-    Application::GetInstance().menus.get()->fbxFiles = fbxFiles;
+    Application::GetInstance().menus.get()->fbxFiles = metaFiles;
 
     Application::GetInstance().menus.get()->textures.clear();
     Application::GetInstance().menus.get()->textures = textures;

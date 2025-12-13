@@ -48,7 +48,6 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
     processNode(scene->mRootNode, scene);
     Obj->modelId = Application::GetInstance().scene.get()->models.size() + otherMesh.size();
 
-    //Obj = &Application::GetInstance().scene->models.back();
     Obj->myMesh->mesh.VAO = Mmesh.VAO;
     Obj->myMesh->mesh.VBO = Mmesh.VBO;
     Obj->myMesh->mesh.EBO = Mmesh.EBO;

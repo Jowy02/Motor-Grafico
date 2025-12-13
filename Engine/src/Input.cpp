@@ -141,6 +141,8 @@ bool Input::PreUpdate()
                 }
                 else if (extension == "png" || extension == "dds")
                     Application::GetInstance().scene->ApplyTextureToSelected(path);
+				else if (extension == "meta")
+					Application::GetInstance().scene.get()->LoadMeta(path);
             break;
 		}
 	}

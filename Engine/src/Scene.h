@@ -50,6 +50,9 @@ public:
     void SelectObject(GameObject* obj);
 
     void SaveMesh(std::string filePath, GameObject model);
+    void SaveMeta(int meshesId, std::string filePath);
+
+    void LoadMeta(std::string filePath);
     void LoadMesh(std::string filePath);
 
     void SaveScene(std::string filePath);

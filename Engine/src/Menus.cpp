@@ -86,8 +86,6 @@ bool Menus::PreUpdate()
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-
-
     return true;
 }
 
@@ -629,7 +627,6 @@ void Menus::DrawInspector()
                     delete cam;
                 }
                 selectedCamera = nullptr;
-
             }
         }
     }
@@ -647,15 +644,20 @@ void Menus::DrawInspector()
                     for (auto& text : textures)
                         if (text->textPath == selectedResourcePath) selectedTexture = text;
 
-                    textures.erase(std::remove(textures.begin(), textures.end(), selectedTexture), textures.end());
+                    Application::GetInstance().resourceManager.get()->textures.erase(std::remove(Application::GetInstance().resourceManager.get()->textures.begin(), 
+                        Application::GetInstance().resourceManager.get()->textures.end(), selectedTexture), Application::GetInstance().resourceManager.get()->textures.end());
+                    
                     selectedTexture = nullptr;
                     break;
 
                 case ResourceType::Fbx:
+                    //change for meta files
                     fbxFiles.erase(std::remove(fbxFiles.begin(), fbxFiles.end(), selectedResourcePath), fbxFiles.end());
                     break;
 
                 case ResourceType::Mesh:
+                    //TODO CHANGE FROM RESOURCE MANAGER
+                    //Application::GetInstance().resourceManager.get()->Meshes()
                     meshesFiles.erase(std::remove(meshesFiles.begin(), meshesFiles.end(), selectedResourcePath), meshesFiles.end());
                     break;
 
@@ -774,7 +776,7 @@ void Menus::DrawResourceManager()
                 }
                 if (!ImGui::GetDragDropPayload() && dragedMesh)
                 {
-                    Application::GetInstance().menus.get()->selectedObj = NULL;
+                    selectedObj = NULL;
                     Application::GetInstance().scene->LoadMesh(meshesFiles[dragMesh]);
                     dragedMesh = false;
                 }
@@ -810,8 +812,8 @@ void Menus::DrawResourceManager()
                 }
                 if (!ImGui::GetDragDropPayload() && dragedFbx)
                 {
-                    Application::GetInstance().menus.get()->selectedObj = NULL;
-                    Application::GetInstance().scene->LoadFBX(fbxFiles[dragFbx]);
+                    selectedObj = NULL;
+                    Application::GetInstance().scene->LoadMeta(fbxFiles[dragFbx]);
                     dragedFbx = false;
                 }
             }

@@ -32,9 +32,10 @@ public:
     std::vector<std::string> meshesFiles;
     std::vector<ComponentMesh*> Meshes;           // Loaded Textures
 
+    std::vector<std::string> metaFiles;
+
 private:
     void LoadMeshResource();
 
-    std::vector<std::string> fbxFiles;
     std::vector<std::string> txtFiles;
 };

@@ -38,7 +38,8 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    LoadFBX("../Library/FBX/street2.FBX");
+    //CAMBIAR ANTES DE ENTREGAR
+    //LoadFBX("../Library/FBX/street2.FBX");
     BuildOctree();
     return true;
 }
@@ -47,6 +48,7 @@ void Scene::LoadFBX(const std::string& path)
 {
     std::string dest = "../Library/FBX/" + std::filesystem::path(path).filename().string();
     int cntModels = models.size();
+    int cntMeshes = Application::GetInstance().resourceManager.get()->Meshes.size();
 
     if (!std::filesystem::exists(dest)) {
         std::filesystem::create_directories("../Library/FBX");
@@ -59,13 +61,24 @@ void Scene::LoadFBX(const std::string& path)
     models.push_back(model);
     BuildOctree();
 
+    //Save mesh files
     for (cntModels; cntModels < models.size(); cntModels++)
     {
         dest = "../Library/Meshes/" + models[cntModels].name + ".txt";
-        Application::GetInstance().scene.get()->SaveMesh(dest, models[cntModels]);
+        SaveMesh(dest, models[cntModels]);
     }
+
     Application::GetInstance().resourceManager.get()->LoadResource();
 
+    //Save meta files
+    dest = "../Library/Meta/" + model.name + ".meta";
+    bool alreadySave = false;
+    for (auto & saveMeta: Application::GetInstance().resourceManager.get()->metaFiles)
+        if (dest == saveMeta) alreadySave = true;
+    if (!alreadySave) {
+        SaveMeta(cntMeshes, dest);
+        Application::GetInstance().resourceManager.get()->LoadResource();
+    }
 }
 
 void Scene::BuildOctree() {
@@ -96,21 +109,25 @@ void Scene::BuildOctree() {
 void Scene::ApplyTextureToSelected(const std::string& path)
 {
     auto selected = Application::GetInstance().menus.get()->selectedObj;
+    bool exist = false;
     if (selected)
     {
-        std::string dest = "../Library/Images/" + std::filesystem::path(path).filename().string();
-        if (!std::filesystem::exists(dest)) {
-            std::filesystem::create_directories("../Library/Images");
-            std::filesystem::copy_file(path, dest,
-                std::filesystem::copy_options::update_existing);
-            Application::GetInstance().resourceManager.get()->LoadResource();
-        }
-        Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-
-        for (auto& model : models)
+        for (auto & text: Application::GetInstance().resourceManager.get()->textures)
+            if (text->textPath == path) {
+                Application::GetInstance().menus.get()->selectedObj->ApplTexture(text,path);
+                exist = true;
+            }
+        if (!exist)
         {
-            if (model.modelId == Application::GetInstance().menus.get()->selectedObj->modelId)
-                Application::GetInstance().menus.get()->selectedObj->ApplTexture(tex, path);
+            std::string dest = "../Library/Images/" + std::filesystem::path(path).filename().string();
+            if (!std::filesystem::exists(dest)) {
+                std::filesystem::create_directories("../Library/Images");
+                std::filesystem::copy_file(path, dest,
+                    std::filesystem::copy_options::update_existing);
+                Application::GetInstance().resourceManager.get()->LoadResource();
+            }
+            Texture* tex = new Texture(path.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+            Application::GetInstance().menus.get()->selectedObj->ApplTexture(tex, path);
         }
     }
     else
@@ -228,7 +245,6 @@ void Scene::Raycast(const LineSegment& ray)
             }
         }
     }
-
     if (selected)
     {
         SelectObject(selected); // ahora usa la misma lógica que el menú
@@ -358,6 +374,23 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
 
     file.close();
 }
+void Scene::SaveMeta(int meshesId, std::string filePath)
+{
+    std::ofstream file(filePath);
+    if (!file.is_open()) return;
+    for (meshesId; meshesId < Application::GetInstance().resourceManager.get()->Meshes.size();meshesId++)
+    {
+        file << "Mesh:\n";
+
+        file << "{" << "\n";
+        file << "MeshRef: " << Application::GetInstance().resourceManager.get()->Meshes[meshesId]->filenameMesh << "\n";
+        file << "Texture: " << "" << "\n"; 
+
+        file << "}" << "\n";
+    }
+    file.close();
+}
+
 void Scene::SaveScene(std::string filePath)
 {
     std::ofstream file(filePath);
@@ -462,10 +495,7 @@ void Scene::LoadScene(std::string filePath)
             if (line == "{" && prevline == "GameObjects:") {
                 insideObject = true;
             }
-            else if (line == "}") {
-                insideObject = false;
-                insideCam = false;
-            }
+ 
             else if (line == "{" && prevline == "Cameras:")
             {
                 insideCam = true;
@@ -626,100 +656,44 @@ void Scene::LoadScene(std::string filePath)
     cameras[0]->UpdateViewMatrix();
     cameras[0]->UpdateProjectionMatrix();
 }
+void Scene::LoadMeta(std::string filePath)
+{
+    std::ifstream file(filePath);
+    if (!file.is_open()) return;
+
+    std::string line;
+    std::string prevline = "";
+    bool insideMesh = false;
+
+    while (std::getline(file, line)) {
+
+        if (line == "{" && prevline == "Mesh:") {
+            insideMesh = true;
+        }
+        else if (line == "}") {
+            insideMesh = false;
+        }
+        prevline = line;
+        if (insideMesh) {
+            // parsear clave: valor
+            std::istringstream iss(line);
+            std::string key;
+            if (std::getline(iss, key, ':')) {
+                std::string value;
+                std::getline(iss, value);
+                // limpiar espacios
+                if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+
+                if (key == "MeshRef") {
+                    LoadMesh(value);
+                }
+            }
+        }
+    }
+}
 void Scene::LoadMesh(std::string filePath)
 {
-    //std::ifstream file(filePath);
-    //if (!file.is_open()) return;
-    //bool insideMesh = false;
-    //bool insideObject = false;
     GameObject NewModel(filePath);
-
-    //std::string line;
-    //std::string prevLine;
-
-    //while (std::getline(file, line)) {
-    //    if (line == "{") {
-    //        if (prevLine == "Mesh:") insideMesh = true;
-    //        else insideObject = true;
-    //    }
-    //    else if (line == "}") {
-    //        insideMesh = false;
-    //        insideObject = false;
-    //    }
-    //    else if (insideMesh) {
-    //        std::istringstream iss(line);
-    //        std::string key;
-    //        if (std::getline(iss, key, ':')) {
-    //            std::string value;
-    //            std::getline(iss, value);
-    //            if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-
-    //            if (key == "IndexCount") {
-    //                NewModel.myMesh->mesh.indexCount = std::stoi(value);
-    //            }
-    //            else if (key == "minAABB") {
-    //                std::stringstream ss(value);
-    //                ss >> NewModel.myTransform->minAABB.x;
-    //                ss.ignore(1);
-    //                ss >> NewModel.myTransform->minAABB.y;
-    //                ss.ignore(1);
-    //                ss >> NewModel.myTransform->minAABB.z;
-
-    //            }
-    //            else if (key == "maxAABB") {
-    //                std::stringstream ss(value);
-    //                ss >> NewModel.myTransform->maxAABB.x;
-    //                ss.ignore(1);
-    //                ss >> NewModel.myTransform->maxAABB.y;
-    //                ss.ignore(1);
-    //                ss >> NewModel.myTransform->maxAABB.z;
-
-    //            }
-    //            else if (key == "Texture") {
-    //   
-    //                NewModel.myMesh->mesh.texture = nullptr;
-    //            }
-    //            else if (key == "Indices") {
-    //                // leer línea completa con índices separados por '|'
-    //                std::stringstream ss(value);
-    //                std::string token;
-    //                NewModel.myMesh->mesh.indices.clear();
-    //                while (std::getline(ss, token, '|')) {
-    //                    if (!token.empty())
-    //                        NewModel.myMesh->mesh.indices.push_back(std::stoi(token));
-    //                }
-    //            }
-    //            else if (key == "Vertices") {
-    //                // leer línea completa con índices separados por '|'
-    //                std::stringstream ss(value);
-    //                std::string token;
-    //                NewModel.myMesh->mesh.vertices.clear();
-    //                while (std::getline(ss, token, '|')) {
-    //                    if (!token.empty())
-    //                        NewModel.myMesh->mesh.vertices.push_back(std::stof(token));
-    //                }
-    //            }
-    //            else if (key == "PositionsLocal") {
-    //                std::stringstream ss(value);
-    //                std::string token;
-    //                NewModel.myMesh->mesh.positionsLocal.clear();
-    //                while (std::getline(ss, token, '|')) {
-    //                    if (!token.empty()) {
-    //                        std::stringstream vecStream(token);
-    //                        float x, y, z;
-    //                        vecStream >> x;
-    //                        vecStream.ignore(1);
-    //                        vecStream >> y;
-    //                        vecStream.ignore(1);
-    //                        vecStream >> z;
-    //                        NewModel.myMesh->mesh.positionsLocal.push_back(glm::vec3(x, y, z));
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //    prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
-    //}
     for (int i = 0; i< Application::GetInstance().resourceManager.get()->meshesFiles.size(); i++)
     {
         if (Application::GetInstance().resourceManager.get()->Meshes[i]->filenameMesh == filePath)
@@ -743,12 +717,19 @@ void Scene::LoadMesh(std::string filePath)
 
     NewModel.modelId = (int)models.size();
 
+    NewModel.UpdateTransform();
+    NewModel.myTransform->UpdateAABB();
+
     models.push_back(NewModel);
     models.back().myMesh->RecreateBuffers();
 
-    NewModel.UpdateTransform();
-    NewModel.myTransform->UpdateAABB();
-    BuildOctree();
+    if (!octreeRoot) {
+        Application::GetInstance().scene->BuildOctree();
+    }
+    else {
+        OctreeNode* root = octreeRoot.get();
+        root->Insert(&models.back());
+    }
 }
 
 bool Scene::PostUpdate()
