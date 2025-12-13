@@ -57,7 +57,7 @@ public:
 
     void SaveScene(std::string filePath);
     void LoadScene(std::string filePath);
-
+    void ClearScene();
     // --- Scene content ---
     std::vector<GameObject> models;
     std::vector<Camera*> cameras;

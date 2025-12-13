@@ -93,7 +93,7 @@ void ResourceManager::LoadResource()
             //    exist = false;
 
             //}
-            if (fileName.substr(fileName.size() - 4) == ".txt") {
+            if (fileName.substr(fileName.size() - 4) == ".mesh") {
                 txtFiles.push_back("../Library/FBX/" + fileName);
             }
         } while (FindNextFileA(h, &data));
@@ -135,7 +135,7 @@ void ResourceManager::LoadResource()
                 continue;
             fileName = data.cFileName;
 
-            if (fileName.substr(fileName.size() - 4) == ".txt") {
+            if (fileName.substr(fileName.size() - 5) == ".mesh") {
                 for (auto& files : meshesFiles)
                 {
                     std::string TempfileName = "../Library/Meshes/" + fileName;
@@ -219,8 +219,10 @@ void ResourceManager::LoadMeshResource()
 
                     }
                     else if (key == "Texture") {
-
-                        tempMesh->mesh.texture = nullptr;
+                        for (auto& text : textures)
+                        {
+                            if (value == text->textPath) tempMesh->mesh.texture = text;
+                        }
                     }
                     else if (key == "Indices") {
                         // leer línea completa con índices separados por '|'

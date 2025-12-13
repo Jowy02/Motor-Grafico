@@ -1,10 +1,10 @@
 Mesh:
 {
-MeshRef: ../Library/Meshes/Baker_house.txt
+MeshRef: ../Library/Meshes/Baker_house.mesh
 Texture: 
 }
 Mesh:
 {
-MeshRef: ../Library/Meshes/Chimney.txt
+MeshRef: ../Library/Meshes/Chimney.mesh
 Texture: 
 }

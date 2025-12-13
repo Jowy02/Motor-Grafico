@@ -188,6 +188,7 @@ void Menus::MainMenu()
             selectedObj = NULL;
             if(ImGui::MenuItem("Save", nullptr, &isSave)) ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".txt,.json", config);
             if (ImGui::MenuItem("Load", nullptr, &isLoad))ImGuiFileDialog::Instance()->OpenDialog("ChooseScene", "Choose Scene File", ".txt,.json", config);
+            if (ImGui::MenuItem("Clear", nullptr))Application::GetInstance().scene.get()->ClearScene();
 
 
             ImGui::EndMenu();

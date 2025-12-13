@@ -66,7 +66,7 @@ void Mesh::loadModel(const std::string& path, GameObject* Obj)
     Obj->myTransform->maxAABB = maxAABB;
     Obj->name = name;
 
-    Obj->modelPath = "../Library/Meshes/" + name + ".txt";
+    Obj->modelPath = "../Library/Meshes/" + name + ".mesh";
 
     maxAABB = { 0,0,0 };
     minAABB = {0,0,0};
@@ -134,7 +134,7 @@ void Mesh::processOthers(const aiScene* scene)
         newModel.UpdateTransform();
         newModel.myTransform->UpdateAABB();
 
-        newModel.modelPath = "../Library/Meshes/" + newModel.name + ".txt";
+        newModel.modelPath = "../Library/Meshes/" + newModel.name + ".mesh";
         Application::GetInstance().scene->models.push_back(std::move(newModel));
     }
 }

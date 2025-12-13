@@ -68,7 +68,7 @@ void Scene::LoadFBX(const std::string& path)
     //Save mesh files
     for (cntModels; cntModels < models.size(); cntModels++)
     {
-        dest = "../Library/Meshes/" + models[cntModels].name + ".txt";
+        dest = "../Library/Meshes/" + models[cntModels].name + ".mesh";
         SaveMesh(dest, models[cntModels]);
     }
 
@@ -375,7 +375,9 @@ void Scene::SaveMesh(std::string filePath, GameObject model)
 
     file << "{" << "\n";
     file << "IndexCount: " << model.myMesh->mesh.indexCount << "\n";
-    file << "Texture: " << model.texturePath << "\n";
+    if(model.myMesh->mesh.texture !=NULL)file << "Texture: " << model.myMesh->mesh.texture->textPath.c_str() << "\n";
+    else file << "Texture: " << "" << "\n";
+    
     file << "minAABB: " << model.myTransform->minAABB.x << ", " << model.myTransform->minAABB.y << ", " << model.myTransform->minAABB.z << "\n";
     file << "maxAABB: " << model.myTransform->maxAABB.x << ", " << model.myTransform->maxAABB.y << ", " << model.myTransform->maxAABB.z << "\n";
 
@@ -453,6 +455,48 @@ void Scene::SaveScene(std::string filePath)
         }
     }
     file.close();
+}
+void Scene::ClearScene()
+{
+    if (!models.empty()) {
+        GameObject grid = models.front(); // Guarda la Grid (asumiendo índice 0)
+        models.clear();                   // Borra todos los objetos
+        models.push_back(grid);           // Reinserta la Grid
+
+        // Limpia y resetea el Octree
+        if (octreeRoot) {
+            octreeRoot->Clear();
+            octreeRoot.reset();
+        }
+
+        Application::GetInstance().menus.get()->selectedObj = nullptr;
+    }
+    if (cameras.size() > 1) {
+        cameras.clear();
+        cameras.push_back(Application::GetInstance().camera.get());
+    }
+
+    if (models.size() > 1) {
+        for (int i = models.size() - 1; i >= 0; --i) {
+            auto& model = models[i];
+
+            if (model.name != "Grid")
+            {
+                Application::GetInstance().menus.get()->selectedObj = nullptr;
+
+                if (model.isChild) models[model.ParentID].eraseChild(model.modelId);
+                model.CleanUpChilds();
+                auto& sceneModels = models;
+                sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
+                    [&](const GameObject& m) { return &m == &models[model.modelId]; }), sceneModels.end());
+
+                if (models.size() <= 1) {
+                    break;
+                }
+                Application::GetInstance().scene.get()->octreeRoot.get()->Clear();
+            }
+        }
+    }
 }
 void Scene::LoadScene(std::string filePath)
 {
@@ -606,6 +650,7 @@ void Scene::LoadScene(std::string filePath)
 
                     }
                     else if (key == "Texture") {
+                        //todo
 
                         Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
                         models[UID].ApplTexture(tex, value);
@@ -726,6 +771,7 @@ void Scene::LoadMesh(std::string filePath)
             NewModel.myMesh = Application::GetInstance().resourceManager.get()->Meshes[i];
             NewModel.myTransform->minAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->minAABB;
             NewModel.myTransform->maxAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->maxAABB;
+            NewModel.myMesh->mesh.texture = Application::GetInstance().resourceManager.get()->Meshes[i]->mesh.texture;
         }
     }
     NewModel.modelPath = filePath;
