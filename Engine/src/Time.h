@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
+#include "Module.h"
 
-class Time {
+class Time : public Module {
 public:
     inline static float deltaTime = 0.0f;        // dt usado por el juego (Game Clock)
     inline static double time = 0.0;            // segundos acumulados del Game Clock

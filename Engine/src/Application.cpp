@@ -22,7 +22,7 @@ Application::Application()
     mesh = std::make_shared<Mesh>();
     simulationController = std::make_shared<SimulationController>();
     resourceManager = std::make_shared<ResourceManager>();
-   // time = std::make_shared<Time>();
+    time = std::make_shared<Time>();
 
 
     // Ordered for awake / Start / Update // Reverse order of CleanUp
@@ -35,7 +35,7 @@ Application::Application()
     AddModule(std::static_pointer_cast<Module>(camera));
     AddModule(std::static_pointer_cast<Module>(simulationController));
     AddModule(std::static_pointer_cast<Module>(resourceManager));
-    //AddModule(std::static_pointer_cast<Module>(time));
+    AddModule(std::static_pointer_cast<Module>(time));
 
 }
 
@@ -124,7 +124,7 @@ void Application::PrepareUpdate()
     dt = (float)(now - perfLastTime) / (float)SDL_GetPerformanceFrequency();
     perfLastTime = now;
 
-    Time::Update(dt);
+    Application::GetInstance().time.get()->Update(dt);
 
     //frameTime.Start();
     frameStart = SDL_GetTicks();
@@ -157,7 +157,7 @@ bool Application::DoUpdate()
     bool result = true;
     for (const auto& module : moduleList) 
     {
-        result = module.get()->Update(Time::deltaTime);
+        result = module.get()->Update(Application::GetInstance().time.get()->deltaTime);
        // result = module.get()->Update(dt);
         if (!result)
             break;

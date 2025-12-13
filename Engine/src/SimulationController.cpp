@@ -50,7 +50,7 @@ void SimulationController::Play()
 
 
     currentState = GameState::RUNNING;
-    Time::Resume();
+    Application::GetInstance().time->Resume();
 
 }
 
@@ -58,12 +58,12 @@ void SimulationController::Pause()
 {
     if (currentState == GameState::RUNNING) {
         currentState = GameState::PAUSED;
-        Time::Pause();
+        Application::GetInstance().time->Pause();
 
     }
     else if (currentState == GameState::PAUSED) {
         currentState = GameState::RUNNING;
-        Time::Resume();
+        Application::GetInstance().time->Resume();
     }
 }
 
@@ -74,8 +74,8 @@ void SimulationController::Stop()
         LoadInitialcamaras();
 
         currentState = GameState::STOPPED;
-        Time::Init(Time::fixedDeltaTime);
-        Time::Pause();
+        Application::GetInstance().time->Init(Application::GetInstance().time.get()->fixedDeltaTime);
+        Application::GetInstance().time->Pause();
     }
 
 }
@@ -85,8 +85,8 @@ void SimulationController::Step()
     if (currentState == GameState::STOPPED) {
         SaveInitialSceneState();
         currentState = GameState::PAUSED;
-        Time::Pause();
-        Time::RequestStepOnce();
+        Application::GetInstance().time->Pause();
+        Application::GetInstance().time->RequestStepOnce();
         return;
     }
 
@@ -95,7 +95,7 @@ void SimulationController::Step()
     }
 
     if (currentState == GameState::PAUSED) {
-        Time::RequestStepOnce();
+        Application::GetInstance().time->RequestStepOnce();
     }
 }
 
@@ -106,7 +106,7 @@ float SimulationController::GetGameDeltaTime(float realDeltaTime) const
     }
     return 0.0f;*/
 
-    return Time::deltaTime;
+    return Application::GetInstance().time.get()->deltaTime;
 
 }
 

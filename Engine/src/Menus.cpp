@@ -240,19 +240,19 @@ void Menus::DrawSimulationToolbar()
 
     // Faster / Slower
     if (ImGui::Button("<< Slower")) {
-        Time::SetTimeScale(Time::timeScale - 0.25f);
+        Application::GetInstance().time->SetTimeScale(Time::timeScale - 0.25f);
     }
     ImGui::SameLine();
     if (ImGui::Button("Faster >>")) {
-        Time::SetTimeScale(Time::timeScale + 0.25f);
+        Application::GetInstance().time->SetTimeScale(Time::timeScale + 0.25f);
     }
 
     ImGui::SameLine();
 
     // TimeScale slider
-    float ts = Time::timeScale;
-    if (ImGui::SliderFloat("TimeScale", &ts, Time::minTimeScale, Time::maxTimeScale, "%.2f")) {
-        Time::SetTimeScale(ts);
+    float ts = Application::GetInstance().time.get()->timeScale;
+    if (ImGui::SliderFloat("TimeScale", &ts, Application::GetInstance().time.get()->minTimeScale, Application::GetInstance().time.get()->maxTimeScale, "%.2f")) {
+        Application::GetInstance().time->SetTimeScale(ts);
     }
 
     // Mostrar estados y relojes
@@ -260,7 +260,7 @@ void Menus::DrawSimulationToolbar()
     ImGui::Begin("Debug");
     ImGui::Text("State: %s", (currentState == GameState::STOPPED) ? "STOPPED" : (currentState == GameState::RUNNING ? "RUNNING" : "PAUSED"));
     ImGui::SameLine();
-    ImGui::Text(" | Game Time: %.2f s | Real Time: %.2f s | dt (game): %.4f s", (float)Time::time, (float)Time::realTime, Time::deltaTime);
+    ImGui::Text(" | Game Time: %.2f s | Real Time: %.2f s | dt (game): %.4f s", (float)Application::GetInstance().time.get()->time, (float)Application::GetInstance().time.get()->realTime, Application::GetInstance().time.get()->deltaTime);
     ImGui::End();
 
 }
@@ -336,7 +336,7 @@ void Menus::BuildDockSpace()
 void Menus::CalculateFPS(float dt)
 {
     framesCounter++;
-    timeAccumulator += Time::realDeltaTime;
+    timeAccumulator += Application::GetInstance().time.get()->realDeltaTime;
 
     if (timeAccumulator >= 1.0f)
     {
