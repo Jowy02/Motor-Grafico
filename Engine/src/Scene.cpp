@@ -22,6 +22,10 @@
 #include <cmath> 
 #include <filesystem>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 Scene::Scene() : Module()
 {
 }
@@ -230,21 +234,41 @@ void Scene::Raycast(const LineSegment& ray)
     float closestT = FLT_MAX;
     GameObject* selected = nullptr;
 
-    for (auto* model : hitModels) {
-        for (size_t i = 0; i < model->myMesh->mesh.indices.size(); i += 3) {
-            glm::vec3 v0 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 0]];
-            glm::vec3 v1 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 1]];
-            glm::vec3 v2 = model->myMesh->mesh.positionsWorld[model->myMesh->mesh.indices[i + 2]];
+    for (auto* model : hitModels)
+    {
+        glm::mat4 modelMatrix = model->myTransform->transformMatrix;
+
+        const auto& indices = model->myMesh->mesh.indices;
+        const auto& positions = model->myMesh->mesh.positionsLocal;
+
+        for (size_t i = 0; i + 2 < indices.size(); i += 3)
+        {
+            size_t index0 = indices[i];
+            size_t index1 = indices[i + 1];
+            size_t index2 = indices[i + 2];
+
+            glm::vec3 v0 = glm::vec3(
+                modelMatrix * glm::vec4(positions[index0], 1.0f)
+            );
+            glm::vec3 v1 = glm::vec3(
+                modelMatrix * glm::vec4(positions[index1], 1.0f)
+            );
+            glm::vec3 v2 = glm::vec3(
+                modelMatrix * glm::vec4(positions[index2], 1.0f)
+            );
 
             float t;
-            if (RayIntersectsTriangle(ray, v0, v1, v2, t)) {
-                if (t < closestT) {
+            if (RayIntersectsTriangle(ray, v0, v1, v2, t))
+            {
+                if (t < closestT)
+                {
                     closestT = t;
                     selected = model;
                 }
             }
         }
     }
+
     if (selected)
     {
         SelectObject(selected); // ahora usa la misma lógica que el menú
