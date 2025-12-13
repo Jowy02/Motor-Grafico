@@ -38,6 +38,7 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
+    LoadFBX("../Library/FBX/street2.FBX");
     BuildOctree();
     return true;
 }
