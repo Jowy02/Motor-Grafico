@@ -33,4 +33,7 @@ public:
 	std::string filenameMesh;
 	glm::vec3 minAABB;
 	glm::vec3 maxAABB;
+
+	bool importTexture = true;
+	float initialScale = 1.0f;
 };

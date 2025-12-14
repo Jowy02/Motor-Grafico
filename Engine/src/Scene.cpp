@@ -42,8 +42,6 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    //CAMBIAR ANTES DE ENTREGAR
-    //LoadFBX("../Library/FBX/street2.FBX");
     BuildOctree();
     return true;
 }
@@ -75,7 +73,9 @@ void Scene::LoadFBX(const std::string& path)
     Application::GetInstance().resourceManager.get()->LoadResource();
 
     //Save meta files
-    dest = "../Library/Meta/" + model.name + ".meta";
+    std::string temp = std::filesystem::path(path).filename().string();
+    temp = temp.substr(0, temp.find_last_of('.'));
+    dest = "../Library/Meta/" + temp + ".meta";
     
     if (dest != Application::GetInstance().resourceManager.get()->getMetaResource(dest))
     {
@@ -605,14 +605,14 @@ void Scene::LoadScene(std::string filePath)
                     {
                         if (value != "")
                         {
-                            if( LoadMesh(value))
+                            //Check if mesh exist if no go to next object
+                            if(LoadMesh(value))
                             {
                                 insideObject = true;
                                 UID = models.size() - 1;
                                 models[UID].modelId = UID;
                             }
                             else insideObject = false;
-
                         }
                     }
                     else if (key == "ParentUID")
@@ -654,7 +654,6 @@ void Scene::LoadScene(std::string filePath)
                     }
                     else if (key == "Texture") {
                         models[UID].ApplTexture(Application::GetInstance().resourceManager.get()->getTextureResource(value), value);
-                        models[UID].actualTexture = models[UID].myMesh->mesh.texture;
                     }
                 }
             }
@@ -770,6 +769,8 @@ bool Scene::LoadMesh(std::string filePath)
         NewModel.myTransform->minAABB = NewModel.myMesh->minAABB;
         NewModel.myTransform->maxAABB = NewModel.myMesh->maxAABB;
         NewModel.modelPath = filePath;
+        NewModel.actualTexture = NewModel.myMesh->mesh.texture;
+        NewModel.saveTexture = NewModel.myMesh->mesh.texture;
 
         NewModel.myTransform->center = (NewModel.myTransform->minAABB + NewModel.myTransform->maxAABB) * 0.5f;
         NewModel.myTransform->size = NewModel.myTransform->maxAABB - NewModel.myTransform->minAABB;
@@ -779,6 +780,10 @@ bool Scene::LoadMesh(std::string filePath)
         NewModel.myTransform->position = { 0,0,0 };
         NewModel.myTransform->rotation = { 0,0,0 };
         NewModel.myTransform->scale = { 1,1,1 };
+        NewModel.myTransform->scale *= NewModel.myMesh->initialScale;
+
+        if (!NewModel.myMesh->importTexture)
+            NewModel.actualTexture = NULL;
 
         NewModel.modelId = (int)models.size();
 

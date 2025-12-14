@@ -103,6 +103,8 @@ private:
 
     enum class ResourceType { None, Texture, Mesh, Fbx };
     ResourceType selectedResourceType = ResourceType::None;
+    //ComponentMesh* selectedMesh = nullptr;
+
     int selectedResourceIndex = -1;
 
 };

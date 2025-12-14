@@ -28,7 +28,7 @@ bool ResourceManager::Awake()
 bool ResourceManager::Start()
 {
     LoadResource();
-
+    //Application::GetInstance().scene.get()->LoadMeta("../Library/Meta/street2.meta");
     return true;
 }
 

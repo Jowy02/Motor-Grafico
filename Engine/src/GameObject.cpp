@@ -31,8 +31,8 @@ GameObject::GameObject(const std::string& path)
 }
 void GameObject::ApplTexture(Texture* tex, std::string path)
 {
-    myMesh->mesh.texture = tex;
     actualTexture = tex;
+    saveTexture = tex;
     texturePath = path;
 
     if (tex != nullptr)
@@ -66,10 +66,10 @@ void GameObject::Draw()
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(myTransform->transformMatrix));
     
-    if (myMesh->mesh.texture)
+    if (actualTexture)
     {
-        myMesh->mesh.texture->texUnit(shaderProgram, "tex0", 0);
-        myMesh->mesh.texture->Bind();
+        actualTexture->texUnit(shaderProgram, "tex0", 0);
+        actualTexture->Bind();
         GLint useTexLoc = glGetUniformLocation(shaderProgram, "useTexture");
 
         glUniform1i(useTexLoc, 1);
@@ -90,8 +90,8 @@ void GameObject::Draw()
 
     glBindVertexArray(0);
 
-    if (myMesh->mesh.texture)
-        myMesh->mesh.texture->Unbind();
+    if (actualTexture)
+        actualTexture->Unbind();
 
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
@@ -173,14 +173,14 @@ void GameObject::switchTexture(bool checker, std::string type)
     if (type == "BlackWhite")
     {
         if (checker) tempTex = blackWhite;
-        else tempTex = actualTexture;
+        else tempTex = saveTexture;
     }
     if (type == "Hide")
     {
         if (checker) tempTex = noTexture;
-        else tempTex = actualTexture;
+        else tempTex = saveTexture;
     }
-    myMesh->mesh.texture = tempTex;
+    actualTexture = tempTex;
 }
 
 // Get the model matrix

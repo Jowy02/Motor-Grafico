@@ -635,7 +635,15 @@ void Menus::DrawInspector()
     {
         ImGui::Text("Resource : %s", selectedResourcePath.c_str());
         Texture* selectedTexture = nullptr;
-
+        if (selectedResourceType == ResourceType::Mesh)
+        {
+            if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::DragFloat("Scale", &Application::GetInstance().resourceManager.get()->getMeshResource(selectedResourcePath)->initialScale, 0.1f, 0.1f, 10.0f);
+            }
+            if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Checkbox("Import texture", &Application::GetInstance().resourceManager.get()->getMeshResource(selectedResourcePath)->importTexture);
+            }
+        }
         if (ImGui::Button("Delete Selected")) {
 
             switch (selectedResourceType) 

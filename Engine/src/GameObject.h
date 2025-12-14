@@ -67,6 +67,7 @@ public:
 
     // --- Textures and visibility ---
     Texture* actualTexture = nullptr;
+    Texture* saveTexture = nullptr;
     void switchTexture(bool checker, std::string type);
     bool isHidden = false;
 
