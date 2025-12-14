@@ -260,7 +260,6 @@ void Menus::DrawSimulationToolbar()
     ImGui::SameLine();
     ImGui::Text(" | Game Time: %.2f s | Real Time: %.2f s | dt (game): %.4f s", (float)Application::GetInstance().time.get()->time, (float)Application::GetInstance().time.get()->realTime, Application::GetInstance().time.get()->deltaTime);
     ImGui::End();
-
 }
 
 void Menus::BuildDockSpace() 
@@ -780,8 +779,8 @@ void Menus::DrawResourceManager()
         }
     }
 
-    if (ImGui::CollapsingHeader("Fbx", ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::BeginTable("FbxTable", 8)) {
+    if (ImGui::CollapsingHeader("Meta", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::BeginTable("MetaTable", 8)) {
 
             for (int i = 0; i < metaFiles.size(); i++) {
                 ImGui::TableNextColumn();
@@ -856,35 +855,37 @@ void Menus::DrawSystemConfig()
     ImGui::Begin("System Config", &showSystemInfo);
 
     // Window Config
-    ImGui::Text("Window");
-    int width = 0, height = 0;
-    SDL_GetWindowSize(Application::GetInstance().window.get()->window, &width, &height);
-
-    if (ImGui::DragInt("Width", &width, 0.1f) || ImGui::DragInt("Height", &height, 0.1f))
+    if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        Application::GetInstance().window.get()->SetWindowSize(width, height);
-        glViewport(0, 0, width, height);
+
+        int width = 0, height = 0;
+        SDL_GetWindowSize(Application::GetInstance().window.get()->window, &width, &height);
+
+        if (ImGui::DragInt("Width", &width, 0.1f) || ImGui::DragInt("Height", &height, 0.1f))
+        {
+            Application::GetInstance().window.get()->SetWindowSize(width, height);
+            glViewport(0, 0, width, height);
+        }
     }
-      
     // Camera Config
-    ImGui::Separator();
-    ImGui::Text("Camera");
+    if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+    {
 
-    ImGui::DragFloat("Move Speed", &Application::GetInstance().camera.get()->MOVESPEED, 0.05f, 0.0f, 1.0f);
-    ImGui::DragFloat("Sensitivity", &Application::GetInstance().camera.get()->sensitivity, 0.05f,0.0f,1.0f);
+        ImGui::DragFloat("Move Speed", &Application::GetInstance().camera.get()->MOVESPEED, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Sensitivity", &Application::GetInstance().camera.get()->sensitivity, 0.05f, 0.0f, 1.0f);
 
-    glm::vec3 Position = Application::GetInstance().camera.get()->Position;
-    ImGui::Text("Position: (%.2f, %.2f, %.2f)",
-        Position.x,
-        Position.y,
-        Position.z);
+        glm::vec3 Position = Application::GetInstance().camera.get()->Position;
+        ImGui::Text("Position: (%.2f, %.2f, %.2f)",
+            Position.x,
+            Position.y,
+            Position.z);
 
-    glm::vec3 Orientation = Application::GetInstance().camera.get()->Orientation;
-    ImGui::Text("Orientation: (%.2f, %.2f, %.2f)",
-        Orientation.x,
-        Orientation.y,
-        Orientation.z);
-
+        glm::vec3 Orientation = Application::GetInstance().camera.get()->Orientation;
+        ImGui::Text("Orientation: (%.2f, %.2f, %.2f)",
+            Orientation.x,
+            Orientation.y,
+            Orientation.z);
+    }
     ImGui::End();
 }
 void Menus::DrawAboutWindow()
