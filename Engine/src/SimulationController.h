@@ -13,10 +13,10 @@ struct InitialGameObjectData
     glm::vec3 pos;
     glm::vec3 rot;
     glm::vec3 scale;
-    std::string texturePath; // Add the texture
+    std::string texturePath; 
 
     bool isHidden;
-    int parentID; // Para restaurar la jerarquía
+    int parentID; 
     std::string name;
     int modelId;
 };

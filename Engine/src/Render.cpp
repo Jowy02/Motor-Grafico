@@ -35,7 +35,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "uniform sampler2D tex0;\n"
 "uniform bool useTexture;\n"
-"uniform vec4 overrideColor;\n" // <- agregado
+"uniform vec4 overrideColor;\n" 
 "void main()\n"
 "{\n"
 "   if(useTexture)\n"
@@ -69,7 +69,7 @@ const char* normalFragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n" // Verde
+"   FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n" // Green
 "}\0";
 
 
@@ -146,18 +146,18 @@ void Render::InitRaycastData(GameObject& model, const GLfloat* vertices, int ver
     model.myMesh->mesh.positionsLocal.clear();
     model.myMesh->mesh.indices.clear();
 
-    // Rellenar posiciones locales (8 floats por vértice: pos+color+uv)
+    // Fill local positions(8 floats per vertex : pos + color + uv)
     for (int i = 0; i < vertexCount; i += 8) {
         glm::vec3 pos(vertices[i], vertices[i + 1], vertices[i + 2]);
         model.myMesh->mesh.positionsLocal.push_back(pos);
     }
 
-    // Rellenar índices
+    // Fill indexes
     for (int i = 0; i < indexCount; ++i) {
         model.myMesh->mesh.indices.push_back(indices[i]);
     }
     model.myMesh->mesh.indexCount = indexCount;
-    // Actualizar AABB local
+    // Update local AABB
     model.myTransform->localMinAABB = glm::vec3(FLT_MAX);
     model.myTransform->localMaxAABB = glm::vec3(-FLT_MAX);
     for (auto& v : model.myMesh->mesh.positionsLocal) {
@@ -228,7 +228,7 @@ void Render::DrawAABBOctree(const glm::vec3& min, const glm::vec3& max, const gl
 
         glUseProgram(shaderProgram);
 
-        // Matrices
+        // Matrix
         Application::GetInstance().camera.get()->Matrix(45.0f, 0.1f, 100.0f, shaderProgram);
         glm::mat4 modelMat(1.0f);
         GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
@@ -247,7 +247,7 @@ void Render::DrawAABBOctree(const glm::vec3& min, const glm::vec3& max, const gl
         }
         if (useTexLoc != -1) glUniform1i(useTexLoc, 0);
 
-        // Dibujar
+        // Draw
         glLineWidth(3.0f);
         glEnable(GL_POLYGON_OFFSET_LINE);
         glPolygonOffset(-1.0f, -1.0f);
@@ -268,7 +268,7 @@ void Render::DrawAABBOctree(const glm::vec3& min, const glm::vec3& max, const gl
 
 void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 {
-    // Si no hay datos de AABB, salir
+    // If there is no AABB data, exit
     glm::vec3 minL = model.myTransform->localMinAABB;
     glm::vec3 maxL = model.myTransform->localMaxAABB;
     if (minL == glm::vec3(FLT_MAX) && maxL == glm::vec3(-FLT_MAX)) return;
@@ -317,8 +317,7 @@ void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 
     glm::mat4 modelMat = model.GetModelMatrix();
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model_matrix");
-    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat)); //Matriz de la figura
-
+    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMat)); //Figure matrix
     GLint overrideColorLoc = glGetUniformLocation(shaderProgram, "overrideColor");
     if (overrideColorLoc != -1)
     {
@@ -354,8 +353,6 @@ void Render::DrawAABBOutline(GameObject& model, glm::vec3 color)
 
 bool Render::PreUpdate()
 {
-
-    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(shaderProgram);
@@ -365,7 +362,7 @@ bool Render::PreUpdate()
 
 bool Render::Update(float dt)
 {
-    auto& scene = *Application::GetInstance().scene; // referencia a la escena actual
+    auto& scene = *Application::GetInstance().scene; // Reference to the current scene
     auto& models = scene.models;
 
 
@@ -769,7 +766,7 @@ gemotryMesh Render::CreateGrid(int size, int divisions)
     model.name = "Grid";
     model.modelId = Application::GetInstance().scene.get()->models.size();
 
-    float thickness = 0.00001f; // Altura de la AABB
+    float thickness = 0.00001f; //AABB Height
     model.myTransform->localMinAABB = glm::vec3(-half, -thickness, -half);
     model.myTransform->localMaxAABB = glm::vec3(half, thickness, half);
     model.UpdateTransform();
@@ -826,7 +823,6 @@ void Render::ShowFaceNormals()
 {
     if (FaceNormals)
     {
-        //glDisable(GL_DEPTH_TEST);
         glUseProgram(normalShaderProgram);
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
         Application::GetInstance().camera.get()->Matrix(45.0f, 0.2f, 100.0f, normalShaderProgram);
@@ -851,7 +847,6 @@ void Render::ShowVertexNormals()
 {
     if (VertexNormals)
     {
-        //glDisable(GL_DEPTH_TEST);
         glUseProgram(normalShaderProgram);
         GLuint modelLoc = glGetUniformLocation(normalShaderProgram, "model_matrix");
         Application::GetInstance().camera.get()->Matrix(45.0f, 0.2f, 100.0f, normalShaderProgram);
@@ -876,7 +871,6 @@ void Render::ShowVertexNormals()
 gemotryMesh Render::Draw3D(const GLfloat* vertices, size_t vertexCount, const GLuint* indices, size_t indexCount, float rotation, Texture* texture)
 {
     // Set the camera projection and view matrices
-    //Application::GetInstance().camera.get()->Inputs(temp); // (commented out input handling)
     glUseProgram(shaderProgram);
 
     if (texture != nullptr)
@@ -1009,10 +1003,6 @@ gemotryMesh Render::DrawVertexNormalsFromMesh(const float* vertices, size_t vert
         float y = vertices[i + 1];
         float z = vertices[i + 2];
 
-       /* float nx = vertices[i + 3];
-        float ny = vertices[i + 4];
-        float nz = vertices[i + 5];*/
-
         glm::vec3 normal = vertexNormals[i / 8];
         float nx = normal.x;
         float ny = normal.y;
@@ -1060,7 +1050,7 @@ void  Render::OrderModels()
 {
  
     GameObject model("NULL");
-    auto& scene = *Application::GetInstance().scene;  // Referencia a la escena actual
+    auto& scene = *Application::GetInstance().scene;  // Reference to the current scene
     auto& models = scene.models;
 
     glm::vec3 cameraPos = Application::GetInstance().camera.get()->Position;
@@ -1078,7 +1068,7 @@ void  Render::OrderModels()
 
     }
 
-    // ordenar de mayor a menor distancia
+    // Order from longest to shortest distance
     for (int i = 0; i < modelOrder.size(); ++i)
     {
         for (int j = i + 1; j < modelOrder.size(); ++j)
@@ -1090,8 +1080,8 @@ void  Render::OrderModels()
         }
     }
 
-    glDisable(GL_BLEND);        // sin blending
-    glEnable(GL_DEPTH_TEST);    // usar z-buffer
+    glDisable(GL_BLEND);        // whithout blending
+    glEnable(GL_DEPTH_TEST);    // z-buffer
     glDepthMask(GL_TRUE);
 
     for (auto& m : models)
@@ -1104,10 +1094,8 @@ void  Render::OrderModels()
         if (!m.hasTransparency)
             m.Draw();
     }
-    glEnable(GL_BLEND);                             // activar blending
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // fórmula más común
-    //glEnable(GL_ALPHA_TEST);                        // activar alpha test
-    //glAlphaFunc(GL_GREATER, 0.1f);                  // descartar píxeles con alfa < 0.1
+    glEnable(GL_BLEND);                            
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
     glDepthMask(GL_FALSE);
 
     for (auto& pair : modelOrder)
@@ -1133,8 +1121,6 @@ void  Render::OrderModels()
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
-
-
 }
 
 void Render::FrustumModels() {
@@ -1176,7 +1162,7 @@ bool Render::CleanUp()
 
 std::vector<glm::vec3> Render::CalculateVertexNormalsPrueva(const GLfloat* vertices, const GLuint* indices, int vertexCount, int indexCount, float smoothingAngleDeg)
 {
-    int stride = 8; // cada vértice: x, y, z, r, g, b, u, v
+    int stride = 8; 
     int numVertices = vertexCount / stride;
 
     std::vector<glm::vec3> vertexNormals(numVertices, glm::vec3(0.0f));

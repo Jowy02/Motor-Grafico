@@ -125,8 +125,6 @@ void Application::PrepareUpdate()
     perfLastTime = now;
 
     Application::GetInstance().time.get()->Update(dt);
-
-    //frameTime.Start();
     frameStart = SDL_GetTicks();
 }
 
@@ -152,13 +150,10 @@ bool Application::PreUpdate()
 // Call modules on each loop iteration
 bool Application::DoUpdate()
 {
-   // float gameDeltaTime = simulationController->GetGameDeltaTime(dt);
-
     bool result = true;
     for (const auto& module : moduleList) 
     {
         result = module.get()->Update(Application::GetInstance().time.get()->deltaTime);
-       // result = module.get()->Update(dt);
         if (!result)
             break;
     }

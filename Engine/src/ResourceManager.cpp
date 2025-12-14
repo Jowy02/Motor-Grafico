@@ -105,7 +105,7 @@ void ResourceManager::CheckTextureFiles()
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
                 continue;
 
-            // Filtrar por tipo de archivo
+            //Filter by file type
             fileName = data.cFileName;
             if (fileName.substr(fileName.size() - 4) == ".png") {
                 fileName = "../Library/Images/" + fileName;

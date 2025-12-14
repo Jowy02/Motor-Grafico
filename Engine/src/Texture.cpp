@@ -32,16 +32,12 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
         Application::GetInstance().menus->LogToConsole("DevIL initialized");
     }
 
-    /* ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);*/
-
- 
-
-    // 🔸 Detectar el formato real antes de convertir
+    // Detectar el formato real antes de convertir
     textPath = imagePath;
     ILint imgFormat = ilGetInteger(IL_IMAGE_FORMAT);
     ILint imgType = ilGetInteger(IL_IMAGE_TYPE);
 
-    // 🔸 Solo convertimos a RGBA si no tiene canal alfa
+    // Solo convertimos a RGBA si no tiene canal alfa
     if (imgFormat != IL_RGBA)
         ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 
@@ -50,7 +46,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum form
     ILint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
     unsigned char* data = ilGetData();
 
-    // --- 🔎 Detección precisa de transparencia ---
+    // Detección precisa de transparencia 
     hasAlpha = (bpp == 5);
     bool foundTransparent = false;
 

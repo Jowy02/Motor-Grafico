@@ -48,6 +48,7 @@ bool Menus::Start()
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.DisplaySize = { 10,20 };
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.IniFilename = "imgui_layout.ini";
     std::string path = "imgui_layout.ini";

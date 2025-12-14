@@ -97,7 +97,7 @@ void Scene::BuildOctree() {
         globalMax = glm::max(globalMax, m.myTransform->maxAABB);
     }
 
-    // Añadir un pequeño padding para evitar cajas degeneradas
+    // Add a little padding to avoid degenerate boxes
     const float pad = 0.001f;
     globalMin -= glm::vec3(pad);
     globalMax += glm::vec3(pad);
@@ -148,7 +148,7 @@ void Scene::SelectObject(GameObject* obj)
     }
     else {
         selected = false;
-        menus->selectedObj = nullptr; // mismo comportamiento que en la jerarquía
+        menus->selectedObj = nullptr;
     }
 }
 
@@ -163,7 +163,7 @@ void Scene::RaycastFromMouse(int mouseX, int mouseY)
         Application::GetInstance().window->height,
         view, proj);
 
-    Raycast(ray); // usa tu lógica actual de intersección
+    Raycast(ray); 
 }
 
 bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t)
@@ -175,7 +175,7 @@ bool Scene::RayIntersectsTriangle(const LineSegment& ray, const glm::vec3& v0, c
     glm::vec3 h = glm::cross(dir, edge2);
     float a = glm::dot(edge1, h);
 
-    if (fabs(a) < EPSILON) return false; // paralelo
+    if (fabs(a) < EPSILON) return false; // Parallel
 
     float f = 1.0f / a;
     glm::vec3 s = ray.a - v0;
@@ -195,7 +195,7 @@ bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, c
 {
     glm::vec3 dir = ray.Direction();
 
-    // Evita división por cero
+    // Avoid division by zero
     glm::vec3 invDir;
     invDir.x = (dir.x != 0.0f) ? 1.0f / dir.x : std::numeric_limits<float>::infinity();
     invDir.y = (dir.y != 0.0f) ? 1.0f / dir.y : std::numeric_limits<float>::infinity();
@@ -210,12 +210,12 @@ bool Scene::RayIntersectsAABB(const LineSegment& ray, const glm::vec3& boxMin, c
     float tNear = glm::max(glm::max(tmin.x, tmin.y), tmin.z);
     float tFar = glm::min(glm::min(tmax.x, tmax.y), tmax.z);
 
-    // Si todo el AABB está detrás del rayo
+    // If all the AABB is behind the lightning
     if (tFar < 0.0f) return false;
-    // Si no hay solapamiento
+    // If there is no overlap
     if (tNear > tFar) return false;
 
-    // Si el rayo empieza dentro del AABB, usamos tFar
+    // If the ray starts inside the AABB, we use tFar
     t = (tNear >= 0.0f) ? tNear : tFar;
     return true;
 }
@@ -270,7 +270,7 @@ void Scene::Raycast(const LineSegment& ray)
 
     if (selected)
     {
-        SelectObject(selected); // ahora usa la misma lógica que el menú
+        SelectObject(selected);
         Application::GetInstance().menus->LogToConsole(
             Application::GetInstance().menus->selectedObj ?
             "Selected: " + Application::GetInstance().menus->selectedObj->name :
@@ -316,10 +316,10 @@ void Scene::ImGuizmo() {
                 parentMatrix = Application::GetInstance().scene->models[menus->selectedObj->ParentID].myTransform->transformMatrix;
             }
 
-            // Convertir world a local
+            // Convert world to local
             glm::mat4 localModel = glm::inverse(parentMatrix) * model;
 
-            // Descomponer la local
+            // Break down local
             float translation[3], rotationDeg[3], scaleArr[3];
             ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localModel), translation, rotationDeg, scaleArr);
 
@@ -336,8 +336,6 @@ void Scene::ImGuizmo() {
 Camera* Scene::GetActiveCamera()
 {
     auto& menus = Application::GetInstance().menus;
-
-    // Si hay una cámara seleccionada en el menú, devuélvela
     if (menus->selectedCamera)
         return menus->selectedCamera;
 
@@ -346,7 +344,7 @@ Camera* Scene::GetActiveCamera()
 
 bool Scene::Update(float dt)
 {
-    Camera* activeCamera = GetActiveCamera();
+    Camera* activeCamera = Application::GetInstance().camera.get();
     if (activeCamera)
     {
         activeCamera->UpdateProjectionMatrix();
@@ -458,11 +456,11 @@ void Scene::SaveScene(std::string filePath)
 void Scene::ClearScene()
 {
     if (!models.empty()) {
-        GameObject grid = models.front(); // Guarda la Grid (asumiendo índice 0)
-        models.clear();                   // Borra todos los objetos
-        models.push_back(grid);           // Reinserta la Grid
+        GameObject grid = models.front(); //Save the Grid (assuming index 0)
+        models.clear();                   // Delete all objects
+        models.push_back(grid);           // Reinsert the Grid
 
-        // Limpia y resetea el Octree
+        // Clean and reset Octree
         if (octreeRoot) {
             octreeRoot->Clear();
             octreeRoot.reset();

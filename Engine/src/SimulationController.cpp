@@ -164,7 +164,7 @@ void SimulationController::LoadInitialSceneState()
         newParentIDs.push_back(blueprint.parentID);
     }
 
-    // Restaurar jerarquía
+    // Restore hierarchy
     for (int i = 0; i < newParentIDs.size(); ++i)
     {
         int newModelIndex = objectStart + i;
@@ -176,10 +176,10 @@ void SimulationController::LoadInitialSceneState()
         }
     }
 
-    // Reconstruir octree
+    // Rebuild octree
     currentScene->BuildOctree();
 
-    // Reset selección y estado
+    // Reset selection and states
     Application::GetInstance().menus.get()->selectedObj = nullptr;
     currentState = GameState::STOPPED;
 }
@@ -188,7 +188,7 @@ void SimulationController::LoadInitialcamaras() {
 
     auto& menusCams = Application::GetInstance().scene.get()->cameras;
 
-    //Eliminar
+    //Delete
     for (Camera* cam : addedCamerasDuringPlay)
     {
         auto it = std::find(menusCams.begin(), menusCams.end(), cam);
@@ -200,7 +200,7 @@ void SimulationController::LoadInitialcamaras() {
     }
     addedCamerasDuringPlay.clear();
 
-    //Restaurar
+    //Restore
     for (Camera* cam : removedCamerasDuringPlay)
     {
         menusCams.push_back(cam);
