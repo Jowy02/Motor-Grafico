@@ -641,35 +641,24 @@ void Menus::DrawInspector()
             switch (selectedResourceType) 
             {
                 case ResourceType::Texture:
-                    // liberar memoria y borrar del vector
-                    for (auto& text : textures)
-                        if (text->textPath == selectedResourcePath) selectedTexture = text;
-
-                    Application::GetInstance().resourceManager.get()->textures.erase(std::remove(Application::GetInstance().resourceManager.get()->textures.begin(), 
-                        Application::GetInstance().resourceManager.get()->textures.end(), selectedTexture), Application::GetInstance().resourceManager.get()->textures.end());
-                    
+                    Application::GetInstance().resourceManager.get()->deleteResource(ResourceManager::Type::TEXTURE, selectedResourcePath);
                     selectedTexture = nullptr;
                     break;
 
                 case ResourceType::Fbx:
-                    //change for meta files
-                    fbxFiles.erase(std::remove(fbxFiles.begin(), fbxFiles.end(), selectedResourcePath), fbxFiles.end());
+                    Application::GetInstance().resourceManager.get()->deleteResource(ResourceManager::Type::META, selectedResourcePath);
                     break;
 
                 case ResourceType::Mesh:
-                    //TODO CHANGE FROM RESOURCE MANAGER
-                    //Application::GetInstance().resourceManager.get()->Meshes()
-                    meshesFiles.erase(std::remove(meshesFiles.begin(), meshesFiles.end(), selectedResourcePath), meshesFiles.end());
+                    Application::GetInstance().resourceManager.get()->deleteResource(ResourceManager::Type::MESH, selectedResourcePath);
                     break;
 
                 default: 
                     break;
             }
-            DeleteFileA(selectedResourcePath.c_str());
 
             selectedResourceType = ResourceType::None;
             selectedResourcePath.clear();
-            Application::GetInstance().resourceManager.get()->LoadResource();
         }
         ImGui::Separator();
     }

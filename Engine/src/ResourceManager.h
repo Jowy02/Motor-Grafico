@@ -12,6 +12,13 @@ struct SDL_Texture;
 class ResourceManager: public Module
 {
 public:
+    enum class Type : unsigned char
+    {
+        MESH,
+        TEXTURE,
+        META
+    };
+
     ResourceManager();
     virtual ~ResourceManager();
 
@@ -24,18 +31,22 @@ public:
     bool CleanUp() override;    // Called before quitting
 
     void LoadResource();
-    bool init = true;
+    void deleteResource(Type type, std::string path);
 
-    std::vector<GameObject> models;           // Loaded models
-    std::vector<Texture*> textures;           // Loaded Textures
+    ComponentMesh* getMeshResource(std::string path);
+    Texture* getTextureResource(std::string path);
+    std::string getMetaResource(std::string path);
 
-    std::vector<std::string> meshesFiles;
     std::vector<ComponentMesh*> Meshes;           // Loaded Textures
 
+private:
+    std::vector<Texture*> textures;           // Loaded Textures
+    std::vector<std::string> meshesFiles;
     std::vector<std::string> metaFiles;
 
-private:
     void LoadMeshResource();
 
-    std::vector<std::string> txtFiles;
+    void CheckMeshFiles();
+    void CheckTextureFiles();
+    void CheckMetaFiles();
 };

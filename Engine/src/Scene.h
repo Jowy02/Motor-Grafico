@@ -53,7 +53,7 @@ public:
     void SaveMeta(int meshesId, std::string filePath);
 
     void LoadMeta(std::string filePath);
-    void LoadMesh(std::string filePath);
+    bool LoadMesh(std::string filePath);
 
     void SaveScene(std::string filePath);
     void LoadScene(std::string filePath);

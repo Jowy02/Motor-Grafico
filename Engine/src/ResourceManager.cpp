@@ -45,90 +45,27 @@ bool ResourceManager::Update(float dt)
 
 void ResourceManager::LoadResource()
 {
+    CheckMeshFiles();
+    CheckTextureFiles();
+    CheckMetaFiles();
+
+    Application::GetInstance().menus.get()->fbxFiles.clear();
+    Application::GetInstance().menus.get()->fbxFiles = metaFiles;
+
+    Application::GetInstance().menus.get()->textures.clear();
+    Application::GetInstance().menus.get()->textures = textures;
+
+    Application::GetInstance().menus.get()->meshesFiles.clear();
+    Application::GetInstance().menus.get()->meshesFiles = meshesFiles;
+
+    LoadMeshResource();
+}
+void ResourceManager::CheckMeshFiles()
+{
     WIN32_FIND_DATAA data;
-    HANDLE h = FindFirstFileA("..\\Library\\Images\\*", &data);
-    std::string fileName;
+    HANDLE h = FindFirstFileA("..\\Library\\Meshes\\*", &data);
+    std::string fileName = "";
     bool exist = false;
-
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-
-            // Filtrar por tipo de archivo
-            fileName = data.cFileName;
-            if (fileName.substr(fileName.size() - 4) == ".png") {
-                fileName = "../Library/Images/" + fileName;
-                for (auto& text : textures)
-                {
-                    if (text->textPath == fileName) exist = true;
-                }
-                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); 
-                if(!exist)textures.push_back(tex);
-                exist = false;
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-
-    h = FindFirstFileA("..\\Library\\FBX\\*", &data);
-    fileName = "";
-    exist = false;
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-            fileName = data.cFileName;
-
-            //if (fileName.substr(fileName.size() - 4) == ".fbx" || fileName.substr(fileName.size() - 4) == ".FBX") {
-            //    for (auto& files : fbxFiles)
-            //    {
-            //        std::string TempfileName = "../Library/FBX/" + fileName;
-            //        if (files == TempfileName) {
-            //            exist = true;
-            //        }
-            //    }
-            //    if(!exist)fbxFiles.push_back("../Library/FBX/" + fileName);
-            //    exist = false;
-
-            //}
-            if (fileName.substr(fileName.size() - 4) == ".mesh") {
-                txtFiles.push_back("../Library/FBX/" + fileName);
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-    h = FindFirstFileA("..\\Library\\Meta\\*", &data);
-    fileName = "";
-    exist = false;
-    if (h != INVALID_HANDLE_VALUE) {
-        do {
-            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
-                continue;
-            fileName = data.cFileName;
-
-            if (fileName.substr(fileName.size() - 5) == ".meta") {
-                for (auto& files : metaFiles)
-                {
-                    std::string TempfileName = "../Library/Meta/" + fileName;
-                    if (files == TempfileName) {
-                        exist = true;
-                    }
-                }
-                if (!exist)metaFiles.push_back("../Library/Meta/" + fileName);
-                exist = false;
-
-            }
-        } while (FindNextFileA(h, &data));
-
-        FindClose(h);
-    }
-
-    h = FindFirstFileA("..\\Library\\Meshes\\*", &data);
-    fileName = "";
-    exist = false;
     if (h != INVALID_HANDLE_VALUE) {
         do {
             if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
@@ -151,17 +88,66 @@ void ResourceManager::LoadResource()
 
         FindClose(h);
     }
+}
 
-    Application::GetInstance().menus.get()->fbxFiles.clear();
-    Application::GetInstance().menus.get()->fbxFiles = metaFiles;
+void ResourceManager::CheckTextureFiles()
+{
+    WIN32_FIND_DATAA data;
+    HANDLE h = FindFirstFileA("..\\Library\\Images\\*", &data);
+    std::string fileName;
+    bool exist = false;
 
-    Application::GetInstance().menus.get()->textures.clear();
-    Application::GetInstance().menus.get()->textures = textures;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
 
-    Application::GetInstance().menus.get()->meshesFiles.clear();
-    Application::GetInstance().menus.get()->meshesFiles = meshesFiles;
+            // Filtrar por tipo de archivo
+            fileName = data.cFileName;
+            if (fileName.substr(fileName.size() - 4) == ".png") {
+                fileName = "../Library/Images/" + fileName;
+                for (auto& text : textures)
+                {
+                    if (text->textPath == fileName) exist = true;
+                }
+                Texture* tex = new Texture(fileName.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+                if (!exist)textures.push_back(tex);
+                exist = false;
+            }
+        } while (FindNextFileA(h, &data));
 
-    LoadMeshResource();
+        FindClose(h);
+    }
+}
+
+void ResourceManager::CheckMetaFiles()
+{
+    WIN32_FIND_DATAA data;
+    HANDLE h = FindFirstFileA("..\\Library\\Meta\\*", &data);
+    std::string fileName = "";
+    bool exist = false;
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+                continue;
+            fileName = data.cFileName;
+
+            if (fileName.substr(fileName.size() - 5) == ".meta") {
+                for (auto& files : metaFiles)
+                {
+                    std::string TempfileName = "../Library/Meta/" + fileName;
+                    if (files == TempfileName) {
+                        exist = true;
+                    }
+                }
+                if (!exist)metaFiles.push_back("../Library/Meta/" + fileName);
+                exist = false;
+
+            }
+        } while (FindNextFileA(h, &data));
+
+        FindClose(h);
+    }
 }
 
 void ResourceManager::LoadMeshResource()
@@ -207,7 +193,6 @@ void ResourceManager::LoadMeshResource()
                         ss >> tempMesh->minAABB.y;
                         ss.ignore(1);
                         ss >> tempMesh->minAABB.z;
-
                     }
                     else if (key == "maxAABB") {
                         std::stringstream ss(value);
@@ -216,13 +201,9 @@ void ResourceManager::LoadMeshResource()
                         ss >> tempMesh->maxAABB.y;
                         ss.ignore(1);
                         ss >> tempMesh->maxAABB.z;
-
                     }
                     else if (key == "Texture") {
-                        for (auto& text : textures)
-                        {
-                            if (value == text->textPath) tempMesh->mesh.texture = text;
-                        }
+                        tempMesh->mesh.texture = getTextureResource(value);
                     }
                     else if (key == "Indices") {
                         // leer línea completa con índices separados por '|'
@@ -268,6 +249,58 @@ void ResourceManager::LoadMeshResource()
         }
     }
 }
+ComponentMesh* ResourceManager::getMeshResource(std::string path)
+{
+    for (int i = 0; i < meshesFiles.size(); i++)
+    {
+        if (Meshes[i]->filenameMesh == path)
+            return Meshes[i];
+    }
+    return NULL;
+}
+Texture* ResourceManager::getTextureResource(std::string path) {
+    for (auto& text : textures)
+    {
+        if (path == text->textPath) return text;
+    }
+    return NULL;
+}
+std::string ResourceManager::getMetaResource(std::string path)
+{
+    for (auto& meta : metaFiles)
+    {
+        if (path == meta) return meta;
+    }
+    return "";
+}
+void ResourceManager::deleteResource(Type type, std::string path)
+{
+    if (type == Type::MESH)
+    {
+        Meshes.erase(std::remove(Meshes.begin(), Meshes.end(), getMeshResource(path)), Meshes.end());
+        DeleteFileA(path.c_str());
+        meshesFiles.clear();
+        CheckMeshFiles();
+        Application::GetInstance().menus.get()->meshesFiles.clear();
+        Application::GetInstance().menus.get()->meshesFiles = meshesFiles;
+    }
+    else if (type == Type::TEXTURE)
+    {
+        textures.erase(std::remove(textures.begin(), textures.end(), getTextureResource(path)), textures.end());
+        DeleteFileA(path.c_str());
+        Application::GetInstance().menus.get()->textures.clear();
+        Application::GetInstance().menus.get()->textures = textures;
+    }
+    else if (type == Type::META)
+    {
+        metaFiles.erase(std::remove(metaFiles.begin(), metaFiles.end(), getMetaResource(path)), metaFiles.end());
+        DeleteFileA(path.c_str());
+        Application::GetInstance().menus.get()->fbxFiles.clear();
+        Application::GetInstance().menus.get()->fbxFiles = metaFiles;
+    }
+}
+
+
 bool ResourceManager::PostUpdate()
 {
     return true;

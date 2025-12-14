@@ -52,7 +52,7 @@ void Scene::LoadFBX(const std::string& path)
 {
     std::string dest = "../Library/FBX/" + std::filesystem::path(path).filename().string();
     int cntModels = models.size();
-    int cntMeshes = Application::GetInstance().resourceManager.get()->Meshes.size();
+    int cntMeshes = cntModels;
 
     if (!std::filesystem::exists(dest)) {
         std::filesystem::create_directories("../Library/FBX");
@@ -76,10 +76,9 @@ void Scene::LoadFBX(const std::string& path)
 
     //Save meta files
     dest = "../Library/Meta/" + model.name + ".meta";
-    bool alreadySave = false;
-    for (auto & saveMeta: Application::GetInstance().resourceManager.get()->metaFiles)
-        if (dest == saveMeta) alreadySave = true;
-    if (!alreadySave) {
+    
+    if (dest != Application::GetInstance().resourceManager.get()->getMetaResource(dest))
+    {
         SaveMeta(cntMeshes, dest);
         Application::GetInstance().resourceManager.get()->LoadResource();
     }
@@ -116,11 +115,11 @@ void Scene::ApplyTextureToSelected(const std::string& path)
     bool exist = false;
     if (selected)
     {
-        for (auto & text: Application::GetInstance().resourceManager.get()->textures)
-            if (text->textPath == path) {
-                Application::GetInstance().menus.get()->selectedObj->ApplTexture(text,path);
-                exist = true;
-            }
+        Texture* tempText = Application::GetInstance().resourceManager.get()->getTextureResource(path);
+        if (path == tempText->textPath) {
+            Application::GetInstance().menus.get()->selectedObj->ApplTexture(tempText, path);
+            exist = true;
+        }
         if (!exist)
         {
             std::string dest = "../Library/Images/" + std::filesystem::path(path).filename().string();
@@ -404,12 +403,12 @@ void Scene::SaveMeta(int meshesId, std::string filePath)
 {
     std::ofstream file(filePath);
     if (!file.is_open()) return;
-    for (meshesId; meshesId < Application::GetInstance().resourceManager.get()->Meshes.size();meshesId++)
+    for (meshesId; meshesId < models.size();meshesId++)
     {
         file << "Mesh:\n";
 
         file << "{" << "\n";
-        file << "MeshRef: " << Application::GetInstance().resourceManager.get()->Meshes[meshesId]->filenameMesh << "\n";
+        file << "MeshRef: " << models[meshesId].modelPath.c_str() << "\n";
         file << "Texture: " << "" << "\n"; 
 
         file << "}" << "\n";
@@ -606,9 +605,14 @@ void Scene::LoadScene(std::string filePath)
                     {
                         if (value != "")
                         {
-                            LoadMesh(value);
-                            UID = models.size() - 1;
-                            models[UID].modelId = UID;
+                            if( LoadMesh(value))
+                            {
+                                insideObject = true;
+                                UID = models.size() - 1;
+                                models[UID].modelId = UID;
+                            }
+                            else insideObject = false;
+
                         }
                     }
                     else if (key == "ParentUID")
@@ -647,14 +651,10 @@ void Scene::LoadScene(std::string filePath)
                         ss.ignore(1);
                         ss >> models[UID].myTransform->rotation.z;
                         models[UID].UpdateTransform();
-
                     }
                     else if (key == "Texture") {
-                        //todo
-
-                        Texture* tex = new Texture(value.c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-                        models[UID].ApplTexture(tex, value);
-                        models[UID].actualTexture = tex;
+                        models[UID].ApplTexture(Application::GetInstance().resourceManager.get()->getTextureResource(value), value);
+                        models[UID].actualTexture = models[UID].myMesh->mesh.texture;
                     }
                 }
             }
@@ -760,46 +760,44 @@ void Scene::LoadMeta(std::string filePath)
         }
     }
 }
-void Scene::LoadMesh(std::string filePath)
+bool Scene::LoadMesh(std::string filePath)
 {
     GameObject NewModel(filePath);
-    for (int i = 0; i< Application::GetInstance().resourceManager.get()->meshesFiles.size(); i++)
+    ComponentMesh* mesh = Application::GetInstance().resourceManager.get()->getMeshResource(filePath);
+    if (mesh != NULL)
     {
-        if (Application::GetInstance().resourceManager.get()->Meshes[i]->filenameMesh == filePath)
-        {
-            Application::GetInstance().resourceManager.get()->Meshes;
-            NewModel.myMesh = Application::GetInstance().resourceManager.get()->Meshes[i];
-            NewModel.myTransform->minAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->minAABB;
-            NewModel.myTransform->maxAABB = Application::GetInstance().resourceManager.get()->Meshes[i]->maxAABB;
-            NewModel.myMesh->mesh.texture = Application::GetInstance().resourceManager.get()->Meshes[i]->mesh.texture;
+        NewModel.myMesh = mesh;
+        NewModel.myTransform->minAABB = NewModel.myMesh->minAABB;
+        NewModel.myTransform->maxAABB = NewModel.myMesh->maxAABB;
+        NewModel.modelPath = filePath;
+
+        NewModel.myTransform->center = (NewModel.myTransform->minAABB + NewModel.myTransform->maxAABB) * 0.5f;
+        NewModel.myTransform->size = NewModel.myTransform->maxAABB - NewModel.myTransform->minAABB;
+        NewModel.myTransform->localMinAABB = NewModel.myTransform->minAABB;
+        NewModel.myTransform->localMaxAABB = NewModel.myTransform->maxAABB;
+
+        NewModel.myTransform->position = { 0,0,0 };
+        NewModel.myTransform->rotation = { 0,0,0 };
+        NewModel.myTransform->scale = { 1,1,1 };
+
+        NewModel.modelId = (int)models.size();
+
+        NewModel.UpdateTransform();
+        NewModel.myTransform->UpdateAABB();
+
+        models.push_back(NewModel);
+        models.back().myMesh->RecreateBuffers();
+
+        if (!octreeRoot) {
+            Application::GetInstance().scene->BuildOctree();
         }
+        else {
+            OctreeNode* root = octreeRoot.get();
+            root->Insert(&models.back());
+        }
+        return true;
     }
-    NewModel.modelPath = filePath;
-
-    NewModel.myTransform->center = (NewModel.myTransform->minAABB + NewModel.myTransform->maxAABB) * 0.5f;
-    NewModel.myTransform->size = NewModel.myTransform->maxAABB - NewModel.myTransform->minAABB;
-    NewModel.myTransform->localMinAABB = NewModel.myTransform->minAABB;
-    NewModel.myTransform->localMaxAABB = NewModel.myTransform->maxAABB;
-
-    NewModel.myTransform->position = { 0,0,0 };
-    NewModel.myTransform->rotation = { 0,0,0 };
-    NewModel.myTransform->scale = { 1,1,1 };
-
-    NewModel.modelId = (int)models.size();
-
-    NewModel.UpdateTransform();
-    NewModel.myTransform->UpdateAABB();
-
-    models.push_back(NewModel);
-    models.back().myMesh->RecreateBuffers();
-
-    if (!octreeRoot) {
-        Application::GetInstance().scene->BuildOctree();
-    }
-    else {
-        OctreeNode* root = octreeRoot.get();
-        root->Insert(&models.back());
-    }
+    return false;
 }
 
 bool Scene::PostUpdate()
@@ -810,7 +808,7 @@ bool Scene::PostUpdate()
 bool Scene::CleanUp()
 {
     Application::GetInstance().menus->LogToConsole("Scene::CleanUp started");
-
+    ClearScene();
     imagesFiles.clear();
     for (auto& tex : images)
         tex.Delete();
