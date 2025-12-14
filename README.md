@@ -122,7 +122,6 @@ The current version supports scene creation, modification, saving, and loading, 
   - **File:** Scene and application controls.  
   - **View:** Toggle editor windows.  
   - **Help:** Access documentation, bug reporting, releases, and engine information.  
-
 ## Additional Functionalities
 
 ### **Camera Management**
@@ -143,6 +142,10 @@ The current version supports scene creation, modification, saving, and loading, 
 ### **Scene Management**
 - **Clear Scene** functionality allows users to remove **all GameObjects** from the current scene.  
 - This behaves similarly to creating a **new empty scene**, providing a clean starting point for further work.  
+
+### **Texture Transparency Support**
+- Imported model textures can now include **transparency (alpha channel)**.  
+- Transparency is correctly applied to the model in the scene, preserving visual fidelity for transparent materials.
 
 ## Credits
 **All contributors working on this project**:
