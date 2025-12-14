@@ -500,11 +500,11 @@ void Scene::ClearScene()
 void Scene::LoadScene(std::string filePath)
 {
     if (!models.empty()) {
-        GameObject grid = models.front(); // Guarda la Grid (asumiendo índice 0)
-        models.clear();                   // Borra todos los objetos
-        models.push_back(grid);           // Reinserta la Grid
+        GameObject grid = models.front(); // Save Grid (always on index 0)
+        models.clear();                   // Delete all objects
+        models.push_back(grid);           // Reinsert the Grid
 
-        // Limpia y resetea el Octree
+        // Clean y reset Octree
         if (octreeRoot) {
             octreeRoot->Clear();
             octreeRoot.reset();
@@ -517,7 +517,6 @@ void Scene::LoadScene(std::string filePath)
         cameras.push_back(Application::GetInstance().camera.get());
     }
 
-    //"../Library/FBX/Scene.txt"
     std::ifstream file(filePath);
     if (!file.is_open()) return;
     std::string ModelName;
@@ -570,13 +569,13 @@ void Scene::LoadScene(std::string filePath)
             prevline = line;
 
             if (insideObject) {
-                // parsear clave: valor
+                // Parse key : value
                 std::istringstream iss(line);
                 std::string key;
                 if (std::getline(iss, key, ':')) {
                     std::string value;
                     std::getline(iss, value);
-                    // limpiar espacios
+                    // Clean space between words
                     if (!value.empty() && value[0] == ' ') value.erase(0, 1);
 
                     if (key == "Name") {
@@ -664,9 +663,8 @@ void Scene::LoadScene(std::string filePath)
                 if (std::getline(iss, key, ':')) {
                     std::string value;
                     std::getline(iss, value);
-                    // limpiar espacios
+                    // Clean space between words
                     if (!value.empty() && value[0] == ' ') value.erase(0, 1);
-
                     if (key == "Name"){
                         if (C_UID < 0) C_UID = 0;
                         else {
@@ -743,13 +741,13 @@ void Scene::LoadMeta(std::string filePath)
         }
         prevline = line;
         if (insideMesh) {
-            // parsear clave: valor
+            // Parse key : value
             std::istringstream iss(line);
             std::string key;
             if (std::getline(iss, key, ':')) {
                 std::string value;
                 std::getline(iss, value);
-                // limpiar espacios
+                // Clean space between words
                 if (!value.empty() && value[0] == ' ') value.erase(0, 1);
 
                 if (key == "MeshRef") {

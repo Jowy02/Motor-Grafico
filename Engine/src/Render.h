@@ -55,16 +55,11 @@ public:
     gemotryMesh DrawFaceNormals(const GLfloat* vertices, const GLuint* indices, size_t indexCount, std::vector<float>& outLines); // Draw face normals
     gemotryMesh DrawVertexNormalsFromMesh(const float* vertices, size_t vertexCount, const std::vector<glm::vec3>& vertexNormals, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec3>& bitangents, std::vector<float>& outLines); // Draw vertex normals
   
-
     std::vector<glm::vec3> CalculateVertexNormalsPrueva(const GLfloat* vertices, const GLuint* indices, int vertexCount, int indexCount, float smoothingAngleDeg);
-
-
     std::pair<std::vector<glm::vec3>, std::vector<glm::vec3>> CalculateTangentsAndBitangents(  const GLfloat* vertices,  const GLuint* indices, const std::vector<glm::vec3>& vertexNormals ,int vertexCount, int indexCount);
  
-
     void InitRaycastData(GameObject& model, const GLfloat* vertices, int vertexCount, GLuint* indices, int indexCount);
     void InitRaycastDataSphere(GameObject& model, const std::vector<float>& vertices, const std::vector<unsigned int>& indices, int stride = 8);
-
 
     void OrderModels();
     void FrustumModels();

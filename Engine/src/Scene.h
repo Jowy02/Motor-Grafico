@@ -46,18 +46,19 @@ public:
     bool RayIntersectsAABB(const LineSegment& ray, const glm::vec3& min, const glm::vec3& max, float& t);
     void Raycast(const LineSegment& ray);
     void RaycastFromMouse(int mouseX, int mouseY);
-
     void SelectObject(GameObject* obj);
 
-    void SaveMesh(std::string filePath, GameObject model);
-    void SaveMeta(int meshesId, std::string filePath);
-
-    void LoadMeta(std::string filePath);
-    bool LoadMesh(std::string filePath);
-
+    // Scene load and Save
     void SaveScene(std::string filePath);
     void LoadScene(std::string filePath);
     void ClearScene();
+
+    // --- Custom file creators (META & MESH) ---
+    void SaveMesh(std::string filePath, GameObject model);
+    void SaveMeta(int meshesId, std::string filePath);
+    void LoadMeta(std::string filePath);
+    bool LoadMesh(std::string filePath);
+
     // --- Scene content ---
     std::vector<GameObject> models;
     std::vector<Camera*> cameras;

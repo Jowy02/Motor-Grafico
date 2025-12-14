@@ -91,12 +91,8 @@ bool Menus::PreUpdate()
 
 bool Menus::Update(float dt)
 {
- 
-    // Dock Space
     BuildDockSpace();
     MainMenu();
-
-    //DrawSimulationToolbar();
 
     CalculateFPS(dt);
 
@@ -256,7 +252,7 @@ void Menus::DrawSimulationToolbar()
         Application::GetInstance().time->SetTimeScale(ts);
     }
 
-    // Mostrar estados y relojes
+    // Show states and clocks
 
     ImGui::Begin("Debug");
     ImGui::Text("State: %s", (currentState == GameState::STOPPED) ? "STOPPED" : (currentState == GameState::RUNNING ? "RUNNING" : "PAUSED"));
@@ -410,7 +406,7 @@ void Menus::DrawGameObjectNode(GameObject* obj)
     // Tree node
     bool nodeOpen = ImGui::TreeNodeEx((void*)obj, flags, "%s", obj->name.c_str());
 
-    // Selección con click
+    // Selection by click
     if (ImGui::IsItemClicked())
     {
         if (selectedObj != obj) { 
@@ -423,7 +419,7 @@ void Menus::DrawGameObjectNode(GameObject* obj)
 
     if (ImGui::BeginDragDropSource())
     {
-        //Ppuntero al objeto arrastrado
+        // Pointer to the dragged object
         ImGui::SetDragDropPayload("OBJECT_NODE", &obj, sizeof(obj));
         ImGui::Text("Mover %s", obj->name.c_str());
         ImGui::EndDragDropSource();
@@ -448,7 +444,7 @@ void Menus::DrawGameObjectNode(GameObject* obj)
     
     if (nodeOpen)
     {
-        // Dibujar hijos del objeto
+        // Draw children of the object
         for (auto& child : obj->childrenID)
             DrawGameObjectNode(&Application::GetInstance().scene.get()->models[child]);
 
@@ -457,7 +453,7 @@ void Menus::DrawGameObjectNode(GameObject* obj)
 }
 void  Menus::DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels)
 {
-    // Eliminar recursivamente los hijos
+    // Recursively delete children
     for (int childId : obj->childrenID)
     {
         auto it = std::find_if(sceneModels.begin(), sceneModels.end(),
@@ -469,7 +465,7 @@ void  Menus::DeleteObject(GameObject* obj, std::vector<GameObject>& sceneModels)
         }
     }
     selectedObj->CleanUpChilds();
-    // Eliminar el propio objeto
+    // Delete Object
     sceneModels.erase(std::remove_if(sceneModels.begin(), sceneModels.end(),
         [&](const GameObject& m) { return m.modelId == obj->modelId; }),
         sceneModels.end());
@@ -577,7 +573,7 @@ void Menus::DrawInspector()
 
         if (ImGui::DragFloat3("Rotation", &eulerAngles.x, 0.5f))
         {
-            // Convertir euler a orientación de la cámara
+            // Convert euler to camera orientation
             float pitch = glm::radians(eulerAngles.x);
             float yaw = glm::radians(eulerAngles.y);
 
@@ -686,7 +682,7 @@ Texture* Menus::GetLoadedTexture(const std::string& path)
             return tex; 
         }
     }
-    return nullptr; // No encontrada.
+    return nullptr; // Not found.
 }
 void Menus::SaveLoad()
 {
@@ -786,13 +782,13 @@ void Menus::DrawResourceManager()
     if (ImGui::CollapsingHeader("Fbx", ImGuiTreeNodeFlags_DefaultOpen)) {
         if (ImGui::BeginTable("FbxTable", 8)) {
 
-            for (int i = 0; i < fbxFiles.size(); i++) {
+            for (int i = 0; i < metaFiles.size(); i++) {
                 ImGui::TableNextColumn();
 
                 ImGui::BeginGroup();
-                if (ImGui::Selectable(fbxFiles[i].c_str(), selectedResourcePath == fbxFiles[i]))
+                if (ImGui::Selectable(metaFiles[i].c_str(), selectedResourcePath == metaFiles[i]))
                 {
-                    selectedResourcePath = fbxFiles[i];
+                    selectedResourcePath = metaFiles[i];
                     selectedResourceType = ResourceType::Fbx;
                 }
                 ImGui::EndGroup();
@@ -802,8 +798,8 @@ void Menus::DrawResourceManager()
                     dragFbx = i;
                     dragedFbx = true;
 
-                    ImGui::Text("Arrastrando %s", fbxFiles[dragFbx].c_str());
-                    ImGui::SetDragDropPayload("TEXTURE_POINTER", &fbxFiles[dragFbx], fbxFiles[dragFbx].size() + 1);
+                    ImGui::Text("Arrastrando %s", metaFiles[dragFbx].c_str());
+                    ImGui::SetDragDropPayload("TEXTURE_POINTER", &metaFiles[dragFbx], metaFiles[dragFbx].size() + 1);
 
                     ImGui::EndDragDropSource();
 
@@ -811,7 +807,7 @@ void Menus::DrawResourceManager()
                 if (!ImGui::GetDragDropPayload() && dragedFbx)
                 {
                     selectedObj = NULL;
-                    Application::GetInstance().scene->LoadMeta(fbxFiles[dragFbx]);
+                    Application::GetInstance().scene->LoadMeta(metaFiles[dragFbx]);
                     dragedFbx = false;
                 }
             }

@@ -28,7 +28,8 @@ bool ResourceManager::Awake()
 bool ResourceManager::Start()
 {
     LoadResource();
-    //Application::GetInstance().scene.get()->LoadMeta("../Library/Meta/street2.meta");
+    //Once its all upload Street enviroment load using the meta file
+    Application::GetInstance().scene.get()->LoadMeta("../Library/Meta/street2.meta");
     return true;
 }
 
@@ -45,12 +46,14 @@ bool ResourceManager::Update(float dt)
 
 void ResourceManager::LoadResource()
 {
+    //Check every folder (MESH/TEXTURE/META)
     CheckMeshFiles();
     CheckTextureFiles();
     CheckMetaFiles();
 
-    Application::GetInstance().menus.get()->fbxFiles.clear();
-    Application::GetInstance().menus.get()->fbxFiles = metaFiles;
+    //Update menu reference 
+    Application::GetInstance().menus.get()->metaFiles.clear();
+    Application::GetInstance().menus.get()->metaFiles = metaFiles;
 
     Application::GetInstance().menus.get()->textures.clear();
     Application::GetInstance().menus.get()->textures = textures;
@@ -152,6 +155,7 @@ void ResourceManager::CheckMetaFiles()
 
 void ResourceManager::LoadMeshResource()
 {
+    //Check all directions saved on meshesFiles and upload all component mesh
     for (int i = Meshes.size();i < meshesFiles.size();i++)
     {
         GameObject NewModel("NULL");
@@ -206,7 +210,7 @@ void ResourceManager::LoadMeshResource()
                         tempMesh->mesh.texture = getTextureResource(value);
                     }
                     else if (key == "Indices") {
-                        // leer línea completa con índices separados por '|'
+                        //Read entire line with indexes separated by '|'
                         std::stringstream ss(value);
                         std::string token;
                         tempMesh->mesh.indices.clear();
@@ -216,7 +220,7 @@ void ResourceManager::LoadMeshResource()
                         }
                     }
                     else if (key == "Vertices") {
-                        // leer línea completa con índices separados por '|'
+                        // Read entire line with vertex separated by '|'
                         std::stringstream ss(value);
                         std::string token;
                         tempMesh->mesh.vertices.clear();
@@ -245,7 +249,7 @@ void ResourceManager::LoadMeshResource()
                     }
                 }
             }
-            prevLine = line; // guarda la línea anterior para saber si era "Mesh:"
+            prevLine = line; // Save last line to check the object type
         }
     }
 }
@@ -295,8 +299,8 @@ void ResourceManager::deleteResource(Type type, std::string path)
     {
         metaFiles.erase(std::remove(metaFiles.begin(), metaFiles.end(), getMetaResource(path)), metaFiles.end());
         DeleteFileA(path.c_str());
-        Application::GetInstance().menus.get()->fbxFiles.clear();
-        Application::GetInstance().menus.get()->fbxFiles = metaFiles;
+        Application::GetInstance().menus.get()->metaFiles.clear();
+        Application::GetInstance().menus.get()->metaFiles = metaFiles;
     }
 }
 

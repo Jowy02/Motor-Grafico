@@ -104,8 +104,10 @@ void GameObject::UpdateTransform()
 
     myTransform-> GenerateLocalMatrix();
 
+    //Check if this object is a child
     if (isChild)
     {
+        //If this object is a child aplly the parent transform
         myTransform->transformMatrix = Application::GetInstance().scene->models[ParentID].myTransform->transformMatrix * myTransform->localMatrix;
         parentTransform = false;
     }
@@ -118,14 +120,14 @@ void GameObject::UpdateTransform()
     ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(myTransform->transformMatrix), translation, rotationDeg, scaleArr);
     myTransform->BoundingBox(translation, rotationDeg, scaleArr);
 
-    // Actualiza posiciones mundiales
+    // Update world positions
    
     myMesh->mesh.positionsWorld.resize(myMesh->mesh.positionsLocal.size());
     for (size_t i = 0; i < myMesh->mesh.positionsLocal.size(); ++i) {
         glm::vec4 p = myTransform->transformMatrix * glm::vec4(myMesh->mesh.positionsLocal[i], 1.0f);
         myMesh->mesh.positionsWorld[i] = glm::vec3(p);
     }
-    // Actualiza AABB mundo usando los bounds locales (funci�n ya existente)
+    //Update AABB world using local bounds
     myTransform->UpdateAABB();
 }
 
@@ -138,11 +140,8 @@ void GameObject::loadModel(const std::string& path)
     name = name.substr(0, name.find_last_of('.'));
 
     modelPath = "../Library/Meshes/" + name + ".mesh";
-
-    //processNode(scene->mRootNode, scene);
     Application::GetInstance().mesh.get()->loadModel(path, this);
 
-    //processOthers(scene);
     myTransform->center = (myTransform->minAABB + myTransform->maxAABB) * 0.5f;
     myTransform->size = myTransform->maxAABB - myTransform->minAABB;
 
@@ -213,7 +212,7 @@ void  GameObject::eraseChild(int childId)
 
 void GameObject::CleanUpChilds()
 {
-    // Hacer copia de IDs para iterar sin invalidar
+    // Make copy of IDs to iterate without invalidating
     std::vector<int> childrenCopy = childrenID;
 
     for (int childId : childrenCopy)
@@ -223,10 +222,10 @@ void GameObject::CleanUpChilds()
 
         GameObject& child = Application::GetInstance().scene->models[childId];
 
-        // Recursivamente limpiar hijos
+        // Recursively clear children
         child.CleanUpChilds();
 
-        // Limpiar buffers y texturas
+        // Clean buffers and textures
         child.CleanUp();
     }
 

@@ -57,13 +57,10 @@ public:
 
     void DrawSimulationToolbar();
 
-    std::vector<std::string> fbxFiles;
-    std::vector<std::string> txtFiles;
-    std::vector<std::string> meshesFiles;
-    std::vector<Texture*> textures;           // Loaded models
+    std::vector<std::string> metaFiles;          // Loaded meta ref
+    std::vector<std::string> meshesFiles;       // Loaded meshes ref
+    std::vector<Texture*> textures;             // Loaded Textures ref
 
-
-   // std::vector<Camera*> cameras;
     Camera* selectedCamera = nullptr;
     std::string selectedResourcePath;
 
@@ -92,6 +89,7 @@ private:
 
     bool initialization_exist = false;
 
+    // Resource manager variables 
     bool draged = false;
     int dragTexture = 0;
 
@@ -103,8 +101,6 @@ private:
 
     enum class ResourceType { None, Texture, Mesh, Fbx };
     ResourceType selectedResourceType = ResourceType::None;
-    //ComponentMesh* selectedMesh = nullptr;
-
     int selectedResourceIndex = -1;
 
 };

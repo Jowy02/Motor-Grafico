@@ -31,6 +31,8 @@ public:
 	ModelMesh mesh;
 
 	std::string filenameMesh;
+
+	//Mesh import variables
 	glm::vec3 minAABB;
 	glm::vec3 maxAABB;
 

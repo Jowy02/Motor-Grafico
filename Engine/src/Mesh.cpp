@@ -195,7 +195,7 @@ void Mesh::processMesh(aiMesh* mesh, const aiScene* scene)
         vertices.push_back(vertex.y);
         vertices.push_back(vertex.z);
 
-        // Normal (solo si existen)
+        // Normal
         if (mesh->HasNormals()) {
             vertices.push_back(mesh->mNormals[i].x);
             vertices.push_back(mesh->mNormals[i].y);

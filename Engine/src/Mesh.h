@@ -88,7 +88,6 @@ public:
 private:
     // --- Internal data ---
     std::string directory;
-    //GameObject* Obj = nullptr;
     
     // --- Extra textures ---
     Texture* blackWhite = nullptr;
@@ -97,7 +96,6 @@ private:
     // --- Model loading (Assimp) ---
     void processNode(aiNode* node, const aiScene* scene);
     void processMesh(aiMesh* mesh, const aiScene* scene);
-
     void processOthers(const aiScene* scene);
     std::vector<aiMesh*> otherMesh;
     int objNum = 0;

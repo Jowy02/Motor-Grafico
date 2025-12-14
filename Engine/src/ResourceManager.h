@@ -37,16 +37,15 @@ public:
     Texture* getTextureResource(std::string path);
     std::string getMetaResource(std::string path);
 
-    std::vector<ComponentMesh*> Meshes;           // Loaded Textures
+    std::vector<ComponentMesh*> Meshes;         // Loaded Meshes
 
 private:
-    std::vector<Texture*> textures;           // Loaded Textures
-    std::vector<std::string> meshesFiles;
-    std::vector<std::string> metaFiles;
+    std::vector<Texture*> textures;             // Loaded Textures
+    std::vector<std::string> meshesFiles;       // Loaded Meshes filepath as id controller
+    std::vector<std::string> metaFiles;         // Loaded Meta files
 
-    void LoadMeshResource();
-
-    void CheckMeshFiles();
-    void CheckTextureFiles();
-    void CheckMetaFiles();
+    void LoadMeshResource();                    // Load all component mesh or add new meshes 
+    void CheckMeshFiles();                      // Check Mesh folder 
+    void CheckTextureFiles();                   // Check Texture folder 
+    void CheckMetaFiles();                      // Check Meta folder
 };
