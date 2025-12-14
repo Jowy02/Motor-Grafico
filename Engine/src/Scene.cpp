@@ -782,7 +782,7 @@ bool Scene::LoadMesh(std::string filePath)
 
         if (!NewModel.myMesh->importTexture)
             NewModel.actualTexture = NULL;
-
+        if(NewModel.actualTexture != NULL)NewModel.texturePath = NewModel.actualTexture->textPath;
         NewModel.modelId = (int)models.size();
 
         NewModel.UpdateTransform();

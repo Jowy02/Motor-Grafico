@@ -143,7 +143,6 @@ void SimulationController::LoadInitialSceneState()
     for (auto& model : currentScene->models)
     {
         model.CleanUpChilds();
-        model.CleanUp();
     }
     currentScene->models.clear();
 
